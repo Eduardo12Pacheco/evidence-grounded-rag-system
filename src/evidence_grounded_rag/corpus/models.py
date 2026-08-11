@@ -8,7 +8,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from evidence_grounded_rag.corpus.ids import derive_chunk_id, synthetic_location
+from evidence_grounded_rag.corpus.ids import (
+    derive_chunk_id,
+    local_location,
+    synthetic_location,
+)
+from evidence_grounded_rag.corpus.normalize import sha256_hex
 
 
 @dataclass(frozen=True)
@@ -21,6 +26,7 @@ class Chunk:
     text: str
     location: str
     corpus_version: str
+    checksum_sha256: str = ""
 
 
 @dataclass(frozen=True)
@@ -97,6 +103,34 @@ def build_chunks(
     texts: list[str],
 ) -> tuple[Chunk, ...]:
     """Build chunk records with derived IDs and stable ``synthetic://`` locations."""
+    return _build_chunks_with_location(
+        corpus_id, corpus_version, document_id, texts, synthetic_location
+    )
+
+
+def build_local_chunks(
+    corpus_id: str,
+    corpus_version: str,
+    document_id: str,
+    texts: list[str],
+) -> tuple[Chunk, ...]:
+    """Build chunk records with derived IDs and stable ``local://`` locations.
+
+    Used by the real-local corpus boundary. Locations use the ``local://``
+    scheme so real-local content is never mistaken for synthetic fixtures.
+    """
+    return _build_chunks_with_location(
+        corpus_id, corpus_version, document_id, texts, local_location
+    )
+
+
+def _build_chunks_with_location(
+    corpus_id: str,
+    corpus_version: str,
+    document_id: str,
+    texts: list[str],
+    location_fn,
+) -> tuple[Chunk, ...]:
     chunks: list[Chunk] = []
     for seq, text in enumerate(texts):
         chunks.append(
@@ -105,8 +139,9 @@ def build_chunks(
                 document_id=document_id,
                 seq=seq,
                 text=text,
-                location=synthetic_location(corpus_id, document_id, seq),
+                location=location_fn(corpus_id, document_id, seq),
                 corpus_version=corpus_version,
+                checksum_sha256=sha256_hex(text),
             )
         )
     return tuple(chunks)

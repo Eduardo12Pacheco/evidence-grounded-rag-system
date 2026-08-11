@@ -13,6 +13,11 @@ PACKAGE_VERSION = "0.1.0"
 #: Version of the corpus manifest schema this implementation understands.
 CORPUS_FORMAT_VERSION = "1.0"
 
+#: Version of the source-manifest schema used by the corpus audit boundary
+#: (the bounded, explicitly approved real-local corpus). This is a separate
+#: schema from ``CORPUS_FORMAT_VERSION``, which describes synthetic fixtures.
+SOURCE_MANIFEST_VERSION = "1.0"
+
 #: Version of the deterministic text normalization used for checksums and
 #: exact excerpt comparison.
 NORMALIZATION_VERSION = "v1"

@@ -45,3 +45,16 @@ def sha256_hex(text: str) -> str:
     import hashlib
 
     return hashlib.sha256(normalize_text(text).encode("utf-8")).hexdigest()
+
+
+def sha256_bytes(data: bytes) -> str:
+    """Return the lowercase SHA-256 hex digest of the exact raw bytes.
+
+    Used by the source-manifest boundary, where checksums must describe the
+    byte-exact captured file, NOT the normalized text. ``sha256_hex`` and
+    ``sha256_bytes`` deliberately differ: raw bytes preserve trailing
+    whitespace/newlines that normalization removes.
+    """
+    import hashlib
+
+    return hashlib.sha256(data).hexdigest()

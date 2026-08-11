@@ -1,0 +1,41 @@
+{
+  "manifest_version": "1.0",
+  "corpus_id": "python-docs-3.12.13",
+  "corpus_version": "1.0.0",
+  "status": "approved-for-local-development",
+  "publisher": "Python Software Foundation",
+  "official_docs_url": "https://docs.python.org/3.12/",
+  "source_url": "https://github.com/python/cpython/tree/v3.12.13/Doc",
+  "license": {
+    "name": "Python Software Foundation License Version 2",
+    "version": "2",
+    "url": "https://docs.python.org/3.12/license.html",
+    "url_psf": "https://www.python.org/psf/license/",
+    "evidence_excerpt": "Section 2: \"PSF hereby grants Licensee a nonexclusive, royalty-free, world-wide license to reproduce, analyze, test, perform and/or display publicly, prepare derivative works, distribute, and otherwise use Python alone or in any derivative version, provided, however, that PSF's License Agreement and PSF's notice of copyright ... are retained in Python alone or in any derivative version prepared by Licensee.\" Section 3: \"In the event Licensee prepares a derivative work that is based on or incorporates Python or any part thereof, and wants to make the derivative work available to others ... Licensee hereby agrees to include in any such work a brief summary of the changes made to Python.\""
+  },
+  "revision": "3bb231a6a5dc02b95658877318bf61501a7209e9",
+  "revision_tag": "v3.12.13",
+  "access_date": "2026-08-11",
+  "acquisition_method": "commit-pinned raw GitHub URLs (https://raw.githubusercontent.com/python/cpython/<commit>/<path>); no mirror, no mutable branch",
+  "expected_files": [
+    {
+      "path": "Doc/tutorial/introduction.rst",
+      "size": 18959,
+      "sha256": "db919b049a48e7acd17869e2cabeec71060f552fa041a99fc3bf527b7da36a25"
+    },
+    {
+      "path": "Doc/library/functions.rst",
+      "size": 91745,
+      "sha256": "963d7143ba762daba0675a6cb3b2b470fd374f2110e92a678f4f28ee85bd7048"
+    },
+    {
+      "path": "Doc/reference/lexical_analysis.rst",
+      "size": 39844,
+      "sha256": "001f1f19e0038d09dd99ed6a1bf2248220707730360abccdf11f65a89981c2e6"
+    }
+  ],
+  "document_count": 3,
+  "redistribution_status": "not-redistributed",
+  "privacy_status": "no-private-content-detected",
+  "verification_timestamp": "2026-08-11T23:17:22Z"
+}

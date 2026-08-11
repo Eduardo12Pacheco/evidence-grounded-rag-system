@@ -35,6 +35,24 @@ The demo runs ONLY on the committed synthetic fixture corpus
 no credentials, and never touches an unlicensed corpus. The real-corpus gate
 is shown as BLOCKED.
 
+## Real-local corpus is NOT part of the demo
+
+The approved real-local corpus (Python 3.12.13 documentation,
+`approved-for-local-development`) is intentionally absent from the demo. It is
+an explicit, opt-in, local-development boundary exercised only by the offline
+scripts — the demo, the default pipeline, and synthetic evaluation are
+unchanged and remain synthetic-only:
+
+```bash
+uv run python scripts/acquire_corpus.py \
+    # writes data/raw/python-docs-3.12.13/ (gitignored) + the source manifest
+uv run python scripts/verify_corpus.py --manifest data/manifests/corpus-source-v1.0.0.json
+    # offline verification of manifest, revision, files, sizes, SHA-256, privacy
+```
+
+See `docs/corpus-license-contract.md` for the license decision and why Gob.ec
+is not used, and `README.md` for the synthetic / real-local / blocked modes.
+
 ## Run book
 
 ```bash

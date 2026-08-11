@@ -28,6 +28,16 @@ def synthetic_location(corpus_id: str, document_id: str, seq: int) -> str:
     return f"synthetic://{corpus_id}/{document_id}/chunk/{seq}"
 
 
+def local_location(corpus_id: str, document_id: str, seq: int) -> str:
+    """Return the stable ``local://`` location for a locally derived chunk.
+
+    Real-local corpora are explicitly local-only: the ``local://`` scheme keeps
+    them distinct from ``synthetic://`` fixtures and never presents real
+    content as an authorized external source.
+    """
+    return f"local://{corpus_id}/{document_id}/chunk/{seq}"
+
+
 def validate_document_id(document_id: str) -> None:
     if not isinstance(document_id, str) or not _DOC_ID_RE.match(document_id):
         raise ValueError(f"invalid document id: {document_id!r}")

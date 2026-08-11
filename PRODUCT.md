@@ -1,6 +1,6 @@
 # Product — evidence-grounded-rag-system
 
-Status: **scaffold / implementation not started**
+Status: **implementation in progress — offline synthetic-fixture evaluation only.**
 
 ## Platform
 
@@ -22,8 +22,9 @@ support them, and the system says "I don't know" when evidence is missing.
 ## What it is NOT yet
 
 - Not a search engine, no API, no production deployment.
-- Not using any real corpus (none is licensed yet).
-- Not claiming any accuracy number.
+- Not using any real corpus (none is licensed yet); only synthetic fixtures.
+- Not claiming any accuracy number for real content — all committed metrics
+  describe synthetic fixtures only.
 
 ## Success metric (product)
 

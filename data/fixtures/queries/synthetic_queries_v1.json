@@ -1,0 +1,129 @@
+{
+  "query_set_id": "synthetic-queries-v1",
+  "query_set_version": "1.0.0",
+  "corpus_id": "synthetic-fixtures",
+  "corpus_version": "1.0.0",
+  "synthetic": true,
+  "queries": [
+    {
+      "query_id": "q-001",
+      "category": "numeric",
+      "question": "How much is the cost of a public event permit?",
+      "answerable": true,
+      "expected_state": "answered",
+      "expected_reason": null,
+      "relevance": [
+        { "chunk_id": "doc-aurora-park-permits::0", "grade": 2 }
+      ]
+    },
+    {
+      "query_id": "q-002",
+      "category": "answerable",
+      "question": "What must a permit application include?",
+      "answerable": true,
+      "expected_state": "answered",
+      "expected_reason": null,
+      "relevance": [
+        { "chunk_id": "doc-aurora-park-permits::1", "grade": 2 }
+      ]
+    },
+    {
+      "query_id": "q-003",
+      "category": "citation_boundary",
+      "question": "What is the review time for permit requests?",
+      "answerable": true,
+      "expected_state": "answered",
+      "expected_reason": null,
+      "relevance": [
+        { "chunk_id": "doc-aurora-park-permits::2", "grade": 2 }
+      ]
+    },
+    {
+      "query_id": "q-004",
+      "category": "multi_passage",
+      "question": "What must a permit application include and how long does the review take?",
+      "answerable": true,
+      "expected_state": "answered",
+      "expected_reason": null,
+      "relevance": [
+        { "chunk_id": "doc-aurora-park-permits::1", "grade": 2 },
+        { "chunk_id": "doc-aurora-park-permits::2", "grade": 2 }
+      ]
+    },
+    {
+      "query_id": "q-005",
+      "category": "answerable",
+      "question": "Is access to the East River trail free?",
+      "answerable": true,
+      "expected_state": "answered",
+      "expected_reason": null,
+      "relevance": [
+        { "chunk_id": "doc-east-river-trail::0", "grade": 2 }
+      ]
+    },
+    {
+      "query_id": "q-006",
+      "category": "answerable",
+      "question": "When is the Central Library open on Saturday?",
+      "answerable": true,
+      "expected_state": "answered",
+      "expected_reason": null,
+      "relevance": [
+        { "chunk_id": "doc-central-library::1", "grade": 2 }
+      ]
+    },
+    {
+      "query_id": "q-007",
+      "category": "conflicting",
+      "question": "How much is the special event fee per day?",
+      "answerable": false,
+      "expected_state": "abstained",
+      "expected_reason": "conflicting_evidence",
+      "relevance": [
+        { "chunk_id": "doc-event-fee-2024::0", "grade": 2 },
+        { "chunk_id": "doc-event-fee-2025::0", "grade": 2 }
+      ]
+    },
+    {
+      "query_id": "q-008",
+      "category": "ambiguous",
+      "question": "When is the pool open?",
+      "answerable": false,
+      "expected_state": "abstained",
+      "expected_reason": "insufficient_evidence",
+      "relevance": [
+        { "chunk_id": "doc-aurora-pools::0", "grade": 1 },
+        { "chunk_id": "doc-aurora-pools::1", "grade": 1 }
+      ]
+    },
+    {
+      "query_id": "q-009",
+      "category": "unanswerable",
+      "question": "What is the fine for littering in Millbrook?",
+      "answerable": false,
+      "expected_state": "abstained",
+      "expected_reason": "unsupported_query",
+      "relevance": []
+    },
+    {
+      "query_id": "q-010",
+      "category": "unanswerable",
+      "question": "What are the opening hours of the Regional Museum?",
+      "answerable": false,
+      "expected_state": "abstained",
+      "expected_reason": "unsupported_query",
+      "relevance": []
+    },
+    {
+      "query_id": "q-011",
+      "category": "answerable",
+      "question": "When is the East River trail closed?",
+      "answerable": true,
+      "expected_state": "answered",
+      "expected_reason": null,
+      "relevance": [
+        { "chunk_id": "doc-east-river-trail::1", "grade": 2 }
+      ]
+    }
+  ]
+}

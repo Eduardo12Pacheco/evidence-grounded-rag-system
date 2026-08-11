@@ -1,0 +1,145 @@
+{
+  "manifest": {
+    "manifest_id": "synthetic-fixtures-2026-08-11",
+    "format_version": "1.0",
+    "corpus_id": "synthetic-fixtures",
+    "corpus_version": "1.0.0",
+    "synthetic": true,
+    "real_corpus": false,
+    "provenance": "project-generated-synthetic",
+    "provenance_detail": "Hand-authored fictional content about the fictional Aurora City. No real institution, regulation, person, or dataset is represented.",
+    "license": {
+      "status": "approved",
+      "terms": "Project-generated synthetic content authored for this repository. Covered by the repository MIT license as original content. Not derived from any third-party source.",
+      "redistribution": "Allowed within this repository as committed fixtures only."
+    },
+    "real_corpus_gate": {
+      "blocked": true,
+      "blocker": "No external corpus license has been independently confirmed. The Gob.ec corpus is explicitly unauthorized: its 'Creative Commons Attribution 4.0 International' label conflicts with the linked by/3.0/ec terms, and the license discrepancy is unresolved. Real-corpus ingestion stays blocked until a written license confirmation is obtained and recorded."
+    }
+  },
+  "documents": [
+    {
+      "doc_id": "doc-aurora-park-permits",
+      "title": "Aurora City Park Permits Guide",
+      "version": "1.0.0",
+      "captured_at": "2026-08-11",
+      "source_name": "project-generated-synthetic",
+      "source_url": null,
+      "attribution": "Synthetic guide describing a fictional city's park permit rules.",
+      "license": "Project-generated synthetic content; covered by this repository's MIT license as original content.",
+      "chunks": [
+        {
+          "seq": 0,
+          "text": "The cost of a public event permit in Aurora Park is 120 dollars per day."
+        },
+        {
+          "seq": 1,
+          "text": "A permit application must include a signed code of conduct and a contact phone number."
+        },
+        {
+          "seq": 2,
+          "text": "Permit requests have a review time of up to 10 working days after submission."
+        }
+      ],
+      "checksum_sha256": "7d4716ef6e2ff626e1620b4c900e68d61741ff325577761685aac75433c7eb2f"
+    },
+    {
+      "doc_id": "doc-east-river-trail",
+      "title": "East River Trail Access Rules",
+      "version": "1.0.0",
+      "captured_at": "2026-08-11",
+      "source_name": "project-generated-synthetic",
+      "source_url": null,
+      "attribution": "Synthetic access rules for a fictional river trail.",
+      "license": "Project-generated synthetic content; covered by this repository's MIT license as original content.",
+      "chunks": [
+        {
+          "seq": 0,
+          "text": "Access to the East River trail is free for residents between sunrise and sunset."
+        },
+        {
+          "seq": 1,
+          "text": "The East River trail is closed during flood season in April."
+        }
+      ],
+      "checksum_sha256": "5637b8c34eb537a418d224b0955ba95ce438ccf09c014dc729b3208286e981ca"
+    },
+    {
+      "doc_id": "doc-central-library",
+      "title": "Central Library Opening Hours",
+      "version": "1.0.0",
+      "captured_at": "2026-08-11",
+      "source_name": "project-generated-synthetic",
+      "source_url": null,
+      "attribution": "Synthetic opening hours for a fictional public library.",
+      "license": "Project-generated synthetic content; covered by this repository's MIT license as original content.",
+      "chunks": [
+        {
+          "seq": 0,
+          "text": "The Central Library is open Monday through Friday from 8 in the morning to 8 in the evening."
+        },
+        {
+          "seq": 1,
+          "text": "The Central Library is open Saturday from 9 in the morning to 5 in the evening."
+        }
+      ],
+      "checksum_sha256": "be10579fde591436ac722c4e1b5977596e17929c480096259e8a1b1889f84810"
+    },
+    {
+      "doc_id": "doc-event-fee-2024",
+      "title": "Special Event Fee Schedule (2024 Edition)",
+      "version": "1.0.0",
+      "captured_at": "2026-08-11",
+      "source_name": "project-generated-synthetic",
+      "source_url": null,
+      "attribution": "Synthetic fee schedule edition 2024.",
+      "license": "Project-generated synthetic content; covered by this repository's MIT license as original content.",
+      "chunks": [
+        {
+          "seq": 0,
+          "text": "The special event fee is 120 dollars per day."
+        }
+      ],
+      "checksum_sha256": "96d8fe9c962c6cab26c3144a47e29d053ee40f7b0270ddacd1ae050caed3d427"
+    },
+    {
+      "doc_id": "doc-event-fee-2025",
+      "title": "Special Event Fee Schedule (2025 Draft)",
+      "version": "1.0.0",
+      "captured_at": "2026-08-11",
+      "source_name": "project-generated-synthetic",
+      "source_url": null,
+      "attribution": "Synthetic fee schedule draft 2025; directly contradicts the 2024 edition.",
+      "license": "Project-generated synthetic content; covered by this repository's MIT license as original content.",
+      "chunks": [
+        {
+          "seq": 0,
+          "text": "The special event fee is 50 dollars per day."
+        }
+      ],
+      "checksum_sha256": "5eafaf16221a7e267f8630736887e59d4c6f440904496fc65da3af989768276c"
+    },
+    {
+      "doc_id": "doc-aurora-pools",
+      "title": "Aurora City Pools Opening Season",
+      "version": "1.0.0",
+      "captured_at": "2026-08-11",
+      "source_name": "project-generated-synthetic",
+      "source_url": null,
+      "attribution": "Synthetic opening season for two fictional city pools.",
+      "license": "Project-generated synthetic content; covered by this repository's MIT license as original content.",
+      "chunks": [
+        {
+          "seq": 0,
+          "text": "The North Pool is open from June to August."
+        },
+        {
+          "seq": 1,
+          "text": "The South Pool is open from June to August."
+        }
+      ],
+      "checksum_sha256": "87e420d241eb0c66e68fd65fda8ba672b52345d07d71227ddb48dec01f59cad9"
+    }
+  ]
+}

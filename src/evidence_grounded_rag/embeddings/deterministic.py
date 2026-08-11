@@ -1,0 +1,63 @@
+"""Deterministic, offline, non-semantic embedding for development and tests.
+
+This embedding is a hashed bag-of-words vector with signed hashing, L2
+normalized to a fixed dimension. It is fully deterministic (no model weights,
+no network, no randomness) and it is NOT semantic: it cannot generalize beyond
+token overlap. It exists so the dense pipeline and hybrid fusion can be
+exercised offline. ``semantic`` is False and every report labels it as such.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import math
+from collections.abc import Sequence
+
+from evidence_grounded_rag.embeddings.base import (
+    EmbeddingError,
+    EmbeddingProvider,
+    Vector,
+)
+from evidence_grounded_rag.text.tokenizer import tokenize
+from evidence_grounded_rag.versions import EMBEDDING_MODEL_ID
+
+#: "local"/"offline": no remote service, no weights, no downloads.
+MODE = "offline"
+DEFAULT_DIMENSION = 256
+
+
+class DeterministicEmbedding(EmbeddingProvider):
+    """Hashed bag-of-words embedding. Deterministic and explicitly non-semantic."""
+
+    model_id: str = EMBEDDING_MODEL_ID
+    mode: str = MODE
+    semantic: bool = False
+
+    def __init__(self, dimension: int = DEFAULT_DIMENSION) -> None:
+        if not isinstance(dimension, int) or dimension < 1:
+            raise EmbeddingError(f"dimension must be a positive int, got {dimension!r}")
+        self.dimension = dimension
+
+    def embed(self, texts: Sequence[str]) -> list[Vector]:
+        return [self.embed_one(text) for text in texts]
+
+    def embed_one(self, text: str) -> Vector:
+        counts: dict[str, int] = {}
+        for token in tokenize(text):
+            counts[token] = counts.get(token, 0) + 1
+        vector = [0.0] * self.dimension
+        for token, count in counts.items():
+            digest = hashlib.sha256(token.encode("utf-8")).digest()
+            index = int.from_bytes(digest[:8], "big") % self.dimension
+            sign = 1.0 if (digest[8] & 1) == 0 else -1.0
+            vector[index] += sign * count
+        norm = math.sqrt(sum(value * value for value in vector)) or 1.0
+        return tuple(value / norm for value in vector)
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "model_id": self.model_id,
+            "mode": self.mode,
+            "semantic": self.semantic,
+            "dimension": self.dimension,
+        }

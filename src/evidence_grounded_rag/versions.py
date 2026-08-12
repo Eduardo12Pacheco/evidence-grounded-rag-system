@@ -33,6 +33,16 @@ BM25_VERSION = "okapi-bm25-v1"
 #: embedding with no learned meaning.
 EMBEDDING_MODEL_ID = "deterministic-hashed-bow-v1"
 
+#: Identifier of the optional local semantic embedding model (BAAI bge-small-en
+#: v1.5). The model is NOT bundled and is never downloaded implicitly: it is
+#: acquired explicitly into a gitignored cache and verified against the
+#: committed model manifest before any semantic use.
+SEMANTIC_EMBEDDING_MODEL_ID = "BAAI/bge-small-en-v1.5"
+
+#: Version of the embedding-model manifest schema
+#: (data/manifests/embedding-model-v1.0.0.json).
+EMBEDDING_MODEL_MANIFEST_VERSION = "1.0"
+
 #: Version of the committed reciprocal rank fusion configuration.
 FUSION_VERSION = "rrf-v1"
 

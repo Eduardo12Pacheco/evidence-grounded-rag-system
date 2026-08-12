@@ -1,0 +1,2209 @@
+{
+  "configs": {
+    "bm25": {
+      "b": 0.75,
+      "k1": 1.5,
+      "tokenizer_version": "v1",
+      "version": "okapi-bm25-v1"
+    },
+    "fusion": {
+      "k": 60,
+      "version": "rrf-v1"
+    },
+    "min_fused_score": 0.01,
+    "mode_labels": {
+      "hash": "Deterministic hash embedding diagnostic \u2014 not semantic retrieval",
+      "hybrid": "Hybrid BM25 plus local semantic embeddings",
+      "semantic": "Local semantic embedding model",
+      "sparse": "BM25 sparse baseline"
+    },
+    "modes": [
+      "sparse",
+      "hash",
+      "semantic",
+      "hybrid"
+    ],
+    "top_k": 10,
+    "versions": {
+      "corpus_format": "1.0",
+      "normalization": "v1",
+      "package": "0.1.0",
+      "source_manifest": "1.0"
+    }
+  },
+  "corpus": {
+    "access_date": "2026-08-11",
+    "acquisition_method": "commit-pinned raw GitHub URLs (https://raw.githubusercontent.com/python/cpython/<commit>/<path>); no mirror, no mutable branch",
+    "canonical_checksum": "34fb94d40908a3f6f3f946b40333ad0cff9d619f1f1b4691d53e345ef4f7063e",
+    "chunk_count": 70,
+    "chunks_per_document": {
+      "doc-library-functions.rst": 42,
+      "doc-reference-lexical_analysis.rst": 19,
+      "doc-tutorial-introduction.rst": 9
+    },
+    "corpus_id": "python-docs-3.12.13",
+    "corpus_version": "1.0.0",
+    "document_count": 3,
+    "documents": [
+      {
+        "chunk_count": 42,
+        "doc_id": "doc-library-functions.rst",
+        "normalized_sha256": "8a0b886dcae024a36cd9d3a617658cce2c920c2a1045552f7f0f27c2ae43cad7",
+        "raw_sha256": "963d7143ba762daba0675a6cb3b2b470fd374f2110e92a678f4f28ee85bd7048",
+        "raw_size": 91745,
+        "source_path": "Doc/library/functions.rst"
+      },
+      {
+        "chunk_count": 19,
+        "doc_id": "doc-reference-lexical_analysis.rst",
+        "normalized_sha256": "831fc96e7b9087c11a9c068a5b0775aa2e78a29318622c7e0d669158f8cab5d6",
+        "raw_sha256": "001f1f19e0038d09dd99ed6a1bf2248220707730360abccdf11f65a89981c2e6",
+        "raw_size": 39844,
+        "source_path": "Doc/reference/lexical_analysis.rst"
+      },
+      {
+        "chunk_count": 9,
+        "doc_id": "doc-tutorial-introduction.rst",
+        "normalized_sha256": "ff687eeb82c54211d344f2991dd5aad4443c49e4948f21d8d98cf9e2b90242b4",
+        "raw_sha256": "db919b049a48e7acd17869e2cabeec71060f552fa041a99fc3bf527b7da36a25",
+        "raw_size": 18959,
+        "source_path": "Doc/tutorial/introduction.rst"
+      }
+    ],
+    "license": {
+      "name": "Python Software Foundation License Version 2",
+      "url": "https://docs.python.org/3.12/license.html",
+      "version": "2"
+    },
+    "manifest_id": "corpus-source-v1.0.0",
+    "manifest_version": "1.0",
+    "official_docs_url": "https://docs.python.org/3.12/",
+    "privacy_status": "no-private-content-detected",
+    "publisher": "Python Software Foundation",
+    "raw_files": [
+      {
+        "path": "Doc/tutorial/introduction.rst",
+        "sha256": "db919b049a48e7acd17869e2cabeec71060f552fa041a99fc3bf527b7da36a25",
+        "size": 18959
+      },
+      {
+        "path": "Doc/library/functions.rst",
+        "sha256": "963d7143ba762daba0675a6cb3b2b470fd374f2110e92a678f4f28ee85bd7048",
+        "size": 91745
+      },
+      {
+        "path": "Doc/reference/lexical_analysis.rst",
+        "sha256": "001f1f19e0038d09dd99ed6a1bf2248220707730360abccdf11f65a89981c2e6",
+        "size": 39844
+      }
+    ],
+    "redistribution_status": "not-redistributed",
+    "revision": "3bb231a6a5dc02b95658877318bf61501a7209e9",
+    "revision_tag": "v3.12.13",
+    "source_url": "https://github.com/python/cpython/tree/v3.12.13/Doc",
+    "status": "approved-for-local-development"
+  },
+  "deterministic_digest": "66cf48baa1a3e587b1b36d74397306d77451c90a6e9ce62efe8fb58db5928a6a",
+  "implementation_commit": "3c750985a280cd421e77524943af3bd388ac2c52",
+  "labels": {
+    "bounded_scope": "Bounded evaluation over three Python 3.12.13 documentation files and 70 chunks; it does not represent all Python documentation.",
+    "generation": "No generation in this module: retrieval evaluation only, no LLM.",
+    "hash_mode": "Deterministic hash embedding diagnostic \u2014 not semantic retrieval",
+    "hybrid_mode": "Hybrid BM25 plus local semantic embeddings",
+    "no_hash_fallback": "Semantic modes load the local model with local_files_only=True and refuse to run if it is unavailable; hash embeddings are never used under a semantic label.",
+    "retrieval_not_faithfulness": "Retrieval quality does not imply answer faithfulness; no generation or faithfulness metrics are reported here.",
+    "semantic_mode": "Local semantic embedding model",
+    "separate_report": "This report is separate from the synthetic report and from python-docs-real-evaluation-v1.0.0.json and is never combined with either.",
+    "sparse_mode": "BM25 sparse baseline"
+  },
+  "limitations": [
+    "Bounded evaluation over three Python 3.12.13 documentation files and 70 chunks; it does not represent all Python documentation and is NOT validation of Python documentation in general.",
+    "Retrieval metrics only. No generation and no faithfulness metrics are produced by this module; retrieval quality does not imply answer faithfulness.",
+    "No LLM is involved anywhere; generation is out of scope for this materializer.",
+    "The semantic model (BAAI/bge-small-en-v1.5, revision 5c38ec7c) is used locally with local_files_only=True from a gitignored cache; weights are never committed or redistributed. No benchmark numbers from the model card are claimed as project metrics, and no model is claimed to be universally best.",
+    "Semantic float inference is deterministic within one CPU thread and one process; cross-process float determinism is best-effort. Ranking stability is recorded from two runs in the same process.",
+    "Denominators are small (12 answerable and 6 non-answerable queries per mode); one query moves percentages by up to 8.3 percentage points.",
+    "Only wall-clock seconds per mode and process-wide peak RSS are recorded; per-mode memory was not measured. Runtime observations and the timestamp are runtime provenance and are excluded from the deterministic digest.",
+    "No chunk-level or claim-level text is stored in this report; only chunk ids, query ids, and metric numbers."
+  ],
+  "metrics": {
+    "hash": {
+      "groups": {
+        "abstain": {
+          "mrr": 0.0,
+          "ndcg@5": 0.0,
+          "no_result_rate": 0.0,
+          "num_queries": 2,
+          "num_with_relevance": 0,
+          "recall@1": 0.0,
+          "recall@10": 0.0,
+          "recall@5": 0.0,
+          "top10_hit_count": 0,
+          "top1_hit_count": 0,
+          "top5_hit_count": 0
+        },
+        "ambiguous": {
+          "mrr": 0.0,
+          "ndcg@5": 0.0,
+          "no_result_rate": 0.0,
+          "num_queries": 2,
+          "num_with_relevance": 0,
+          "recall@1": 0.0,
+          "recall@10": 0.0,
+          "recall@5": 0.0,
+          "top10_hit_count": 0,
+          "top1_hit_count": 0,
+          "top5_hit_count": 0
+        },
+        "answerable": {
+          "mrr": 0.4544973544973545,
+          "ndcg@5": 0.4289200283888675,
+          "no_result_rate": 0.0,
+          "num_queries": 12,
+          "num_with_relevance": 12,
+          "recall@1": 0.3333333333333333,
+          "recall@10": 0.8333333333333334,
+          "recall@5": 0.5416666666666666,
+          "top10_hit_count": 11,
+          "top1_hit_count": 4,
+          "top5_hit_count": 7
+        },
+        "multi_passage": {
+          "mrr": 0.38095238095238093,
+          "ndcg@5": 0.3333333333333333,
+          "no_result_rate": 0.0,
+          "num_queries": 3,
+          "num_with_relevance": 3,
+          "recall@1": 0.3333333333333333,
+          "recall@10": 0.5,
+          "recall@5": 0.3333333333333333,
+          "top10_hit_count": 2,
+          "top1_hit_count": 1,
+          "top5_hit_count": 1
+        },
+        "single_passage": {
+          "mrr": 0.16666666666666666,
+          "ndcg@5": 0.0,
+          "no_result_rate": 0.0,
+          "num_queries": 2,
+          "num_with_relevance": 2,
+          "recall@1": 0.0,
+          "recall@10": 1.0,
+          "recall@5": 0.0,
+          "top10_hit_count": 2,
+          "top1_hit_count": 0,
+          "top5_hit_count": 0
+        },
+        "unanswerable": {
+          "mrr": 0.0,
+          "ndcg@5": 0.0,
+          "no_result_rate": 0.0,
+          "num_queries": 2,
+          "num_with_relevance": 0,
+          "recall@1": 0.0,
+          "recall@10": 0.0,
+          "recall@5": 0.0,
+          "top10_hit_count": 0,
+          "top1_hit_count": 0,
+          "top5_hit_count": 0
+        }
+      },
+      "overall": {
+        "mrr": 0.4544973544973545,
+        "ndcg@5": 0.4289200283888675,
+        "no_result_rate": 0.0,
+        "num_queries": 18,
+        "num_with_relevance": 12,
+        "recall@1": 0.3333333333333333,
+        "recall@10": 0.8333333333333334,
+        "recall@5": 0.5416666666666666,
+        "top10_hit_count": 11,
+        "top1_hit_count": 4,
+        "top5_hit_count": 7
+      }
+    },
+    "hybrid": {
+      "groups": {
+        "abstain": {
+          "mrr": 0.0,
+          "ndcg@5": 0.0,
+          "no_result_rate": 0.0,
+          "num_queries": 2,
+          "num_with_relevance": 0,
+          "recall@1": 0.0,
+          "recall@10": 0.0,
+          "recall@5": 0.0,
+          "top10_hit_count": 0,
+          "top1_hit_count": 0,
+          "top5_hit_count": 0
+        },
+        "ambiguous": {
+          "mrr": 0.0,
+          "ndcg@5": 0.0,
+          "no_result_rate": 0.0,
+          "num_queries": 2,
+          "num_with_relevance": 0,
+          "recall@1": 0.0,
+          "recall@10": 0.0,
+          "recall@5": 0.0,
+          "top10_hit_count": 0,
+          "top1_hit_count": 0,
+          "top5_hit_count": 0
+        },
+        "answerable": {
+          "mrr": 0.7777777777777778,
+          "ndcg@5": 0.7967741810315813,
+          "no_result_rate": 0.0,
+          "num_queries": 12,
+          "num_with_relevance": 12,
+          "recall@1": 0.625,
+          "recall@10": 0.9583333333333334,
+          "recall@5": 0.9166666666666666,
+          "top10_hit_count": 12,
+          "top1_hit_count": 8,
+          "top5_hit_count": 11
+        },
+        "multi_passage": {
+          "mrr": 0.5,
+          "ndcg@5": 0.5235472396517734,
+          "no_result_rate": 0.0,
+          "num_queries": 3,
+          "num_with_relevance": 3,
+          "recall@1": 0.3333333333333333,
+          "recall@10": 0.8333333333333334,
+          "recall@5": 0.6666666666666666,
+          "top10_hit_count": 3,
+          "top1_hit_count": 1,
+          "top5_hit_count": 2
+        },
+        "single_passage": {
+          "mrr": 0.6666666666666666,
+          "ndcg@5": 0.75,
+          "no_result_rate": 0.0,
+          "num_queries": 2,
+          "num_with_relevance": 2,
+          "recall@1": 0.5,
+          "recall@10": 1.0,
+          "recall@5": 1.0,
+          "top10_hit_count": 2,
+          "top1_hit_count": 1,
+          "top5_hit_count": 2
+        },
+        "unanswerable": {
+          "mrr": 0.0,
+          "ndcg@5": 0.0,
+          "no_result_rate": 0.0,
+          "num_queries": 2,
+          "num_with_relevance": 0,
+          "recall@1": 0.0,
+          "recall@10": 0.0,
+          "recall@5": 0.0,
+          "top10_hit_count": 0,
+          "top1_hit_count": 0,
+          "top5_hit_count": 0
+        }
+      },
+      "overall": {
+        "mrr": 0.7777777777777778,
+        "ndcg@5": 0.7967741810315813,
+        "no_result_rate": 0.0,
+        "num_queries": 18,
+        "num_with_relevance": 12,
+        "recall@1": 0.625,
+        "recall@10": 0.9583333333333334,
+        "recall@5": 0.9166666666666666,
+        "top10_hit_count": 12,
+        "top1_hit_count": 8,
+        "top5_hit_count": 11
+      }
+    },
+    "semantic": {
+      "groups": {
+        "abstain": {
+          "mrr": 0.0,
+          "ndcg@5": 0.0,
+          "no_result_rate": 0.0,
+          "num_queries": 2,
+          "num_with_relevance": 0,
+          "recall@1": 0.0,
+          "recall@10": 0.0,
+          "recall@5": 0.0,
+          "top10_hit_count": 0,
+          "top1_hit_count": 0,
+          "top5_hit_count": 0
+        },
+        "ambiguous": {
+          "mrr": 0.0,
+          "ndcg@5": 0.0,
+          "no_result_rate": 0.0,
+          "num_queries": 2,
+          "num_with_relevance": 0,
+          "recall@1": 0.0,
+          "recall@10": 0.0,
+          "recall@5": 0.0,
+          "top10_hit_count": 0,
+          "top1_hit_count": 0,
+          "top5_hit_count": 0
+        },
+        "answerable": {
+          "mrr": 0.8333333333333334,
+          "ndcg@5": 0.8034961061549041,
+          "no_result_rate": 0.0,
+          "num_queries": 12,
+          "num_with_relevance": 12,
+          "recall@1": 0.6666666666666666,
+          "recall@10": 0.9166666666666666,
+          "recall@5": 0.875,
+          "top10_hit_count": 11,
+          "top1_hit_count": 9,
+          "top5_hit_count": 11
+        },
+        "multi_passage": {
+          "mrr": 0.6666666666666666,
+          "ndcg@5": 0.6666666666666666,
+          "no_result_rate": 0.0,
+          "num_queries": 3,
+          "num_with_relevance": 3,
+          "recall@1": 0.5,
+          "recall@10": 0.6666666666666666,
+          "recall@5": 0.6666666666666666,
+          "top10_hit_count": 2,
+          "top1_hit_count": 2,
+          "top5_hit_count": 2
+        },
+        "single_passage": {
+          "mrr": 1.0,
+          "ndcg@5": 1.0,
+          "no_result_rate": 0.0,
+          "num_queries": 2,
+          "num_with_relevance": 2,
+          "recall@1": 1.0,
+          "recall@10": 1.0,
+          "recall@5": 1.0,
+          "top10_hit_count": 2,
+          "top1_hit_count": 2,
+          "top5_hit_count": 2
+        },
+        "unanswerable": {
+          "mrr": 0.0,
+          "ndcg@5": 0.0,
+          "no_result_rate": 0.0,
+          "num_queries": 2,
+          "num_with_relevance": 0,
+          "recall@1": 0.0,
+          "recall@10": 0.0,
+          "recall@5": 0.0,
+          "top10_hit_count": 0,
+          "top1_hit_count": 0,
+          "top5_hit_count": 0
+        }
+      },
+      "overall": {
+        "mrr": 0.8333333333333334,
+        "ndcg@5": 0.8034961061549041,
+        "no_result_rate": 0.0,
+        "num_queries": 18,
+        "num_with_relevance": 12,
+        "recall@1": 0.6666666666666666,
+        "recall@10": 0.9166666666666666,
+        "recall@5": 0.875,
+        "top10_hit_count": 11,
+        "top1_hit_count": 9,
+        "top5_hit_count": 11
+      }
+    },
+    "sparse": {
+      "groups": {
+        "abstain": {
+          "mrr": 0.0,
+          "ndcg@5": 0.0,
+          "no_result_rate": 0.0,
+          "num_queries": 2,
+          "num_with_relevance": 0,
+          "recall@1": 0.0,
+          "recall@10": 0.0,
+          "recall@5": 0.0,
+          "top10_hit_count": 0,
+          "top1_hit_count": 0,
+          "top5_hit_count": 0
+        },
+        "ambiguous": {
+          "mrr": 0.0,
+          "ndcg@5": 0.0,
+          "no_result_rate": 0.0,
+          "num_queries": 2,
+          "num_with_relevance": 0,
+          "recall@1": 0.0,
+          "recall@10": 0.0,
+          "recall@5": 0.0,
+          "top10_hit_count": 0,
+          "top1_hit_count": 0,
+          "top5_hit_count": 0
+        },
+        "answerable": {
+          "mrr": 0.7202380952380952,
+          "ndcg@5": 0.7207260261981214,
+          "no_result_rate": 0.0,
+          "num_queries": 12,
+          "num_with_relevance": 12,
+          "recall@1": 0.5416666666666666,
+          "recall@10": 0.875,
+          "recall@5": 0.7916666666666666,
+          "top10_hit_count": 11,
+          "top1_hit_count": 7,
+          "top5_hit_count": 10
+        },
+        "multi_passage": {
+          "mrr": 0.5,
+          "ndcg@5": 0.46228426907818054,
+          "no_result_rate": 0.0,
+          "num_queries": 3,
+          "num_with_relevance": 3,
+          "recall@1": 0.3333333333333333,
+          "recall@10": 0.5,
+          "recall@5": 0.5,
+          "top10_hit_count": 2,
+          "top1_hit_count": 1,
+          "top5_hit_count": 2
+        },
+        "single_passage": {
+          "mrr": 0.5714285714285714,
+          "ndcg@5": 0.5,
+          "no_result_rate": 0.0,
+          "num_queries": 2,
+          "num_with_relevance": 2,
+          "recall@1": 0.5,
+          "recall@10": 1.0,
+          "recall@5": 0.5,
+          "top10_hit_count": 2,
+          "top1_hit_count": 1,
+          "top5_hit_count": 1
+        },
+        "unanswerable": {
+          "mrr": 0.0,
+          "ndcg@5": 0.0,
+          "no_result_rate": 0.0,
+          "num_queries": 2,
+          "num_with_relevance": 0,
+          "recall@1": 0.0,
+          "recall@10": 0.0,
+          "recall@5": 0.0,
+          "top10_hit_count": 0,
+          "top1_hit_count": 0,
+          "top5_hit_count": 0
+        }
+      },
+      "overall": {
+        "mrr": 0.7202380952380952,
+        "ndcg@5": 0.7207260261981214,
+        "no_result_rate": 0.0,
+        "num_queries": 18,
+        "num_with_relevance": 12,
+        "recall@1": 0.5416666666666666,
+        "recall@10": 0.875,
+        "recall@5": 0.7916666666666666,
+        "top10_hit_count": 11,
+        "top1_hit_count": 7,
+        "top5_hit_count": 10
+      }
+    }
+  },
+  "model": {
+    "acquisition_method": "Hugging Face resolve URLs pinned to the exact revision 5c38ec7c405ec4b44b94cc5a9bb96e735b38267a (https://huggingface.co/BAAI/bge-small-en-v1.5/resolve/<revision>/<file>); no mutable branch, no mirror, no fallback",
+    "architecture": {
+      "hidden_size": 384,
+      "intermediate_size": 1536,
+      "max_position_embeddings": 512,
+      "model_type": "BertModel",
+      "name": "bert",
+      "num_attention_heads": 12,
+      "num_hidden_layers": 12,
+      "torch_dtype": "float32",
+      "vocab_size": 30522
+    },
+    "cache_path": "data/raw/models/bge-small-en-v1.5",
+    "device": "cpu",
+    "dimension": 384,
+    "files": [
+      {
+        "path": "config.json",
+        "sha256": "094f8e891b932f2000c92cfc663bac4c62069f5d8af5b5278c4306aef3084750",
+        "size": 743
+      },
+      {
+        "path": "config_sentence_transformers.json",
+        "sha256": "940d5f50db195fa6e5e6a4f122c095f77880de259d74b14a65779ed48bdd7c56",
+        "size": 124
+      },
+      {
+        "path": "sentence_bert_config.json",
+        "sha256": "84e39fda68ccbff05bfa723ae9c0e70e23e2ec373b76e0f8c6e71af72a693cbf",
+        "size": 52
+      },
+      {
+        "path": "modules.json",
+        "sha256": "84e40c8e006c9b1d6c122e02cba9b02458120b5fb0c87b746c41e0207cf642cf",
+        "size": 349
+      },
+      {
+        "path": "1_Pooling/config.json",
+        "sha256": "d1caf60c96f5fba2157c0c26b76d80818fad6cf0b8eb5e73ec372ff9818eba5c",
+        "size": 190
+      },
+      {
+        "path": "tokenizer.json",
+        "sha256": "d241a60d5e8f04cc1b2b3e9ef7a4921b27bf526d9f6050ab90f9267a1f9e5c66",
+        "size": 711396
+      },
+      {
+        "path": "tokenizer_config.json",
+        "sha256": "9261e7d79b44c8195c1cada2b453e55b00aeb81e907a6664974b4d7776172ab3",
+        "size": 366
+      },
+      {
+        "path": "special_tokens_map.json",
+        "sha256": "b6d346be366a7d1d48332dbc9fdf3bf8960b5d879522b7799ddba59e76237ee3",
+        "size": 125
+      },
+      {
+        "path": "vocab.txt",
+        "sha256": "07eced375cec144d27c900241f3e339478dec958f92fddbc551f295c992038a3",
+        "size": 231508
+      },
+      {
+        "path": "model.safetensors",
+        "sha256": "3c9f31665447c8911517620762200d2245a2518d6e7208acc78cd9db317e21ad",
+        "size": 133466304
+      },
+      {
+        "path": "README.md",
+        "sha256": "ddb964361a55c6e5dfca6361615854b260c9c960205d04c7520151aaa1d75837",
+        "size": 94783
+      }
+    ],
+    "license": {
+      "name": "MIT License",
+      "url": "https://huggingface.co/BAAI/bge-small-en-v1.5",
+      "version": "1.0"
+    },
+    "local_files_only": true,
+    "manifest_version": "1.0",
+    "max_input_tokens": 512,
+    "model_card_url": "https://huggingface.co/BAAI/bge-small-en-v1.5",
+    "model_id": "BAAI/bge-small-en-v1.5",
+    "model_status": "approved-for-local-development",
+    "model_version": "1.5",
+    "normalization": {
+      "apply_at": "sentence-transformers 2_Normalize module plus encode(normalize_embeddings=True)",
+      "l2_normalize": true
+    },
+    "official_url": "https://huggingface.co/BAAI/bge-small-en-v1.5",
+    "pooling": {
+      "method": "cls",
+      "note": "1_Pooling/config.json sets pooling_mode_cls_token=true; the sentence-transformers module chain also includes a 2_Normalize L2-normalization module."
+    },
+    "publisher": "Beijing Academy of Artificial Intelligence (BAAI)",
+    "redistribution_status": "not-redistributed",
+    "revision": "5c38ec7c405ec4b44b94cc5a9bb96e735b38267a",
+    "revision_tag": "5c38ec7c405ec4b44b94cc5a9bb96e735b38267a",
+    "tokenizer": {
+      "lowercase": true,
+      "max_length": 512,
+      "name": "WordPiece (bert-base-uncased)",
+      "special_tokens": [
+        "[CLS]",
+        "[MASK]",
+        "[PAD]",
+        "[SEP]",
+        "[UNK]"
+      ],
+      "vocab_size": 30522
+    },
+    "verification_timestamp": "2026-08-12T02:54:30Z"
+  },
+  "per_query": {
+    "hash": {
+      "real-q-001": {
+        "case": "single_passage",
+        "expected_status": "answerable",
+        "first_hit_rank": 6,
+        "num_relevant": 1,
+        "query_id": "real-q-001",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::2",
+          "doc-tutorial-introduction.rst::0",
+          "doc-reference-lexical_analysis.rst::12",
+          "doc-reference-lexical_analysis.rst::15",
+          "doc-reference-lexical_analysis.rst::13",
+          "doc-reference-lexical_analysis.rst::1",
+          "doc-library-functions.rst::12",
+          "doc-library-functions.rst::10",
+          "doc-library-functions.rst::20",
+          "doc-reference-lexical_analysis.rst::14"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-002": {
+        "case": "numeric_parameter",
+        "expected_status": "answerable",
+        "first_hit_rank": 1,
+        "num_relevant": 1,
+        "query_id": "real-q-002",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::3",
+          "doc-library-functions.rst::16",
+          "doc-library-functions.rst::40",
+          "doc-reference-lexical_analysis.rst::14",
+          "doc-reference-lexical_analysis.rst::0",
+          "doc-library-functions.rst::35",
+          "doc-reference-lexical_analysis.rst::1",
+          "doc-library-functions.rst::26",
+          "doc-library-functions.rst::2",
+          "doc-reference-lexical_analysis.rst::4"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-003": {
+        "case": "terminology",
+        "expected_status": "answerable",
+        "first_hit_rank": 1,
+        "num_relevant": 1,
+        "query_id": "real-q-003",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::6",
+          "doc-reference-lexical_analysis.rst::17",
+          "doc-tutorial-introduction.rst::5",
+          "doc-library-functions.rst::1",
+          "doc-library-functions.rst::21",
+          "doc-reference-lexical_analysis.rst::7",
+          "doc-reference-lexical_analysis.rst::18",
+          "doc-library-functions.rst::41",
+          "doc-reference-lexical_analysis.rst::9",
+          "doc-library-functions.rst::22"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-004": {
+        "case": "exact_api",
+        "expected_status": "answerable",
+        "first_hit_rank": 5,
+        "num_relevant": 2,
+        "query_id": "real-q-004",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::16",
+          "doc-reference-lexical_analysis.rst::3",
+          "doc-library-functions.rst::40",
+          "doc-tutorial-introduction.rst::4",
+          "doc-library-functions.rst::31",
+          "doc-library-functions.rst::22",
+          "doc-library-functions.rst::36",
+          "doc-reference-lexical_analysis.rst::14",
+          "doc-reference-lexical_analysis.rst::1",
+          "doc-library-functions.rst::25"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-005": {
+        "case": "section_distinction",
+        "expected_status": "answerable",
+        "first_hit_rank": 3,
+        "num_relevant": 1,
+        "query_id": "real-q-005",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::25",
+          "doc-library-functions.rst::22",
+          "doc-reference-lexical_analysis.rst::1",
+          "doc-library-functions.rst::38",
+          "doc-library-functions.rst::21",
+          "doc-library-functions.rst::16",
+          "doc-library-functions.rst::40",
+          "doc-library-functions.rst::15",
+          "doc-library-functions.rst::24",
+          "doc-library-functions.rst::26"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-006": {
+        "case": "multi_passage",
+        "expected_status": "answerable",
+        "first_hit_rank": 1,
+        "num_relevant": 1,
+        "query_id": "real-q-006",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::6",
+          "doc-library-functions.rst::10",
+          "doc-tutorial-introduction.rst::0",
+          "doc-tutorial-introduction.rst::7",
+          "doc-reference-lexical_analysis.rst::8",
+          "doc-tutorial-introduction.rst::2",
+          "doc-tutorial-introduction.rst::8",
+          "doc-library-functions.rst::6",
+          "doc-reference-lexical_analysis.rst::9",
+          "doc-library-functions.rst::24"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-007": {
+        "case": "multi_passage",
+        "expected_status": "answerable",
+        "first_hit_rank": null,
+        "num_relevant": 2,
+        "query_id": "real-q-007",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::10",
+          "doc-reference-lexical_analysis.rst::6",
+          "doc-library-functions.rst::2",
+          "doc-reference-lexical_analysis.rst::14",
+          "doc-library-functions.rst::20",
+          "doc-library-functions.rst::19",
+          "doc-library-functions.rst::16",
+          "doc-library-functions.rst::12",
+          "doc-library-functions.rst::13",
+          "doc-library-functions.rst::14"
+        ],
+        "top_k_hit": false
+      },
+      "real-q-008": {
+        "case": "multi_passage",
+        "expected_status": "answerable",
+        "first_hit_rank": 7,
+        "num_relevant": 2,
+        "query_id": "real-q-008",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::13",
+          "doc-reference-lexical_analysis.rst::14",
+          "doc-reference-lexical_analysis.rst::12",
+          "doc-tutorial-introduction.rst::5",
+          "doc-library-functions.rst::12",
+          "doc-tutorial-introduction.rst::0",
+          "doc-tutorial-introduction.rst::3",
+          "doc-reference-lexical_analysis.rst::9",
+          "doc-library-functions.rst::34",
+          "doc-reference-lexical_analysis.rst::15"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-009": {
+        "case": "citation_boundary",
+        "expected_status": "answerable",
+        "first_hit_rank": 3,
+        "num_relevant": 1,
+        "query_id": "real-q-009",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::12",
+          "doc-reference-lexical_analysis.rst::14",
+          "doc-reference-lexical_analysis.rst::6",
+          "doc-tutorial-introduction.rst::8",
+          "doc-tutorial-introduction.rst::0",
+          "doc-tutorial-introduction.rst::7",
+          "doc-library-functions.rst::10",
+          "doc-reference-lexical_analysis.rst::2",
+          "doc-reference-lexical_analysis.rst::15",
+          "doc-library-functions.rst::11"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-010": {
+        "case": "exact_api",
+        "expected_status": "answerable",
+        "first_hit_rank": 1,
+        "num_relevant": 1,
+        "query_id": "real-q-010",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::12",
+          "doc-library-functions.rst::13",
+          "doc-library-functions.rst::11",
+          "doc-library-functions.rst::31",
+          "doc-library-functions.rst::21",
+          "doc-library-functions.rst::16",
+          "doc-library-functions.rst::40",
+          "doc-library-functions.rst::22",
+          "doc-library-functions.rst::9",
+          "doc-library-functions.rst::2"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-011": {
+        "case": "numeric_parameter",
+        "expected_status": "answerable",
+        "first_hit_rank": 9,
+        "num_relevant": 1,
+        "query_id": "real-q-011",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::22",
+          "doc-library-functions.rst::38",
+          "doc-library-functions.rst::16",
+          "doc-library-functions.rst::21",
+          "doc-library-functions.rst::40",
+          "doc-library-functions.rst::26",
+          "doc-library-functions.rst::15",
+          "doc-reference-lexical_analysis.rst::3",
+          "doc-library-functions.rst::18",
+          "doc-reference-lexical_analysis.rst::14"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-012": {
+        "case": "single_passage",
+        "expected_status": "answerable",
+        "first_hit_rank": 6,
+        "num_relevant": 1,
+        "query_id": "real-q-012",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::16",
+          "doc-library-functions.rst::21",
+          "doc-library-functions.rst::31",
+          "doc-library-functions.rst::40",
+          "doc-library-functions.rst::13",
+          "doc-library-functions.rst::22",
+          "doc-library-functions.rst::9",
+          "doc-library-functions.rst::11",
+          "doc-library-functions.rst::1",
+          "doc-library-functions.rst::2"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-013": {
+        "case": "unanswerable",
+        "expected_status": "unanswerable",
+        "first_hit_rank": null,
+        "num_relevant": 0,
+        "query_id": "real-q-013",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-tutorial-introduction.rst::7",
+          "doc-reference-lexical_analysis.rst::3",
+          "doc-library-functions.rst::40",
+          "doc-library-functions.rst::35",
+          "doc-tutorial-introduction.rst::4",
+          "doc-reference-lexical_analysis.rst::4",
+          "doc-library-functions.rst::41",
+          "doc-tutorial-introduction.rst::0",
+          "doc-tutorial-introduction.rst::8",
+          "doc-reference-lexical_analysis.rst::0"
+        ],
+        "top_k_hit": null
+      },
+      "real-q-014": {
+        "case": "unanswerable",
+        "expected_status": "unanswerable",
+        "first_hit_rank": null,
+        "num_relevant": 0,
+        "query_id": "real-q-014",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::40",
+          "doc-library-functions.rst::21",
+          "doc-library-functions.rst::16",
+          "doc-library-functions.rst::22",
+          "doc-reference-lexical_analysis.rst::3",
+          "doc-library-functions.rst::24",
+          "doc-library-functions.rst::25",
+          "doc-library-functions.rst::38",
+          "doc-reference-lexical_analysis.rst::14",
+          "doc-library-functions.rst::23"
+        ],
+        "top_k_hit": null
+      },
+      "real-q-015": {
+        "case": "ambiguous",
+        "expected_status": "ambiguous",
+        "first_hit_rank": null,
+        "num_relevant": 0,
+        "query_id": "real-q-015",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::7",
+          "doc-reference-lexical_analysis.rst::5",
+          "doc-library-functions.rst::40",
+          "doc-tutorial-introduction.rst::0",
+          "doc-library-functions.rst::6",
+          "doc-tutorial-introduction.rst::7",
+          "doc-reference-lexical_analysis.rst::14",
+          "doc-reference-lexical_analysis.rst::1",
+          "doc-library-functions.rst::11",
+          "doc-library-functions.rst::16"
+        ],
+        "top_k_hit": null
+      },
+      "real-q-016": {
+        "case": "ambiguous",
+        "expected_status": "ambiguous",
+        "first_hit_rank": null,
+        "num_relevant": 0,
+        "query_id": "real-q-016",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::3",
+          "doc-library-functions.rst::14",
+          "doc-reference-lexical_analysis.rst::11",
+          "doc-library-functions.rst::2",
+          "doc-library-functions.rst::15",
+          "doc-reference-lexical_analysis.rst::14",
+          "doc-tutorial-introduction.rst::7",
+          "doc-library-functions.rst::12",
+          "doc-reference-lexical_analysis.rst::12",
+          "doc-reference-lexical_analysis.rst::2"
+        ],
+        "top_k_hit": null
+      },
+      "real-q-017": {
+        "case": "abstain",
+        "expected_status": "abstain",
+        "first_hit_rank": null,
+        "num_relevant": 0,
+        "query_id": "real-q-017",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-tutorial-introduction.rst::7",
+          "doc-library-functions.rst::40",
+          "doc-library-functions.rst::24",
+          "doc-tutorial-introduction.rst::8",
+          "doc-reference-lexical_analysis.rst::6",
+          "doc-reference-lexical_analysis.rst::14",
+          "doc-tutorial-introduction.rst::0",
+          "doc-library-functions.rst::6",
+          "doc-reference-lexical_analysis.rst::8",
+          "doc-library-functions.rst::26"
+        ],
+        "top_k_hit": null
+      },
+      "real-q-018": {
+        "case": "abstain",
+        "expected_status": "abstain",
+        "first_hit_rank": null,
+        "num_relevant": 0,
+        "query_id": "real-q-018",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::3",
+          "doc-library-functions.rst::40",
+          "doc-library-functions.rst::16",
+          "doc-reference-lexical_analysis.rst::5",
+          "doc-library-functions.rst::26",
+          "doc-reference-lexical_analysis.rst::0",
+          "doc-library-functions.rst::3",
+          "doc-tutorial-introduction.rst::4",
+          "doc-library-functions.rst::2",
+          "doc-library-functions.rst::22"
+        ],
+        "top_k_hit": null
+      }
+    },
+    "hybrid": {
+      "real-q-001": {
+        "case": "single_passage",
+        "expected_status": "answerable",
+        "first_hit_rank": 1,
+        "num_relevant": 1,
+        "query_id": "real-q-001",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::1",
+          "doc-tutorial-introduction.rst::0",
+          "doc-reference-lexical_analysis.rst::2",
+          "doc-reference-lexical_analysis.rst::14",
+          "doc-tutorial-introduction.rst::4",
+          "doc-reference-lexical_analysis.rst::8",
+          "doc-reference-lexical_analysis.rst::10",
+          "doc-reference-lexical_analysis.rst::0",
+          "doc-tutorial-introduction.rst::2",
+          "doc-reference-lexical_analysis.rst::5"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-002": {
+        "case": "numeric_parameter",
+        "expected_status": "answerable",
+        "first_hit_rank": 1,
+        "num_relevant": 1,
+        "query_id": "real-q-002",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::3",
+          "doc-reference-lexical_analysis.rst::4",
+          "doc-reference-lexical_analysis.rst::2",
+          "doc-reference-lexical_analysis.rst::17",
+          "doc-tutorial-introduction.rst::5",
+          "doc-tutorial-introduction.rst::4",
+          "doc-library-functions.rst::12",
+          "doc-library-functions.rst::19",
+          "doc-library-functions.rst::5",
+          "doc-tutorial-introduction.rst::8"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-003": {
+        "case": "terminology",
+        "expected_status": "answerable",
+        "first_hit_rank": 1,
+        "num_relevant": 1,
+        "query_id": "real-q-003",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::6",
+          "doc-reference-lexical_analysis.rst::9",
+          "doc-reference-lexical_analysis.rst::4",
+          "doc-tutorial-introduction.rst::0",
+          "doc-library-functions.rst::37",
+          "doc-reference-lexical_analysis.rst::1",
+          "doc-library-functions.rst::41",
+          "doc-reference-lexical_analysis.rst::16",
+          "doc-library-functions.rst::11",
+          "doc-reference-lexical_analysis.rst::18"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-004": {
+        "case": "exact_api",
+        "expected_status": "answerable",
+        "first_hit_rank": 1,
+        "num_relevant": 2,
+        "query_id": "real-q-004",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::31",
+          "doc-library-functions.rst::32",
+          "doc-library-functions.rst::10",
+          "doc-library-functions.rst::28",
+          "doc-reference-lexical_analysis.rst::15",
+          "doc-tutorial-introduction.rst::1",
+          "doc-library-functions.rst::14",
+          "doc-library-functions.rst::11",
+          "doc-library-functions.rst::7",
+          "doc-library-functions.rst::19"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-005": {
+        "case": "section_distinction",
+        "expected_status": "answerable",
+        "first_hit_rank": 2,
+        "num_relevant": 1,
+        "query_id": "real-q-005",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::25",
+          "doc-reference-lexical_analysis.rst::1",
+          "doc-library-functions.rst::24",
+          "doc-reference-lexical_analysis.rst::8",
+          "doc-library-functions.rst::3",
+          "doc-library-functions.rst::23",
+          "doc-reference-lexical_analysis.rst::11",
+          "doc-library-functions.rst::26",
+          "doc-reference-lexical_analysis.rst::0",
+          "doc-reference-lexical_analysis.rst::9"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-006": {
+        "case": "multi_passage",
+        "expected_status": "answerable",
+        "first_hit_rank": 1,
+        "num_relevant": 1,
+        "query_id": "real-q-006",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::6",
+          "doc-reference-lexical_analysis.rst::5",
+          "doc-reference-lexical_analysis.rst::16",
+          "doc-reference-lexical_analysis.rst::18",
+          "doc-library-functions.rst::12",
+          "doc-tutorial-introduction.rst::0",
+          "doc-library-functions.rst::41",
+          "doc-reference-lexical_analysis.rst::13",
+          "doc-reference-lexical_analysis.rst::14",
+          "doc-tutorial-introduction.rst::2"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-007": {
+        "case": "multi_passage",
+        "expected_status": "answerable",
+        "first_hit_rank": 3,
+        "num_relevant": 2,
+        "query_id": "real-q-007",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::39",
+          "doc-tutorial-introduction.rst::4",
+          "doc-tutorial-introduction.rst::7",
+          "doc-tutorial-introduction.rst::6",
+          "doc-library-functions.rst::38",
+          "doc-library-functions.rst::20",
+          "doc-library-functions.rst::10",
+          "doc-library-functions.rst::40",
+          "doc-library-functions.rst::33",
+          "doc-library-functions.rst::9"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-008": {
+        "case": "multi_passage",
+        "expected_status": "answerable",
+        "first_hit_rank": 6,
+        "num_relevant": 2,
+        "query_id": "real-q-008",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-tutorial-introduction.rst::5",
+          "doc-tutorial-introduction.rst::6",
+          "doc-tutorial-introduction.rst::4",
+          "doc-reference-lexical_analysis.rst::0",
+          "doc-reference-lexical_analysis.rst::13",
+          "doc-tutorial-introduction.rst::3",
+          "doc-library-functions.rst::5",
+          "doc-library-functions.rst::11",
+          "doc-library-functions.rst::17",
+          "doc-library-functions.rst::23"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-009": {
+        "case": "citation_boundary",
+        "expected_status": "answerable",
+        "first_hit_rank": 1,
+        "num_relevant": 1,
+        "query_id": "real-q-009",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::6",
+          "doc-tutorial-introduction.rst::4",
+          "doc-tutorial-introduction.rst::0",
+          "doc-tutorial-introduction.rst::8",
+          "doc-library-functions.rst::37",
+          "doc-library-functions.rst::12",
+          "doc-reference-lexical_analysis.rst::1",
+          "doc-reference-lexical_analysis.rst::14",
+          "doc-reference-lexical_analysis.rst::16",
+          "doc-library-functions.rst::33"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-010": {
+        "case": "exact_api",
+        "expected_status": "answerable",
+        "first_hit_rank": 1,
+        "num_relevant": 1,
+        "query_id": "real-q-010",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::12",
+          "doc-library-functions.rst::11",
+          "doc-library-functions.rst::13",
+          "doc-library-functions.rst::7",
+          "doc-library-functions.rst::28",
+          "doc-library-functions.rst::5",
+          "doc-library-functions.rst::31",
+          "doc-library-functions.rst::6",
+          "doc-library-functions.rst::22",
+          "doc-reference-lexical_analysis.rst::11"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-011": {
+        "case": "numeric_parameter",
+        "expected_status": "answerable",
+        "first_hit_rank": 1,
+        "num_relevant": 1,
+        "query_id": "real-q-011",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::18",
+          "doc-library-functions.rst::29",
+          "doc-library-functions.rst::28",
+          "doc-library-functions.rst::19",
+          "doc-library-functions.rst::22",
+          "doc-reference-lexical_analysis.rst::16",
+          "doc-library-functions.rst::6",
+          "doc-library-functions.rst::3",
+          "doc-library-functions.rst::35",
+          "doc-library-functions.rst::9"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-012": {
+        "case": "single_passage",
+        "expected_status": "answerable",
+        "first_hit_rank": 3,
+        "num_relevant": 1,
+        "query_id": "real-q-012",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::1",
+          "doc-library-functions.rst::21",
+          "doc-library-functions.rst::22",
+          "doc-library-functions.rst::31",
+          "doc-library-functions.rst::11",
+          "doc-library-functions.rst::12",
+          "doc-library-functions.rst::13",
+          "doc-library-functions.rst::3",
+          "doc-library-functions.rst::5",
+          "doc-library-functions.rst::33"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-013": {
+        "case": "unanswerable",
+        "expected_status": "unanswerable",
+        "first_hit_rank": null,
+        "num_relevant": 0,
+        "query_id": "real-q-013",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::41",
+          "doc-library-functions.rst::3",
+          "doc-tutorial-introduction.rst::4",
+          "doc-library-functions.rst::23",
+          "doc-library-functions.rst::35",
+          "doc-library-functions.rst::40",
+          "doc-library-functions.rst::20",
+          "doc-tutorial-introduction.rst::1",
+          "doc-library-functions.rst::19",
+          "doc-reference-lexical_analysis.rst::16"
+        ],
+        "top_k_hit": null
+      },
+      "real-q-014": {
+        "case": "unanswerable",
+        "expected_status": "unanswerable",
+        "first_hit_rank": null,
+        "num_relevant": 0,
+        "query_id": "real-q-014",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::11",
+          "doc-library-functions.rst::23",
+          "doc-library-functions.rst::1",
+          "doc-library-functions.rst::38",
+          "doc-library-functions.rst::13",
+          "doc-library-functions.rst::39",
+          "doc-library-functions.rst::19",
+          "doc-reference-lexical_analysis.rst::7",
+          "doc-library-functions.rst::20",
+          "doc-reference-lexical_analysis.rst::16"
+        ],
+        "top_k_hit": null
+      },
+      "real-q-015": {
+        "case": "ambiguous",
+        "expected_status": "ambiguous",
+        "first_hit_rank": null,
+        "num_relevant": 0,
+        "query_id": "real-q-015",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::12",
+          "doc-reference-lexical_analysis.rst::17",
+          "doc-reference-lexical_analysis.rst::16",
+          "doc-library-functions.rst::11",
+          "doc-library-functions.rst::12",
+          "doc-tutorial-introduction.rst::4",
+          "doc-reference-lexical_analysis.rst::14",
+          "doc-reference-lexical_analysis.rst::5",
+          "doc-reference-lexical_analysis.rst::18",
+          "doc-library-functions.rst::16"
+        ],
+        "top_k_hit": null
+      },
+      "real-q-016": {
+        "case": "ambiguous",
+        "expected_status": "ambiguous",
+        "first_hit_rank": null,
+        "num_relevant": 0,
+        "query_id": "real-q-016",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::11",
+          "doc-reference-lexical_analysis.rst::9",
+          "doc-reference-lexical_analysis.rst::16",
+          "doc-tutorial-introduction.rst::5",
+          "doc-library-functions.rst::11",
+          "doc-tutorial-introduction.rst::4",
+          "doc-library-functions.rst::17",
+          "doc-library-functions.rst::31",
+          "doc-library-functions.rst::12",
+          "doc-library-functions.rst::23"
+        ],
+        "top_k_hit": null
+      },
+      "real-q-017": {
+        "case": "abstain",
+        "expected_status": "abstain",
+        "first_hit_rank": null,
+        "num_relevant": 0,
+        "query_id": "real-q-017",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::6",
+          "doc-reference-lexical_analysis.rst::4",
+          "doc-reference-lexical_analysis.rst::14",
+          "doc-reference-lexical_analysis.rst::13",
+          "doc-tutorial-introduction.rst::7",
+          "doc-library-functions.rst::40",
+          "doc-library-functions.rst::41",
+          "doc-tutorial-introduction.rst::2",
+          "doc-library-functions.rst::33",
+          "doc-library-functions.rst::5"
+        ],
+        "top_k_hit": null
+      },
+      "real-q-018": {
+        "case": "abstain",
+        "expected_status": "abstain",
+        "first_hit_rank": null,
+        "num_relevant": 0,
+        "query_id": "real-q-018",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::5",
+          "doc-reference-lexical_analysis.rst::11",
+          "doc-reference-lexical_analysis.rst::3",
+          "doc-reference-lexical_analysis.rst::8",
+          "doc-reference-lexical_analysis.rst::9",
+          "doc-reference-lexical_analysis.rst::0",
+          "doc-tutorial-introduction.rst::4",
+          "doc-library-functions.rst::25",
+          "doc-library-functions.rst::14",
+          "doc-reference-lexical_analysis.rst::17"
+        ],
+        "top_k_hit": null
+      }
+    },
+    "semantic": {
+      "real-q-001": {
+        "case": "single_passage",
+        "expected_status": "answerable",
+        "first_hit_rank": 1,
+        "num_relevant": 1,
+        "query_id": "real-q-001",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::1",
+          "doc-tutorial-introduction.rst::0",
+          "doc-reference-lexical_analysis.rst::2",
+          "doc-tutorial-introduction.rst::2",
+          "doc-reference-lexical_analysis.rst::5",
+          "doc-tutorial-introduction.rst::4",
+          "doc-reference-lexical_analysis.rst::14",
+          "doc-reference-lexical_analysis.rst::10",
+          "doc-reference-lexical_analysis.rst::8",
+          "doc-library-functions.rst::26"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-002": {
+        "case": "numeric_parameter",
+        "expected_status": "answerable",
+        "first_hit_rank": 1,
+        "num_relevant": 1,
+        "query_id": "real-q-002",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::3",
+          "doc-tutorial-introduction.rst::5",
+          "doc-tutorial-introduction.rst::4",
+          "doc-library-functions.rst::19",
+          "doc-tutorial-introduction.rst::8",
+          "doc-reference-lexical_analysis.rst::4",
+          "doc-reference-lexical_analysis.rst::5",
+          "doc-reference-lexical_analysis.rst::2",
+          "doc-reference-lexical_analysis.rst::17",
+          "doc-library-functions.rst::25"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-003": {
+        "case": "terminology",
+        "expected_status": "answerable",
+        "first_hit_rank": 1,
+        "num_relevant": 1,
+        "query_id": "real-q-003",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::6",
+          "doc-tutorial-introduction.rst::0",
+          "doc-reference-lexical_analysis.rst::1",
+          "doc-library-functions.rst::41",
+          "doc-reference-lexical_analysis.rst::18",
+          "doc-reference-lexical_analysis.rst::7",
+          "doc-reference-lexical_analysis.rst::9",
+          "doc-reference-lexical_analysis.rst::8",
+          "doc-reference-lexical_analysis.rst::5",
+          "doc-tutorial-introduction.rst::2"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-004": {
+        "case": "exact_api",
+        "expected_status": "answerable",
+        "first_hit_rank": 1,
+        "num_relevant": 2,
+        "query_id": "real-q-004",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::31",
+          "doc-library-functions.rst::10",
+          "doc-library-functions.rst::28",
+          "doc-reference-lexical_analysis.rst::15",
+          "doc-library-functions.rst::14",
+          "doc-library-functions.rst::32",
+          "doc-library-functions.rst::7",
+          "doc-library-functions.rst::19",
+          "doc-reference-lexical_analysis.rst::11",
+          "doc-tutorial-introduction.rst::1"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-005": {
+        "case": "section_distinction",
+        "expected_status": "answerable",
+        "first_hit_rank": 2,
+        "num_relevant": 1,
+        "query_id": "real-q-005",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::25",
+          "doc-reference-lexical_analysis.rst::1",
+          "doc-reference-lexical_analysis.rst::8",
+          "doc-library-functions.rst::24",
+          "doc-reference-lexical_analysis.rst::11",
+          "doc-library-functions.rst::26",
+          "doc-reference-lexical_analysis.rst::9",
+          "doc-reference-lexical_analysis.rst::5",
+          "doc-library-functions.rst::15",
+          "doc-reference-lexical_analysis.rst::13"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-006": {
+        "case": "multi_passage",
+        "expected_status": "answerable",
+        "first_hit_rank": 1,
+        "num_relevant": 1,
+        "query_id": "real-q-006",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::6",
+          "doc-reference-lexical_analysis.rst::18",
+          "doc-tutorial-introduction.rst::0",
+          "doc-library-functions.rst::41",
+          "doc-tutorial-introduction.rst::2",
+          "doc-reference-lexical_analysis.rst::7",
+          "doc-reference-lexical_analysis.rst::1",
+          "doc-tutorial-introduction.rst::4",
+          "doc-reference-lexical_analysis.rst::5",
+          "doc-reference-lexical_analysis.rst::9"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-007": {
+        "case": "multi_passage",
+        "expected_status": "answerable",
+        "first_hit_rank": 1,
+        "num_relevant": 2,
+        "query_id": "real-q-007",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-tutorial-introduction.rst::7",
+          "doc-tutorial-introduction.rst::6",
+          "doc-library-functions.rst::39",
+          "doc-tutorial-introduction.rst::4",
+          "doc-library-functions.rst::10",
+          "doc-library-functions.rst::33",
+          "doc-tutorial-introduction.rst::5",
+          "doc-tutorial-introduction.rst::8",
+          "doc-library-functions.rst::18",
+          "doc-library-functions.rst::21"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-008": {
+        "case": "multi_passage",
+        "expected_status": "answerable",
+        "first_hit_rank": null,
+        "num_relevant": 2,
+        "query_id": "real-q-008",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-tutorial-introduction.rst::5",
+          "doc-tutorial-introduction.rst::4",
+          "doc-tutorial-introduction.rst::6",
+          "doc-reference-lexical_analysis.rst::0",
+          "doc-library-functions.rst::17",
+          "doc-library-functions.rst::23",
+          "doc-reference-lexical_analysis.rst::13",
+          "doc-reference-lexical_analysis.rst::9",
+          "doc-library-functions.rst::37",
+          "doc-reference-lexical_analysis.rst::18"
+        ],
+        "top_k_hit": false
+      },
+      "real-q-009": {
+        "case": "citation_boundary",
+        "expected_status": "answerable",
+        "first_hit_rank": 1,
+        "num_relevant": 1,
+        "query_id": "real-q-009",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::6",
+          "doc-tutorial-introduction.rst::0",
+          "doc-library-functions.rst::37",
+          "doc-reference-lexical_analysis.rst::1",
+          "doc-reference-lexical_analysis.rst::14",
+          "doc-tutorial-introduction.rst::4",
+          "doc-reference-lexical_analysis.rst::0",
+          "doc-library-functions.rst::19",
+          "doc-reference-lexical_analysis.rst::7",
+          "doc-reference-lexical_analysis.rst::5"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-010": {
+        "case": "exact_api",
+        "expected_status": "answerable",
+        "first_hit_rank": 1,
+        "num_relevant": 1,
+        "query_id": "real-q-010",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::12",
+          "doc-library-functions.rst::13",
+          "doc-library-functions.rst::7",
+          "doc-library-functions.rst::11",
+          "doc-library-functions.rst::28",
+          "doc-library-functions.rst::6",
+          "doc-reference-lexical_analysis.rst::11",
+          "doc-library-functions.rst::29",
+          "doc-library-functions.rst::21",
+          "doc-library-functions.rst::26"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-011": {
+        "case": "numeric_parameter",
+        "expected_status": "answerable",
+        "first_hit_rank": 2,
+        "num_relevant": 1,
+        "query_id": "real-q-011",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::29",
+          "doc-library-functions.rst::18",
+          "doc-library-functions.rst::19",
+          "doc-library-functions.rst::28",
+          "doc-library-functions.rst::6",
+          "doc-library-functions.rst::3",
+          "doc-library-functions.rst::35",
+          "doc-library-functions.rst::22",
+          "doc-library-functions.rst::41",
+          "doc-library-functions.rst::37"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-012": {
+        "case": "single_passage",
+        "expected_status": "answerable",
+        "first_hit_rank": 1,
+        "num_relevant": 1,
+        "query_id": "real-q-012",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::22",
+          "doc-library-functions.rst::21",
+          "doc-library-functions.rst::1",
+          "doc-library-functions.rst::13",
+          "doc-library-functions.rst::3",
+          "doc-library-functions.rst::31",
+          "doc-library-functions.rst::33",
+          "doc-library-functions.rst::19",
+          "doc-library-functions.rst::4",
+          "doc-library-functions.rst::29"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-013": {
+        "case": "unanswerable",
+        "expected_status": "unanswerable",
+        "first_hit_rank": null,
+        "num_relevant": 0,
+        "query_id": "real-q-013",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::3",
+          "doc-library-functions.rst::41",
+          "doc-library-functions.rst::35",
+          "doc-library-functions.rst::20",
+          "doc-library-functions.rst::19",
+          "doc-library-functions.rst::7",
+          "doc-library-functions.rst::27",
+          "doc-library-functions.rst::1",
+          "doc-library-functions.rst::11",
+          "doc-library-functions.rst::0"
+        ],
+        "top_k_hit": null
+      },
+      "real-q-014": {
+        "case": "unanswerable",
+        "expected_status": "unanswerable",
+        "first_hit_rank": null,
+        "num_relevant": 0,
+        "query_id": "real-q-014",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::1",
+          "doc-library-functions.rst::13",
+          "doc-library-functions.rst::19",
+          "doc-library-functions.rst::20",
+          "doc-library-functions.rst::35",
+          "doc-library-functions.rst::11",
+          "doc-library-functions.rst::3",
+          "doc-library-functions.rst::23",
+          "doc-library-functions.rst::32",
+          "doc-library-functions.rst::0"
+        ],
+        "top_k_hit": null
+      },
+      "real-q-015": {
+        "case": "ambiguous",
+        "expected_status": "ambiguous",
+        "first_hit_rank": null,
+        "num_relevant": 0,
+        "query_id": "real-q-015",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::17",
+          "doc-reference-lexical_analysis.rst::12",
+          "doc-tutorial-introduction.rst::4",
+          "doc-reference-lexical_analysis.rst::14",
+          "doc-reference-lexical_analysis.rst::18",
+          "doc-reference-lexical_analysis.rst::4",
+          "doc-tutorial-introduction.rst::2",
+          "doc-tutorial-introduction.rst::5",
+          "doc-reference-lexical_analysis.rst::8",
+          "doc-tutorial-introduction.rst::0"
+        ],
+        "top_k_hit": null
+      },
+      "real-q-016": {
+        "case": "ambiguous",
+        "expected_status": "ambiguous",
+        "first_hit_rank": null,
+        "num_relevant": 0,
+        "query_id": "real-q-016",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-tutorial-introduction.rst::5",
+          "doc-tutorial-introduction.rst::4",
+          "doc-library-functions.rst::17",
+          "doc-library-functions.rst::23",
+          "doc-library-functions.rst::18",
+          "doc-reference-lexical_analysis.rst::17",
+          "doc-reference-lexical_analysis.rst::9",
+          "doc-tutorial-introduction.rst::8",
+          "doc-reference-lexical_analysis.rst::11",
+          "doc-reference-lexical_analysis.rst::18"
+        ],
+        "top_k_hit": null
+      },
+      "real-q-017": {
+        "case": "abstain",
+        "expected_status": "abstain",
+        "first_hit_rank": null,
+        "num_relevant": 0,
+        "query_id": "real-q-017",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::14",
+          "doc-tutorial-introduction.rst::7",
+          "doc-reference-lexical_analysis.rst::6",
+          "doc-tutorial-introduction.rst::2",
+          "doc-library-functions.rst::33",
+          "doc-tutorial-introduction.rst::4",
+          "doc-reference-lexical_analysis.rst::4",
+          "doc-library-functions.rst::19",
+          "doc-library-functions.rst::2",
+          "doc-reference-lexical_analysis.rst::1"
+        ],
+        "top_k_hit": null
+      },
+      "real-q-018": {
+        "case": "abstain",
+        "expected_status": "abstain",
+        "first_hit_rank": null,
+        "num_relevant": 0,
+        "query_id": "real-q-018",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::5",
+          "doc-reference-lexical_analysis.rst::11",
+          "doc-tutorial-introduction.rst::4",
+          "doc-library-functions.rst::25",
+          "doc-reference-lexical_analysis.rst::8",
+          "doc-reference-lexical_analysis.rst::17",
+          "doc-reference-lexical_analysis.rst::1",
+          "doc-tutorial-introduction.rst::5",
+          "doc-reference-lexical_analysis.rst::3",
+          "doc-reference-lexical_analysis.rst::9"
+        ],
+        "top_k_hit": null
+      }
+    },
+    "sparse": {
+      "real-q-001": {
+        "case": "single_passage",
+        "expected_status": "answerable",
+        "first_hit_rank": 1,
+        "num_relevant": 1,
+        "query_id": "real-q-001",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::1",
+          "doc-tutorial-introduction.rst::0",
+          "doc-reference-lexical_analysis.rst::2",
+          "doc-reference-lexical_analysis.rst::0",
+          "doc-reference-lexical_analysis.rst::14",
+          "doc-reference-lexical_analysis.rst::13",
+          "doc-reference-lexical_analysis.rst::8",
+          "doc-tutorial-introduction.rst::4",
+          "doc-reference-lexical_analysis.rst::10",
+          "doc-library-functions.rst::35"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-002": {
+        "case": "numeric_parameter",
+        "expected_status": "answerable",
+        "first_hit_rank": 1,
+        "num_relevant": 1,
+        "query_id": "real-q-002",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::3",
+          "doc-reference-lexical_analysis.rst::2",
+          "doc-reference-lexical_analysis.rst::4",
+          "doc-library-functions.rst::12",
+          "doc-library-functions.rst::5",
+          "doc-library-functions.rst::6",
+          "doc-reference-lexical_analysis.rst::12",
+          "doc-reference-lexical_analysis.rst::15",
+          "doc-library-functions.rst::40",
+          "doc-reference-lexical_analysis.rst::17"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-003": {
+        "case": "terminology",
+        "expected_status": "answerable",
+        "first_hit_rank": 1,
+        "num_relevant": 1,
+        "query_id": "real-q-003",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::6",
+          "doc-reference-lexical_analysis.rst::4",
+          "doc-library-functions.rst::37",
+          "doc-reference-lexical_analysis.rst::16",
+          "doc-library-functions.rst::11",
+          "doc-library-functions.rst::5",
+          "doc-library-functions.rst::31",
+          "doc-library-functions.rst::12",
+          "doc-reference-lexical_analysis.rst::17",
+          "doc-reference-lexical_analysis.rst::9"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-004": {
+        "case": "exact_api",
+        "expected_status": "answerable",
+        "first_hit_rank": 1,
+        "num_relevant": 2,
+        "query_id": "real-q-004",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::32",
+          "doc-library-functions.rst::31",
+          "doc-tutorial-introduction.rst::1",
+          "doc-library-functions.rst::28",
+          "doc-library-functions.rst::10",
+          "doc-reference-lexical_analysis.rst::15",
+          "doc-library-functions.rst::11",
+          "doc-library-functions.rst::39",
+          "doc-tutorial-introduction.rst::8",
+          "doc-tutorial-introduction.rst::5"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-005": {
+        "case": "section_distinction",
+        "expected_status": "answerable",
+        "first_hit_rank": 2,
+        "num_relevant": 1,
+        "query_id": "real-q-005",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::25",
+          "doc-reference-lexical_analysis.rst::1",
+          "doc-library-functions.rst::24",
+          "doc-library-functions.rst::3",
+          "doc-library-functions.rst::23",
+          "doc-reference-lexical_analysis.rst::8",
+          "doc-reference-lexical_analysis.rst::0",
+          "doc-reference-lexical_analysis.rst::16",
+          "doc-library-functions.rst::5",
+          "doc-library-functions.rst::11"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-006": {
+        "case": "multi_passage",
+        "expected_status": "answerable",
+        "first_hit_rank": 1,
+        "num_relevant": 1,
+        "query_id": "real-q-006",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::6",
+          "doc-reference-lexical_analysis.rst::16",
+          "doc-library-functions.rst::12",
+          "doc-reference-lexical_analysis.rst::13",
+          "doc-reference-lexical_analysis.rst::14",
+          "doc-library-functions.rst::33",
+          "doc-reference-lexical_analysis.rst::4",
+          "doc-library-functions.rst::29",
+          "doc-reference-lexical_analysis.rst::5",
+          "doc-library-functions.rst::31"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-007": {
+        "case": "multi_passage",
+        "expected_status": "answerable",
+        "first_hit_rank": null,
+        "num_relevant": 2,
+        "query_id": "real-q-007",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::39",
+          "doc-tutorial-introduction.rst::4",
+          "doc-library-functions.rst::38",
+          "doc-library-functions.rst::20",
+          "doc-library-functions.rst::40",
+          "doc-library-functions.rst::9",
+          "doc-library-functions.rst::5",
+          "doc-reference-lexical_analysis.rst::16",
+          "doc-library-functions.rst::31",
+          "doc-library-functions.rst::28"
+        ],
+        "top_k_hit": false
+      },
+      "real-q-008": {
+        "case": "multi_passage",
+        "expected_status": "answerable",
+        "first_hit_rank": 2,
+        "num_relevant": 2,
+        "query_id": "real-q-008",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-tutorial-introduction.rst::5",
+          "doc-tutorial-introduction.rst::3",
+          "doc-library-functions.rst::5",
+          "doc-library-functions.rst::11",
+          "doc-tutorial-introduction.rst::6",
+          "doc-reference-lexical_analysis.rst::0",
+          "doc-tutorial-introduction.rst::4",
+          "doc-reference-lexical_analysis.rst::16",
+          "doc-reference-lexical_analysis.rst::13",
+          "doc-library-functions.rst::31"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-009": {
+        "case": "citation_boundary",
+        "expected_status": "answerable",
+        "first_hit_rank": 1,
+        "num_relevant": 1,
+        "query_id": "real-q-009",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::6",
+          "doc-tutorial-introduction.rst::8",
+          "doc-tutorial-introduction.rst::4",
+          "doc-library-functions.rst::12",
+          "doc-reference-lexical_analysis.rst::16",
+          "doc-library-functions.rst::33",
+          "doc-library-functions.rst::29",
+          "doc-library-functions.rst::5",
+          "doc-library-functions.rst::11",
+          "doc-library-functions.rst::31"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-010": {
+        "case": "exact_api",
+        "expected_status": "answerable",
+        "first_hit_rank": 2,
+        "num_relevant": 1,
+        "query_id": "real-q-010",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::11",
+          "doc-library-functions.rst::12",
+          "doc-library-functions.rst::5",
+          "doc-library-functions.rst::13",
+          "doc-library-functions.rst::31",
+          "doc-library-functions.rst::7",
+          "doc-library-functions.rst::22",
+          "doc-library-functions.rst::20",
+          "doc-library-functions.rst::28",
+          "doc-library-functions.rst::34"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-011": {
+        "case": "numeric_parameter",
+        "expected_status": "answerable",
+        "first_hit_rank": 1,
+        "num_relevant": 1,
+        "query_id": "real-q-011",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::18",
+          "doc-reference-lexical_analysis.rst::16",
+          "doc-library-functions.rst::22",
+          "doc-library-functions.rst::28",
+          "doc-library-functions.rst::29",
+          "doc-library-functions.rst::19",
+          "doc-library-functions.rst::9",
+          "doc-library-functions.rst::5",
+          "doc-library-functions.rst::11",
+          "doc-library-functions.rst::31"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-012": {
+        "case": "single_passage",
+        "expected_status": "answerable",
+        "first_hit_rank": 7,
+        "num_relevant": 1,
+        "query_id": "real-q-012",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::1",
+          "doc-library-functions.rst::21",
+          "doc-library-functions.rst::11",
+          "doc-library-functions.rst::12",
+          "doc-library-functions.rst::31",
+          "doc-library-functions.rst::5",
+          "doc-library-functions.rst::22",
+          "doc-library-functions.rst::20",
+          "doc-library-functions.rst::0",
+          "doc-library-functions.rst::28"
+        ],
+        "top_k_hit": true
+      },
+      "real-q-013": {
+        "case": "unanswerable",
+        "expected_status": "unanswerable",
+        "first_hit_rank": null,
+        "num_relevant": 0,
+        "query_id": "real-q-013",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-tutorial-introduction.rst::4",
+          "doc-library-functions.rst::23",
+          "doc-library-functions.rst::40",
+          "doc-tutorial-introduction.rst::1",
+          "doc-reference-lexical_analysis.rst::16",
+          "doc-library-functions.rst::34",
+          "doc-library-functions.rst::36",
+          "doc-library-functions.rst::25",
+          "doc-tutorial-introduction.rst::8",
+          "doc-library-functions.rst::41"
+        ],
+        "top_k_hit": null
+      },
+      "real-q-014": {
+        "case": "unanswerable",
+        "expected_status": "unanswerable",
+        "first_hit_rank": null,
+        "num_relevant": 0,
+        "query_id": "real-q-014",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-library-functions.rst::38",
+          "doc-library-functions.rst::39",
+          "doc-reference-lexical_analysis.rst::7",
+          "doc-reference-lexical_analysis.rst::16",
+          "doc-library-functions.rst::31",
+          "doc-library-functions.rst::11",
+          "doc-library-functions.rst::5",
+          "doc-library-functions.rst::12",
+          "doc-library-functions.rst::28",
+          "doc-library-functions.rst::23"
+        ],
+        "top_k_hit": null
+      },
+      "real-q-015": {
+        "case": "ambiguous",
+        "expected_status": "ambiguous",
+        "first_hit_rank": null,
+        "num_relevant": 0,
+        "query_id": "real-q-015",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::16",
+          "doc-library-functions.rst::11",
+          "doc-library-functions.rst::12",
+          "doc-reference-lexical_analysis.rst::5",
+          "doc-reference-lexical_analysis.rst::12",
+          "doc-library-functions.rst::16",
+          "doc-reference-lexical_analysis.rst::17",
+          "doc-library-functions.rst::31",
+          "doc-reference-lexical_analysis.rst::6",
+          "doc-library-functions.rst::5"
+        ],
+        "top_k_hit": null
+      },
+      "real-q-016": {
+        "case": "ambiguous",
+        "expected_status": "ambiguous",
+        "first_hit_rank": null,
+        "num_relevant": 0,
+        "query_id": "real-q-016",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::16",
+          "doc-library-functions.rst::11",
+          "doc-library-functions.rst::31",
+          "doc-library-functions.rst::12",
+          "doc-library-functions.rst::5",
+          "doc-reference-lexical_analysis.rst::11",
+          "doc-reference-lexical_analysis.rst::8",
+          "doc-library-functions.rst::14",
+          "doc-reference-lexical_analysis.rst::9",
+          "doc-library-functions.rst::2"
+        ],
+        "top_k_hit": null
+      },
+      "real-q-017": {
+        "case": "abstain",
+        "expected_status": "abstain",
+        "first_hit_rank": null,
+        "num_relevant": 0,
+        "query_id": "real-q-017",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::6",
+          "doc-reference-lexical_analysis.rst::13",
+          "doc-library-functions.rst::40",
+          "doc-library-functions.rst::41",
+          "doc-library-functions.rst::5",
+          "doc-reference-lexical_analysis.rst::4",
+          "doc-reference-lexical_analysis.rst::5",
+          "doc-library-functions.rst::27",
+          "doc-library-functions.rst::26",
+          "doc-tutorial-introduction.rst::8"
+        ],
+        "top_k_hit": null
+      },
+      "real-q-018": {
+        "case": "abstain",
+        "expected_status": "abstain",
+        "first_hit_rank": null,
+        "num_relevant": 0,
+        "query_id": "real-q-018",
+        "retrieval_empty": false,
+        "retrieved_chunk_ids": [
+          "doc-reference-lexical_analysis.rst::5",
+          "doc-reference-lexical_analysis.rst::11",
+          "doc-reference-lexical_analysis.rst::0",
+          "doc-reference-lexical_analysis.rst::3",
+          "doc-library-functions.rst::14",
+          "doc-reference-lexical_analysis.rst::9",
+          "doc-library-functions.rst::31",
+          "doc-reference-lexical_analysis.rst::18",
+          "doc-reference-lexical_analysis.rst::16",
+          "doc-reference-lexical_analysis.rst::8"
+        ],
+        "top_k_hit": null
+      }
+    }
+  },
+  "query_set": {
+    "cases": {
+      "abstain": 2,
+      "ambiguous": 2,
+      "citation_boundary": 1,
+      "exact_api": 2,
+      "multi_passage": 3,
+      "numeric_parameter": 2,
+      "section_distinction": 1,
+      "single_passage": 2,
+      "terminology": 1,
+      "unanswerable": 2
+    },
+    "corpus_id": "python-docs-3.12.13",
+    "corpus_manifest_id": "corpus-source-v1.0.0",
+    "corpus_version": "1.0.0",
+    "expected_statuses": {
+      "abstain": 2,
+      "ambiguous": 2,
+      "answerable": 12,
+      "unanswerable": 2
+    },
+    "num_queries": 18,
+    "query_set_id": "python-docs-real-v1",
+    "query_set_version": "1.0.0",
+    "real_local": true,
+    "synthetic": false
+  },
+  "ranking_stability": {
+    "hash": {
+      "fraction_identical": 1.0,
+      "identical_rankings": 18,
+      "num_queries": 18
+    },
+    "hybrid": {
+      "fraction_identical": 1.0,
+      "identical_rankings": 18,
+      "num_queries": 18
+    },
+    "semantic": {
+      "fraction_identical": 1.0,
+      "identical_rankings": 18,
+      "num_queries": 18
+    },
+    "sparse": {
+      "fraction_identical": 1.0,
+      "identical_rankings": 18,
+      "num_queries": 18
+    }
+  },
+  "report_type": "real-local-semantic-evaluation",
+  "report_version": "1.0.0",
+  "runtime_observations": {
+    "elapsed_seconds_per_mode": {
+      "hash": 0.031,
+      "hybrid": 0.701,
+      "semantic": 0.696,
+      "sparse": 0.031
+    },
+    "memory_note": "Only process-wide peak RSS is recorded; per-mode memory was not measured.",
+    "process_peak_rss_kb": 1294644
+  },
+  "timestamp_utc": "2026-08-12T03:16:37+00:00"
+}

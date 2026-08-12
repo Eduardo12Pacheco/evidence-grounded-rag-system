@@ -13,6 +13,15 @@ demo = [
     "streamlit>=1.44",
 ]
 
+# Optional local semantic embeddings (src/evidence_grounded_rag/embeddings/semantic.py).
+# Opt-in ONLY: the core pipeline and tests never require it, no model weights are
+# bundled, and runtime inference is local-only (local_files_only=True). Installing
+# this extra pulls the sentence-transformers stack (torch/transformers), so the
+# default offline development environment stays without it.
+embeddings = [
+    "sentence-transformers>=3.0",
+]
+
 [dependency-groups]
 dev = [
     "pytest>=8",

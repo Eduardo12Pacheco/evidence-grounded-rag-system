@@ -28,12 +28,23 @@ return an empty result.
 
 ### Dense — embedding interface (`embeddings/`)
 
-`EmbeddingProvider` is the replaceable interface. The bundled
-`DeterministicEmbedding` is a hashed bag-of-words vector (signed hashing, L2
-normalized, dimension 256) with `semantic = False`, `mode = offline`. It is
-NEVER labeled semantic: dense scores encode token overlap only. Ranking is
-cosine similarity; ties break by (score desc, chunk id ascending); a query
-vector whose dimension differs from the indexed dimension raises
+`EmbeddingProvider` is the replaceable interface (protocol with `model_id`,
+`mode`, `semantic`, `dimension`, `embed`, `embed_one`, and `to_dict`). Two
+providers exist:
+
+- **`DeterministicEmbedding`** (default) is a hashed bag-of-words vector
+  (signed hashing, L2 normalized, dimension 256) with `semantic = False`,
+  `mode = offline`. It is NEVER labeled semantic: dense scores encode token
+  overlap only.
+- **`SemanticLocalEmbedding`** is optional, explicit, local-only
+  (BAAI/bge-small-en-v1.5, `semantic = True`, `mode = semantic-local`, 384
+  dimensions, CLS pooling, L2 normalized). It loads ONLY from a verified local
+  cache with `local_files_only=True` and raises `SemanticModelUnavailableError`
+  when unavailable — it never silently falls back to the hash embedding. See
+  `docs/embedding-model-contract.md`.
+
+Ranking is cosine similarity; ties break by (score desc, chunk id ascending); a
+query vector whose dimension differs from the indexed dimension raises
 `EmbeddingDimensionError`; an empty index returns an empty result.
 
 ### Fusion — reciprocal rank fusion (`retrieval/fusion.py`)
@@ -282,6 +293,87 @@ rankings (which drive every metric) are unchanged.
 - Results are diagnostic, not production readiness.
 - Denominators are small (12 answerable / 6 non-answerable queries per mode);
   one query moves percentages by up to 8.3 points.
+
+## Semantic-materializer evaluation (separate, retrieval-only)
+
+A SEPARATE retrieval evaluation over the same real-local corpus with the local
+semantic embedding model (BAAI/bge-small-en-v1.5). It is NEVER combined with
+the synthetic report or with the hash-materializer report
+(`python-docs-real-evaluation-v1.0.0.json`); it never falls back to hash
+embeddings under a semantic label. See `docs/embedding-model-contract.md` for
+the model audit, license, revision, and checksum policy.
+
+### Model acquisition and verification (explicit; network only here)
+
+```bash
+uv sync --dev --extra demo --extra embeddings
+uv run python scripts/acquire_embedding_model.py \
+    --manifest data/manifests/embedding-model-v1.0.0.json
+# downloads the pinned revision into a staging dir, verifies it byte-exact
+# against the committed manifest, then atomically swaps it into
+# data/raw/models/bge-small-en-v1.5/ (gitignored); the committed manifest is
+# never rewritten (first-time bootstrap requires the explicit --bootstrap flag)
+
+uv run python scripts/verify_embedding_model.py \
+    --manifest data/manifests/embedding-model-v1.0.0.json
+# offline: re-checks manifest schema/version, model id/version, publisher,
+# URLs, revision, license, dimension (384), max input (512), device,
+# architecture/tokenizer/pooling/normalization metadata, status,
+# redistribution, then file existence + exact sizes + SHA-256 and rejects
+# extra files beyond expected_files; any mismatch stops semantic enablement
+```
+
+### Command
+
+```bash
+uv run python -m evidence_grounded_rag.evaluation.semantic_materialize \
+    --manifest data/manifests/corpus-source-v1.0.0.json \
+    --queries data/evaluation/queries/python-docs-real-v1.0.0.json \
+    --raw-dir data/raw/python-docs-3.12.13 \
+    --model-manifest data/manifests/embedding-model-v1.0.0.json \
+    --cache-dir data/raw/models/bge-small-en-v1.5 \
+    --output data/evaluations/python-docs-real-semantic-evaluation-v1.0.0.json
+```
+
+The command verifies the real corpus first, then loads the semantic model only
+from the local cache (`local_files_only=True`). If the model snapshot cannot be
+verified/loaded it raises `SemanticModelUnavailableError` and writes no report;
+semantic modes are refused and never degrade to the hash embedding.
+
+### Four separated modes
+
+| Mode key | Label | What serves it |
+| --- | --- | --- |
+| `sparse` | `BM25 sparse baseline` | committed Okapi BM25 only |
+| `hash` | `Deterministic hash embedding diagnostic — not semantic retrieval` | deterministic non-semantic hash embedding |
+| `semantic` | `Local semantic embedding model` | BAAI/bge-small-en-v1.5 dense, local-only |
+| `hybrid` | `Hybrid BM25 plus local semantic embeddings` | BM25 + local semantic embeddings fused with committed RRF (`k = 60`) |
+
+All existing thresholds are unchanged: `min_fused_score = 0.01`, `top_k = 10`,
+BM25 `k1 = 1.5` / `b = 0.75`, RRF `k = 60`.
+
+### Report (`data/evaluations/python-docs-real-semantic-evaluation-v1.0.0.json`)
+
+Retrieval metrics only (no generation, no LLM). It records the model
+facts/provenance/license/tokenizer/dimension/normalization/device/cache path
+and per-file checksums, corpus and query-set facts, all four modes, retrieval
+metrics (same formulas as the real protocol: Recall@1/5/10, MRR, nDCG@5,
+no-result rate, top-k hit counts, grouped by answerable/single-passage/
+multi-passage/unanswerable/ambiguous/abstain), per-query rankings and hit
+ranks, ranking stability across two in-process runs, runtime observations
+(wall-clock seconds per mode; process peak RSS if measured; per-mode memory
+"unavailable"), timestamp, code revision, and limitations.
+
+Determinism policy: metrics, per-query rankings, model facts, and configs are
+deterministic and covered by `deterministic_digest`; only the timestamp and
+runtime observations differ between runs (runtime is measured provenance, not
+content). The semantic report explicitly states: bounded 3 files / 70 chunks,
+no general-Python claim, no LLM, retrieval quality does not imply answer
+faithfulness, and no model-card benchmark is claimed as a project metric.
+
+Run the command twice and compare `deterministic_digest` and per-query
+`retrieved_chunk_ids` for cross-run stability; both runs in the same process
+are additionally reported under `ranking_stability`.
 
 ## Definition of done for evaluation
 

@@ -51,6 +51,8 @@ class EmbeddingProvider(Protocol):
 
     def embed_one(self, text: str) -> Vector: ...
 
+    def to_dict(self) -> dict[str, object]: ...
+
 
 @dataclass(frozen=True)
 class DenseSearchResult:

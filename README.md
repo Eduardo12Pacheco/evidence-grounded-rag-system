@@ -2,7 +2,8 @@
 
 Status: **implementation in progress — synthetic-fixture evaluation is the
 default; one real-local corpus (Python 3.12.13 documentation) is approved for
-local development only.**
+local development only; one local semantic embedding model (BAAI/bge-small-en-
+v1.5) is approved for local development only and is opt-in.**
 
 A greenfield RAG system where answers are bound to evidence: hybrid retrieval
 (sparse + dense), embeddings, generation with citations, mandatory abstention,
@@ -11,9 +12,12 @@ exactly what is implemented, what is blocked, and what is not claimed.
 
 ## What this is
 
-- **Hybrid retrieval** — sparse (Okapi BM25) and dense (deterministic,
-  explicitly *non-semantic* embedding) fused by reciprocal rank fusion
-  (RRF, `k = 60`). All parameters are committed and versioned.
+- **Hybrid retrieval** — sparse (Okapi BM25) and dense embeddings fused by
+  reciprocal rank fusion (RRF, `k = 60`). The default dense embedding is a
+  deterministic, explicitly *non-semantic* hash embedding; an optional local
+  semantic model (BAAI/bge-small-en-v1.5, opt-in, local-only, `semantic =
+  True`) can be plugged in behind the same interface. All parameters are
+  committed and versioned.
 - **Structured generation** — a deterministic offline extractive/template
   provider (`is_llm_generated = False`) that turns retrieved passages into
   claims, each cited to the exact chunk.
@@ -62,11 +66,11 @@ src/evidence_grounded_rag/
 ├── corpus/        # synthetic gate+loader AND source-manifest audit, real-local derivation, privacy
 ├── text/          # shared deterministic tokenizer (used by retrieval/embeddings)
 ├── retrieval/     # BM25 + dense + RRF fusion + hybrid engine and traces
-├── embeddings/    # embedding interface + deterministic non-semantic embedding
+├── embeddings/    # embedding interface + deterministic non-semantic embedding + model manifest + optional semantic provider
 ├── generation/    # claim/citation models, extractive provider, env adapter
 ├── validation/    # strict citation validation (fail-closed)
 ├── abstention/    # mandatory abstention reason codes
-├── evaluation/    # committed metrics, versioned query set, materialize command
+├── evaluation/    # committed metrics, versioned query set, synthetic/hash/semantic materializers
 └── pipeline.py    # end-to-end EvidenceRagPipeline (retrieve → generate → validate)
 ```
 
@@ -78,7 +82,9 @@ src/evidence_grounded_rag/
 | Source manifest | `1.0` | source-manifest audit boundary for the approved local corpus |
 | Tokenizer | `v1` | NFKC + case-fold, no stemming |
 | Sparse retriever | `okapi-bm25-v1` | `k1 = 1.5`, `b = 0.75`, Robertson-Sparck Jones idf |
-| Embedding | `deterministic-hashed-bow-v1` | `semantic = False`, offline, no weights |
+| Embedding (default) | `deterministic-hashed-bow-v1` | `semantic = False`, offline, no weights |
+| Semantic embedding (opt-in) | `BAAI/bge-small-en-v1.5` | `semantic = True`, local-only, pinned revision; see `docs/embedding-model-contract.md` |
+| Model manifest | `1.0` | embedding-model manifest schema with checksums (no weights committed) |
 | Fusion | `rrf-v1` | RRF with `k = 60` |
 | Generator | `extractive-template-v1` | not an LLM |
 | Query set | `synthetic-queries-v1` | 11 committed queries, 7 categories |
@@ -106,7 +112,8 @@ are **not** evidence about any real institution or regulation.
 ## Running the system
 
 ```bash
-uv sync --dev --extra demo
+uv sync --dev --extra demo                 # core + demo (no model stack)
+uv sync --dev --extra demo --extra embeddings   # + optional semantic model stack
 uv run pytest                      # real behavior tests, offline
 uv run ruff check .                # lint
 uv run python scripts/materialize_fixtures.py   # regenerate committed fixtures
@@ -151,6 +158,50 @@ Synthetic evaluation (unchanged): `uv run python -m
 evidence_grounded_rag.evaluation.materialize` writes
 `data/manifests/evaluation-synthetic-v1.0.0.json`.
 
+## Semantic local embeddings (optional, separate, retrieval-only)
+
+An opt-in local semantic model (BAAI/bge-small-en-v1.5, MIT, pinned revision,
+384-dim, CLS pooling, L2 normalized) can replace the hash embedding behind the
+same `EmbeddingProvider` interface. It is **never a silent fallback**: the
+model is acquired explicitly, verified byte-exact, and loaded only from the
+gitignored local cache with `local_files_only=True`; if unavailable, semantic
+retrieval raises `SemanticModelUnavailableError`. Full candidate audit,
+license, revision, and checksum policy: `docs/embedding-model-contract.md`.
+
+```bash
+# 1. Install the optional model stack (torch/transformers — large footprint)
+uv sync --dev --extra demo --extra embeddings
+
+# 2. Acquire the pinned model (the ONLY network step)
+uv run python scripts/acquire_embedding_model.py --manifest data/manifests/embedding-model-v1.0.0.json
+
+# 3. Verify the local snapshot (offline, byte-exact, no downloads)
+uv run python scripts/verify_embedding_model.py --manifest data/manifests/embedding-model-v1.0.0.json
+
+# 4. Semantic-materializer evaluation (separate report, retrieval-only)
+uv run python -m evidence_grounded_rag.evaluation.semantic_materialize \
+    --manifest data/manifests/corpus-source-v1.0.0.json \
+    --queries data/evaluation/queries/python-docs-real-v1.0.0.json \
+    --raw-dir data/raw/python-docs-3.12.13 \
+    --model-manifest data/manifests/embedding-model-v1.0.0.json \
+    --cache-dir data/raw/models/bge-small-en-v1.5 \
+    --output data/evaluations/python-docs-real-semantic-evaluation-v1.0.0.json
+```
+
+The semantic materializer reports **four explicitly separated modes** with the
+same committed BM25/RRF parameters and thresholds (`min_fused_score = 0.01`,
+`top_k = 10`, RRF `k = 60`):
+
+- `sparse` — `BM25 sparse baseline`
+- `hash` — `Deterministic hash embedding diagnostic — not semantic retrieval`
+- `semantic` — `Local semantic embedding model`
+- `hybrid` — `Hybrid BM25 plus local semantic embeddings`
+
+It is a **retrieval-only** evaluation: no generation, no LLM, no faithfulness
+metrics. Retrieval quality does not imply answer faithfulness. The prior
+reports (`data/evaluations/python-docs-real-evaluation-v1.0.0.json` and the
+synthetic report) are untouched.
+
 ## Real-local corpus (approved, local-only, not the default)
 
 The **only** approved real source is the Python 3.12.13 official documentation
@@ -191,6 +242,10 @@ Raw data policy:
 - The real-local corpus is derived in memory by
   `corpus/real_local.py::build_real_local_corpus` and carries source URL,
   license, revision, and checksums forward on every document.
+- The semantic model weights live only under `data/raw/models/` (gitignored,
+  never committed); the committed artifact is the embedding-model manifest with
+  metadata and file checksums (`data/manifests/embedding-model-v1.0.0.json`).
+  The model is never redistributed and never silently replaced.
 
 ## Evidence requirements (unchanged contract)
 
@@ -208,8 +263,11 @@ Raw data policy:
 - The approved real-local corpus (Python 3.12.13 docs) is used for local
   development only; its raw text is never committed, packaged, or published.
 - No unlicensed corpus is indexed, ever.
-- `data/raw/` and `data/processed/` are never committed.
+- `data/raw/` and `data/processed/` are never committed (raw corpora and model
+  weights included).
 - Small synthetic fixtures and their manifests are committed for offline
   development. The source manifest
   (`data/manifests/corpus-source-v1.0.0.json`) is committed; the raw capture
-  it describes is not.
+  it describes is not. The embedding-model manifest
+  (`data/manifests/embedding-model-v1.0.0.json`) is committed; the weights it
+  checksums are not.

@@ -1,26 +1,3 @@
-"""Offline Streamlit demo for the evidence-grounded RAG system.
-
-Two explicit corpus sources:
-
-- **Synthetic fixture** (default): runs entirely from committed synthetic
-  fixtures. No credentials, no network, no model downloads. Every panel is
-  failure-visible: gate failures, validation failures, and abstentions are
-  shown explicitly. Generation is offline by default with an explicit
-  offline/live state: live generation shows an actionable
-  ``provider_unavailable`` message and never falls back to offline.
-- **Real local corpus**: the approved Python 3.12.13 documentation corpus,
-  retrieval only. Retrieval modes are explicitly labeled and never silently
-  swap: ``BM25 sparse baseline``, ``Hash embedding diagnostic``, ``Local
-  semantic embeddings``, and ``Semantic hybrid``. The semantic modes load the
-  local model with ``local_files_only=True`` and show an actionable warning
-  instead of falling back to hash embeddings when it is unavailable.
-
-A permanent honesty warning is shown wherever retrieval feeds generation:
-``Retrieval quality does not prove answer faithfulness.``
-
-Run:  uv run --extra demo streamlit run scripts/demo_retrieval.py
-"""
-
 from __future__ import annotations
 
 from pathlib import Path
@@ -91,15 +68,6 @@ def load_real_corpus():
 
 
 def _semantic_status() -> tuple[object | None, str | None]:
-    """Return (provider, error) for the local semantic model.
-
-    The provider itself enforces the boundary: the committed manifest is loaded
-    and passed to ``SemanticLocalEmbedding``, which audits it against the
-    approval constants and byte-verifies the cache before it is usable. Any
-    manifest, cache, or dimension failure surfaces here as an actionable
-    unavailable message. Never falls back to hash embeddings: either a verified
-    local provider is returned or an actionable error message is returned.
-    """
     if st.session_state.get("force_semantic_unavailable"):
         return None, (
             "Semantic model marked unavailable for demo verification; the "
@@ -175,7 +143,9 @@ def _show_answer(record) -> None:
             if record.state is AnswerState.CONFLICTING
             else "ABSTAINED"
         )
-        st.warning(f"{state_label}: `{record.abstention_reason.value if record.abstention_reason else None}`")
+        st.warning(
+            f"{state_label}: `{record.abstention_reason.value if record.abstention_reason else None}`"
+        )
         st.markdown(record.abstention_detail or "")
 
 
@@ -185,7 +155,9 @@ def _show_validation(record) -> None:
         st.caption("no validation performed")
         return
     if record.validation.skipped:
-        st.info("validation skipped: no citations on a refusal (never presented as verified)")
+        st.info(
+            "validation skipped: no citations on a refusal (never presented as verified)"
+        )
         return
     if record.validation.valid:
         st.success(
@@ -292,10 +264,16 @@ def _show_synthetic() -> None:
                 f"- **corpus:** `{status['corpus_id']}` v{status['corpus_version']} "
                 f"({status['num_documents']} documents, {status['num_chunks']} chunks)"
             )
-            st.markdown(f"- **provenance:** `{status['provenance']}` — synthetic: {status['synthetic']}")
+            st.markdown(
+                f"- **provenance:** `{status['provenance']}` — synthetic: {status['synthetic']}"
+            )
             st.markdown(f"- **license status:** `{status['license']['status']}`")
-            st.markdown(f"- **real corpus:** `{status['real_corpus']}` — gate blocked: {status['real_corpus_gate']['blocked']}")
-            st.markdown(f"**Real-corpus blocker:** {status['real_corpus_gate']['blocker']}")
+            st.markdown(
+                f"- **real corpus:** `{status['real_corpus']}` — gate blocked: {status['real_corpus_gate']['blocked']}"
+            )
+            st.markdown(
+                f"**Real-corpus blocker:** {status['real_corpus_gate']['blocker']}"
+            )
 
     col_mode, col_k, _ = st.columns([2, 1, 3])
     with col_mode:
@@ -484,7 +462,12 @@ def _show_real_local() -> None:
     _result_table(corpus, "Sparse (BM25)", sparse.fused)
     _result_table(
         corpus,
-        "Dense — " + ("semantic (local model)" if semantic_selected else "deterministic hash, non-semantic"),
+        "Dense — "
+        + (
+            "semantic (local model)"
+            if semantic_selected
+            else "deterministic hash, non-semantic"
+        ),
         dense.fused,
     )
     _result_table(corpus, f"Fused — {real_mode}", fused.fused)
@@ -492,7 +475,9 @@ def _show_real_local() -> None:
 
 
 def main() -> None:
-    st.set_page_config(page_title="Evidence-Grounded RAG — retrieval demo", layout="wide")
+    st.set_page_config(
+        page_title="Evidence-Grounded RAG — retrieval demo", layout="wide"
+    )
     st.title("Evidence-Grounded RAG — offline demo")
 
     corpus_source = st.selectbox(

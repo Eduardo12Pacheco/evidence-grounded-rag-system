@@ -1,10 +1,3 @@
-"""Deterministic retrieval and faithfulness evaluation.
-
-Defines the committed metric formulas and the versioned, committed query set,
-plus the materialize command that records a fully labeled synthetic-fixture
-evaluation report.
-"""
-
 from __future__ import annotations
 
 from evidence_grounded_rag.evaluation.metrics import (

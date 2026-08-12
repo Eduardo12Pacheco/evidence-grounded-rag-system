@@ -1,36 +1,10 @@
-"""Committed prompt for provider-neutral structured generation.
-
-The prompt version ``grounded-answer-prompt-v1.0.0`` is FROZEN here and
-documented verbatim in ``docs/generation-contract.md``. Any change to the
-wording, evidence framing, JSON schema, or injection policy bumps the version.
-
-Design rules enforced here:
-
-- **Evidence / instructions separation**: the query and the evidence are
-  wrapped in explicit, unambiguous delimiters (``<query>``, ``<evidence>``);
-  the system policy and the output instructions live OUTSIDE those delimiters.
-- **Prompt injection treatment**: the system policy states that everything
-  inside ``<evidence>`` is untrusted DATA, not instructions, and the model must
-  ignore any instruction-like text inside it. The strict parser
-  (``generation/structured.py``) then validates the reply against the exact
-  JSON schema regardless of anything the evidence contained, so injected text
-  can corrupt a provider's output but can never be interpreted as a control
-  instruction by this system.
-- **Bound size**: only the bounded ``EvidencePack`` is included; the evidence
-  section is never larger than the pack.
-"""
-
 from __future__ import annotations
 
 from evidence_grounded_rag.generation.evidence import EvidencePack
 from evidence_grounded_rag.versions import GENERATION_PROMPT_VERSION
 
-#: Frozen prompt version (matches ``docs/generation-contract.md``).
 PROMPT_VERSION = GENERATION_PROMPT_VERSION
 
-#: Default time budget for a live provider call, in seconds. The injected
-#: transport enforces its own timeout; ``LiveGenerator`` converts a
-#: ``TimeoutError`` from the transport into a fail-closed abstention.
 DEFAULT_LIVE_TIMEOUT_SECONDS = 60
 
 _SYSTEM_POLICY = (
@@ -61,11 +35,11 @@ _INSTRUCTIONS = (
     ' "abstention_reason": string | null,'
     ' "abstention_detail": string | null}\n'
     "Rules:\n"
-    "- status is \"answered\" when the evidence supports an answer; "
-    "\"abstained\" when the evidence is insufficient or the query is out of "
-    "scope; \"conflicting\" when the evidence directly contradicts itself; "
-    "\"invalid\" when you cannot produce a valid structured answer at all.\n"
-    "- For \"answered\", write the full answer in answer_text and add one claim "
+    '- status is "answered" when the evidence supports an answer; '
+    '"abstained" when the evidence is insufficient or the query is out of '
+    'scope; "conflicting" when the evidence directly contradicts itself; '
+    '"invalid" when you cannot produce a valid structured answer at all.\n'
+    '- For "answered", write the full answer in answer_text and add one claim '
     "per grounded statement. Every claim MUST cite at least one chunk via "
     "citation_chunk_ids.\n"
     "- Every cited chunk id MUST be one of the <evidence> item ids, and every "
@@ -83,7 +57,6 @@ def build_grounded_answer_prompt(
     query: str,
     evidence: EvidencePack,
 ) -> str:
-    """Build the versioned prompt for one query against one evidence pack."""
     evidence_blocks = "\n".join(
         f'<evidence item="{item.chunk_id}">\n{item.text}\n</evidence>'
         for item in evidence.items

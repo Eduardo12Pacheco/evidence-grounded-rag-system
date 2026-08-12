@@ -1,10 +1,3 @@
-"""Independent sparse/hybrid retrieval layer.
-
-Provides a deterministic, committed Okapi BM25 implementation and a hybrid
-retriever that fuses sparse and dense rankings with reciprocal rank fusion
-(``k = 60``).
-"""
-
 from __future__ import annotations
 
 from evidence_grounded_rag.retrieval.bm25 import BM25, BM25Config

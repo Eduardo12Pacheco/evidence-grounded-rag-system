@@ -1,10 +1,3 @@
-"""Tests for the license-gated corpus layer.
-
-These tests exercise the committed synthetic fixture manifest and the
-fail-closed loading rules: checksum validation, duplicate detection, blocked
-real corpora, unapproved licenses, format handling, and stable ID derivation.
-"""
-
 from __future__ import annotations
 
 import json
@@ -115,7 +108,7 @@ def test_real_corpus_blocker_is_exact_gobec_gate(tmp_path):
     header["synthetic"] = False
     header["real_corpus"] = True
     header["license"]["status"] = "approved"
-    header["real_corpus_gate"] = {"blocked": True}  # no custom blocker → committed text
+    header["real_corpus_gate"] = {"blocked": True}
     manifest = {"manifest": header, "documents": _manifest_documents()}
     path = tmp_path / "approved-but-real.json"
     path.write_text(json.dumps(manifest), encoding="utf-8")

@@ -1,5 +1,3 @@
-"""Tests for hybrid retrieval: committed RRF fusion, modes, trace, and rules."""
-
 from __future__ import annotations
 
 from pathlib import Path
@@ -106,13 +104,13 @@ def test_hybrid_ranking_combines_both_systems(retriever):
 def test_sparse_mode_passthrough(retriever):
     result = retriever.search("permit", top_k=3, mode=MODE_SPARSE)
     assert result.fused.config["retriever"] == "bm25"
-    assert result.trace.dense.chunks  # dense candidates still traced
+    assert result.trace.dense.chunks
 
 
 def test_dense_mode_passthrough(retriever):
     result = retriever.search("permit", top_k=3, mode=MODE_DENSE)
     assert result.fused.config["retriever"] == "dense"
-    assert result.trace.sparse.chunks  # sparse candidates still traced
+    assert result.trace.sparse.chunks
 
 
 def test_invalid_mode_rejected(retriever):
@@ -134,6 +132,10 @@ def test_top_k_zero_returns_empty(retriever):
 
 
 def test_hybrid_is_deterministic(retriever):
-    first = [item.chunk_id for item in retriever.search("library open saturday").fused.chunks]
-    second = [item.chunk_id for item in retriever.search("library open saturday").fused.chunks]
+    first = [
+        item.chunk_id for item in retriever.search("library open saturday").fused.chunks
+    ]
+    second = [
+        item.chunk_id for item in retriever.search("library open saturday").fused.chunks
+    ]
     assert first == second

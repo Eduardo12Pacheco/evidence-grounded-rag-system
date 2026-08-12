@@ -1,38 +1,40 @@
 # AGENTS.md — evidence-grounded-rag-system
 
-## Objective
+## Objetivo
 
-Build hybrid retrieval (sparse + dense embeddings), evidence-grounded
-generation with citations, abstention when evidence is insufficient, and
-faithfulness evaluation. Independent, greenfield project. It MUST NOT copy the
-existing BM25 prototype and MUST NOT present the Gob.ec corpus as authorized.
+Construir recuperación híbrida (embeddings sparse + dense), generación basada en
+evidencia con citas, abstención cuando la evidencia es insuficiente y evaluación
+de fidelidad. Proyecto independiente, greenfield. NO debe copiar el prototipo
+BM25 existente y NO debe presentar el corpus Gob.ec como autorizado.
 
-## Status
+## Estado
 
-Scaffold / implementation not started. No metrics, no claims of results.
+Implementación completa para el alcance declarado, con evaluaciones sintéticas
+y evaluaciones reales acotadas documentadas.
 
-## Boundaries
+## Límites
 
-- Do NOT modify these sibling projects: `ecuador-job-market-intelligence`,
+- NO modificar estos proyectos hermanos: `ecuador-job-market-intelligence`,
   `ecuador-mobility-reliability`, `demand-inventory-optimizer`,
   `ecuador-public-information-evidence-assistant`, `eduardo-github-profile`.
-- Do NOT push, publish, or create GitHub remotes.
-- **No real corpus is implemented until its license is confirmed**
-  (see `docs/corpus-license-contract.md`).
+- La publicación actual ya está configurada en GitHub; no crear nuevos remotes
+  ni hacer push sin autorización explícita del usuario.
+- El corpus local de documentación de Python está auditado para desarrollo
+  local. Gob.ec permanece bloqueado (ver `docs/corpus-license-contract.md`).
 
-## Structure
+## Estructura
 
 ```text
-src/evidence_grounded_rag/     # package under src layout
-tests/                         # pytest; real tests only, no fake coverage
-docs/                          # corpus/license contract, retrieval & evaluation protocol, demo script
-data/fixtures/                 # small versioned fixtures (never a real corpus)
-data/manifests/                # versioned manifests of captured artifacts
-data/raw/ data/processed/      # gitignored runtime output
-deploy/                        # deployment notes (later)
+src/evidence_grounded_rag/     # paquete bajo layout src
+tests/                         # pytest; solo tests reales, sin cobertura falsa
+docs/                          # contract de corpus/licencia, protocolo de retrieval y evaluación, demo script
+data/fixtures/                 # fixtures versionados pequeños (nunca un corpus real)
+data/manifests/                # manifests versionados de artefactos capturados
+data/raw/ data/processed/      # salida de ejecución gitignored
+deploy/                        # notas de despliegue (más adelante)
 ```
 
-## Expected commands
+## Comandos esperados
 
 ```bash
 uv sync --dev
@@ -41,18 +43,18 @@ uv run ruff check .
 uv run --extra demo streamlit run scripts/demo_retrieval.py
 ```
 
-## Data policy
+## Política de datos
 
-- The Gob.ec corpus is NOT implemented and NOT claimed as authorized until the
-  license contract is satisfied.
-- Never commit `data/raw/` or `data/processed/`.
-- Commit small fixtures and manifests only.
+- El corpus Gob.ec permanece bloqueado y NO se reclama como autorizado.
+- Nunca comprometer `data/raw/` ni `data/processed/`.
+- Comprometer únicamente fixtures y manifests pequeños.
 
 ## CodeGraph
 
-Use `.codegraph/` index for structural queries. Never commit its contents.
+Usar el índice `.codegraph/` para consultas estructurales. Nunca comprometer su
+contenido.
 
 ## Testing
 
-Tests must verify real behavior that exists. No placeholder tests pretending
-features exist.
+Los tests deben verificar el comportamiento real que existe. Sin tests
+placeholder que pretendan que las características existen.

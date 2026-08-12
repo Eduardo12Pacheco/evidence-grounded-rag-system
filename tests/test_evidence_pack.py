@@ -1,11 +1,3 @@
-"""Tests for the bounded evidence pack surface exposed to generators.
-
-Covers the evidence boundary (a generator only ever sees pack items), the
-committed ``max_items`` pack limit, iteration/provenance metadata, and prompt
-injection treated as data (instruction-like evidence never becomes an
-instruction to the system).
-"""
-
 from __future__ import annotations
 
 from evidence_grounded_rag.corpus.models import Chunk
@@ -63,7 +55,10 @@ def test_pack_iteration_yields_items_in_rank_order():
     chunks = [_chunk("doc-a::0", "A"), _chunk("doc-b::0", "B")]
     pack = EvidencePack.from_scored_chunks(
         _LookupCorpus(chunks),
-        [_scored("doc-b::0", rank=1, score=0.9), _scored("doc-a::0", rank=2, score=0.5)],
+        [
+            _scored("doc-b::0", rank=1, score=0.9),
+            _scored("doc-a::0", rank=2, score=0.5),
+        ],
     )
     assert [item.chunk_id for item in pack] == ["doc-b::0", "doc-a::0"]
     assert pack.exposed_chunk_ids == ("doc-b::0", "doc-a::0")
@@ -73,7 +68,10 @@ def test_pack_skips_unknown_chunks_from_corpus():
     chunks = [_chunk("doc-a::0", "A")]
     pack = EvidencePack.from_scored_chunks(
         _LookupCorpus(chunks),
-        [_scored("doc-missing::0", rank=1, score=0.9), _scored("doc-a::0", rank=2, score=0.5)],
+        [
+            _scored("doc-missing::0", rank=1, score=0.9),
+            _scored("doc-a::0", rank=2, score=0.5),
+        ],
     )
     assert [item.chunk_id for item in pack] == ["doc-a::0"]
     assert pack.by_chunk_id("doc-missing::0") is None
@@ -116,11 +114,9 @@ def test_prompt_treats_injection_evidence_as_data():
     pack = EvidencePack.from_chunks([chunk], corpus_id="c", corpus_version="1.0.0")
     prompt = build_grounded_answer_prompt("What is the policy?", pack)
 
-    # The evidence block is delimited and the frame tells the model it is data.
     assert "<evidence>" in prompt and "</evidence>" in prompt
     assert '<evidence item="doc-inject::0">' in prompt
     assert injection_text in prompt
-    # System/instructions stay OUTSIDE the evidence delimiters.
     assert "<system>" in prompt and "</system>" in prompt
     assert "<instructions>" in prompt and "</instructions>" in prompt
     assert prompt.index("<evidence>") < prompt.index(injection_text)

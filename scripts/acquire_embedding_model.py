@@ -1,42 +1,3 @@
-"""Acquire the approved local semantic embedding model (BAAI/bge-small-en-v1.5).
-
-Run (normal, trust-anchor mode):
-
-    uv run python scripts/acquire_embedding_model.py \
-        --manifest data/manifests/embedding-model-v1.0.0.json \
-        --cache-dir data/raw/models/bge-small-en-v1.5
-
-Normal mode REQUIRES the committed manifest and treats it as the trust anchor:
-
-- The committed manifest (``data/manifests/embedding-model-v1.0.0.json``) is
-  loaded, schema-validated, and audited against the approval policy. A missing
-  manifest fails clearly and is NOT bootstrapped implicitly.
-- Exactly the manifest's pinned files are downloaded (model id + revision read
-  from the audited manifest) into a temporary STAGING directory on the same
-  filesystem — never directly into the cache.
-- The staged files are verified byte-exact against the manifest's declared
-  sizes and SHA-256 checksums BEFORE the cache is touched.
-- Only then is the staging directory atomically renamed over the cache. A
-  partial or failed run can never leave a seemingly-valid cache: the old cache
-  is only swapped once the full snapshot is verified.
-- The approved manifest is NEVER rewritten in normal mode — a compromised
-  download cannot self-certify by overwriting the committed checksums.
-
-First-time bootstrap (explicit, separate action) for a missing manifest:
-
-    uv run python scripts/acquire_embedding_model.py --bootstrap \
-        --manifest data/manifests/embedding-model-v1.0.0.json \
-        --cache-dir data/raw/models/bge-small-en-v1.5
-
-``--bootstrap`` is the ONLY mode that writes a new manifest, and it requires
-the manifest to be absent. The checksums it records are self-certified (there
-is no trust anchor yet): the command prints a loud warning that the new
-manifest must be reviewed and committed before it is treated as approved.
-
-Standard library only (``urllib``, ``hashlib``, ``json``). The raw cache stays
-gitignored (``data/raw/``); no secrets are ever logged or written.
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -81,7 +42,6 @@ from evidence_grounded_rag.embeddings.manifest import (
     verify_embedding_model_files,
 )
 
-#: Committed model facts recorded on the manifest.
 REDISTRIBUTION_STATUS = REDISTRIBUTION_LOCAL_ONLY
 MODEL_STATUS = STATUS_APPROVED_LOCAL
 
@@ -96,7 +56,6 @@ BOOTSTRAP_WARNING = (
 
 
 def _download_file_bytes(model_id: str, revision: str, rel_path: str) -> bytes:
-    """Download one pinned model file. Returns the raw bytes (network only here)."""
     import urllib.request
 
     url = f"https://huggingface.co/{model_id}/resolve/{revision}/{rel_path}"
@@ -106,7 +65,6 @@ def _download_file_bytes(model_id: str, revision: str, rel_path: str) -> bytes:
 
 
 def _make_staging_dir(cache_dir: Path) -> Path:
-    """Create a temporary staging directory beside the cache (same filesystem)."""
     cache_dir.parent.mkdir(parents=True, exist_ok=True)
     return Path(tempfile.mkdtemp(prefix=".staging-", dir=cache_dir.parent))
 
@@ -118,18 +76,9 @@ def _write_staged_file(staging_dir: Path, rel_path: str, data: bytes) -> None:
 
 
 def _atomically_replace_cache(cache_dir: Path, staging_dir: Path) -> None:
-    """Rename *staging_dir* over *cache_dir*; the swap is all-or-nothing.
-
-    The staging dir is on the same filesystem, so the final rename is atomic.
-    If an old cache exists it is first moved aside to a backup; if the new
-    rename fails the old cache is restored. A partial run can never leave a
-    seemingly-valid cache in place.
-    """
     cache_dir.parent.mkdir(parents=True, exist_ok=True)
     if cache_dir.exists():
-        backup = cache_dir.with_name(
-            f"{cache_dir.name}.old-{int(time.time() * 1000)}"
-        )
+        backup = cache_dir.with_name(f"{cache_dir.name}.old-{int(time.time() * 1000)}")
         cache_dir.rename(backup)
         try:
             staging_dir.rename(cache_dir)
@@ -141,8 +90,9 @@ def _atomically_replace_cache(cache_dir: Path, staging_dir: Path) -> None:
         staging_dir.rename(cache_dir)
 
 
-def build_manifest(entries: list[dict[str, object]], timestamp: str) -> dict[str, object]:
-    """Assemble the full model manifest from committed metadata + capture facts."""
+def build_manifest(
+    entries: list[dict[str, object]], timestamp: str
+) -> dict[str, object]:
     return {
         "manifest_version": SUPPORTED_EMBEDDING_MODEL_MANIFEST_VERSION,
         "model_id": MODEL_ID,
@@ -175,10 +125,6 @@ def build_manifest(entries: list[dict[str, object]], timestamp: str) -> dict[str
 
 
 def _acquire_from_trusted_manifest(args) -> int:
-    """Normal mode: download pinned files and verify against the committed manifest.
-
-    Never rewrites the manifest. Returns the process exit code.
-    """
     try:
         manifest = load_embedding_model_manifest(args.manifest)
     except EmbeddingModelManifestError as exc:
@@ -206,7 +152,9 @@ def _acquire_from_trusted_manifest(args) -> int:
     staging = _make_staging_dir(args.cache_dir)
     try:
         for entry in manifest.expected_files:
-            data = _download_file_bytes(manifest.model_id, manifest.revision, entry.path)
+            data = _download_file_bytes(
+                manifest.model_id, manifest.revision, entry.path
+            )
             _write_staged_file(staging, entry.path, data)
         verify_embedding_model_files(manifest, staging)
     except Exception as exc:  # noqa: BLE001 - any failure must leave the cache untouched
@@ -220,10 +168,16 @@ def _acquire_from_trusted_manifest(args) -> int:
 
     _atomically_replace_cache(args.cache_dir, staging)
 
-    print(f"\nAcquired {manifest.model_id} v{manifest.model_version} at {manifest.revision}")
+    print(
+        f"\nAcquired {manifest.model_id} v{manifest.model_version} at {manifest.revision}"
+    )
     print(f"  cache dir: {args.cache_dir} (gitignored, never committed)")
-    print("  staged, verified byte-exact against the committed manifest, atomically swapped")
-    print(f"  manifest: {args.manifest} (NOT rewritten — committed manifest is the trust anchor)")
+    print(
+        "  staged, verified byte-exact against the committed manifest, atomically swapped"
+    )
+    print(
+        f"  manifest: {args.manifest} (NOT rewritten — committed manifest is the trust anchor)"
+    )
     total = sum(entry.size for entry in manifest.expected_files)
     print(f"  files: {len(manifest.expected_files)}  total bytes: {total}")
     for entry in manifest.expected_files:
@@ -232,7 +186,6 @@ def _acquire_from_trusted_manifest(args) -> int:
 
 
 def _bootstrap(args) -> int:
-    """First-time bootstrap: only allowed when no manifest exists. Self-certifying."""
     if args.manifest.exists():
         print(
             "BOOTSTRAP REFUSED: a model manifest already exists at "
@@ -242,8 +195,10 @@ def _bootstrap(args) -> int:
         )
         return 2
 
-    print(f"BOOTSTRAP: no committed manifest; acquiring {MODEL_ID} v{MODEL_VERSION} "
-          f"at {MODEL_REVISION} self-certified.")
+    print(
+        f"BOOTSTRAP: no committed manifest; acquiring {MODEL_ID} v{MODEL_VERSION} "
+        f"at {MODEL_REVISION} self-certified."
+    )
     staging = _make_staging_dir(args.cache_dir)
     entries: list[dict[str, object]] = []
     try:
@@ -265,13 +220,17 @@ def _bootstrap(args) -> int:
     timestamp = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
     manifest_doc = build_manifest(entries, timestamp)
     args.manifest.parent.mkdir(parents=True, exist_ok=True)
-    args.manifest.write_text(json.dumps(manifest_doc, indent=2) + "\n", encoding="utf-8")
+    args.manifest.write_text(
+        json.dumps(manifest_doc, indent=2) + "\n", encoding="utf-8"
+    )
 
     try:
         loaded = load_embedding_model_manifest(args.manifest)
         audit_embedding_model_manifest(loaded)
     except EmbeddingModelManifestError as exc:
-        print(f"BOOTSTRAP FAILED: newly written manifest invalid — {exc}", file=sys.stderr)
+        print(
+            f"BOOTSTRAP FAILED: newly written manifest invalid — {exc}", file=sys.stderr
+        )
         return 1
 
     _atomically_replace_cache(args.cache_dir, staging)

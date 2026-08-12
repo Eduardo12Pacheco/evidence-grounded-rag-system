@@ -1,11 +1,3 @@
-"""Shared fake semantic embedding provider for offline tests (no weights).
-
-The fake produces deterministic, dimension-stable vectors from SHA-256 digests so
-tests can exercise dense/hybrid retrieval and the semantic materializer without
-downloading a model. It is never used outside tests and never claims real
-semantic quality.
-"""
-
 from __future__ import annotations
 
 import hashlib
@@ -19,8 +11,6 @@ REVISION = "5c38ec7c405ec4b44b94cc5a9bb96e735b38267a"
 
 
 class FakeSemanticProvider(EmbeddingProvider):
-    """Deterministic fake with ``semantic=True`` and stable vectors."""
-
     model_id = MODEL_ID
     mode = "semantic-local"
     semantic = True
@@ -34,10 +24,7 @@ class FakeSemanticProvider(EmbeddingProvider):
 
     def _vector(self, text: str) -> Vector:
         digest = hashlib.sha256(text.encode("utf-8")).digest()
-        vector = [
-            (digest[index] - 127.0) / 128.0
-            for index in range(self._dimension)
-        ]
+        vector = [(digest[index] - 127.0) / 128.0 for index in range(self._dimension)]
         norm = math.sqrt(sum(value * value for value in vector)) or 1.0
         return tuple(value / norm for value in vector)
 
@@ -58,7 +45,11 @@ class FakeSemanticProvider(EmbeddingProvider):
             "dimension": self._dimension,
             "revision": REVISION,
             "revision_tag": REVISION,
-            "license": {"name": "MIT License", "version": "1.0", "url": "https://huggingface.co/fake"},
+            "license": {
+                "name": "MIT License",
+                "version": "1.0",
+                "url": "https://huggingface.co/fake",
+            },
             "max_input_tokens": 512,
             "pooling": "cls",
             "normalization": True,

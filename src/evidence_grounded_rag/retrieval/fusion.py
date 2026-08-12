@@ -1,14 +1,3 @@
-"""Reciprocal rank fusion with committed, reproducible parameters.
-
-The fusion rule is reciprocal rank fusion (RRF). For a candidate chunk its
-fused score is the sum over every system that retrieved it of
-``1 / (k + rank)``, where ``rank`` is the 1-based rank within that system's
-result list. Candidates are deduplicated (one entry per chunk id) and ties are
-broken deterministically by (fused score desc, chunk id ascending). The
-parameter ``k`` is fixed at 60 and committed here; changing it changes every
-downstream number, so it is part of the reproducibility contract.
-"""
-
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -20,8 +9,6 @@ FUSION_NAME = "reciprocal_rank_fusion"
 
 @dataclass(frozen=True)
 class FusionConfig:
-    """Committed RRF parameters."""
-
     k: int = 60
     name: str = FUSION_NAME
 
@@ -34,7 +21,6 @@ def reciprocal_rank_fusion(
     dense: RetrievalResult,
     config: FusionConfig | None = None,
 ) -> RetrievalResult:
-    """Fuse two rank lists into one deterministic RRF ranking."""
     config = config or FusionConfig()
     scores: dict[str, tuple[float, str]] = {}
     for result in (sparse, dense):
@@ -47,9 +33,7 @@ def reciprocal_rank_fusion(
             else:
                 scores[chunk_id] = (current[0] + contribution, current[1])
 
-    ranked = sorted(
-        scores.items(), key=lambda item: (-item[1][0], item[0])
-    )
+    ranked = sorted(scores.items(), key=lambda item: (-item[1][0], item[0]))
     fused = [
         ScoredChunk(
             chunk_id=chunk_id,

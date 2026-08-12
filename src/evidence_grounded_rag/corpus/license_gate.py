@@ -1,11 +1,3 @@
-"""License gate for corpus manifests.
-
-The gate FAILS CLOSED. Any manifest that cannot prove its license is approved
-and independently confirmed is refused. Real corpora are blocked today: no
-external license has been independently confirmed, and the Gob.ec corpus is
-explicitly unauthorized with an unresolved license discrepancy.
-"""
-
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -16,9 +8,6 @@ from evidence_grounded_rag.corpus.errors import (
     UnapprovedLicenseError,
 )
 
-#: Exact blocker recorded for any real-corpus manifest. This text is the
-#: current state of the real-corpus gate and is surfaced verbatim in reports
-#: and the demo.
 REAL_CORPUS_BLOCKER = (
     "No external corpus license has been independently confirmed. The Gob.ec "
     "corpus is explicitly unauthorized: its 'Creative Commons Attribution 4.0 "
@@ -32,19 +21,12 @@ APPROVED_LICENSE_STATUSES = frozenset({"approved"})
 
 @dataclass(frozen=True)
 class GateVerdict:
-    """Result of gating a manifest. ``allowed`` is False unless every check passed."""
-
     allowed: bool
     reasons: tuple[str, ...]
     blocker: str | None = None
 
 
 def gate_manifest(manifest: dict[str, Any]) -> GateVerdict:
-    """Gate a parsed manifest, failing closed on any unapproved or real corpus.
-
-    ``manifest`` must expose ``synthetic``, ``real_corpus`` and a ``license``
-    mapping with a ``status`` string.
-    """
     reasons: list[str] = []
     blocker: str | None = None
 
@@ -77,7 +59,6 @@ def gate_manifest(manifest: dict[str, Any]) -> GateVerdict:
 
 
 def assert_allowed(manifest: dict[str, Any]) -> None:
-    """Raise the appropriate fail-closed error when a manifest is blocked."""
     verdict = gate_manifest(manifest)
     if verdict.allowed:
         return

@@ -1,30 +1,3 @@
-"""Separate real-local evaluation materializer.
-
-Runs a bounded, fully offline evaluation over the single approved real-local
-corpus (Python 3.12.13 documentation) using the committed BM25 sparse
-retriever, the deterministic non-semantic hash embedding (dense), reciprocal
-rank fusion, the offline extractive generator, and the strict citation
-validator — all composed directly over the real-local corpus without touching
-the serving pipeline.
-
-The real report is a SEPARATE artifact from the synthetic report: it is never
-combined with synthetic-fixture numbers, it never falls back to the synthetic
-corpus on any failure, and every mode is labeled explicitly as diagnostic.
-
-Command::
-
-    uv run python -m evidence_grounded_rag.evaluation.real_materialize \
-        --manifest data/manifests/corpus-source-v1.0.0.json \
-        --queries data/evaluation/queries/python-docs-real-v1.0.0.json \
-        --raw-dir data/raw/python-docs-3.12.13 \
-        --output data/evaluations/python-docs-real-evaluation-v1.0.0.json
-
-Timestamp policy: ``timestamp_utc`` is runtime provenance and the ONLY field
-allowed to differ between runs. Every other field (metrics, per-query records,
-traces, configs, labels, corpus facts) is deterministic; ``deterministic_digest``
-covers them so two runs compare byte-for-byte outside the timestamp.
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -80,16 +53,13 @@ from evidence_grounded_rag.versions import (
     TOKENIZER_VERSION,
 )
 
-#: Report identity. The real report is versioned independently of the synthetic
-#: report and is never merged with it.
 REPORT_TYPE = "real-local-evaluation"
 REPORT_VERSION = "1.0.0"
 
-#: Required labels. The dense and hybrid modes and the generation step must be
-#: labeled as deterministic diagnostic components, never as semantic retrieval
-#: or as an LLM.
 DENSE_MODE_LABEL = "Deterministic hash embedding diagnostic — not semantic retrieval"
-HYBRID_MODE_LABEL = "Hybrid diagnostic using BM25 plus deterministic non-semantic hash embeddings"
+HYBRID_MODE_LABEL = (
+    "Hybrid diagnostic using BM25 plus deterministic non-semantic hash embeddings"
+)
 GENERATION_LABEL = "Offline deterministic extractive evaluation — not an LLM result"
 
 MODE_LABELS: dict[str, str] = {
@@ -120,7 +90,6 @@ DEFAULT_OUT = Path("data/evaluations/python-docs-real-evaluation-v1.0.0.json")
 RECALL_KS = (1, 5, 10)
 TOP_HIT_KS = (1, 5, 10)
 
-#: Metric groups reported per mode.
 GROUP_ANSWERABLE = "answerable"
 GROUP_SINGLE_PASSAGE = "single_passage"
 GROUP_MULTI_PASSAGE = "multi_passage"
@@ -139,13 +108,6 @@ RETRIEVAL_GROUPS = (
 
 @dataclass(frozen=True)
 class QueryModeRecord:
-    """Complete per-query, per-mode evaluation record (no chunk-level text).
-
-    Deliberately does not carry claim/answer text or cited excerpts: the report
-    stores only claim ids, citation chunk ids, excerpt checksums, and short
-    excerpt prefixes so no raw corpus text is committed.
-    """
-
     query_id: str
     case: str
     expected_status: str
@@ -175,7 +137,10 @@ class QueryModeRecord:
 
     @property
     def is_abstained(self) -> bool:
-        return self.state in (AnswerState.ABSTAINED.value, AnswerState.CONFLICTING.value)
+        return self.state in (
+            AnswerState.ABSTAINED.value,
+            AnswerState.CONFLICTING.value,
+        )
 
     def to_dict(self) -> dict[str, object]:
         return {
@@ -208,11 +173,6 @@ def build_real_local(
     manifest_path: str | Path,
     raw_dir: str | Path,
 ) -> RealLocalCorpus:
-    """Load the source manifest, audit it, verify local files, and derive the corpus.
-
-    Fails explicitly on ANY audit/verification/derivation error with the stable
-    error code. There is deliberately no synthetic fallback.
-    """
     try:
         manifest = load_source_manifest(manifest_path)
         return build_real_local_corpus(manifest, raw_dir)
@@ -221,13 +181,11 @@ def build_real_local(
 
 
 class RealLocalEvaluationError(RuntimeError):
-    """Raised when the real-local evaluation cannot proceed. No fallback."""
+    pass
 
 
 @dataclass(frozen=True)
 class RealEvaluationReport:
-    """The full deterministic real-local evaluation report."""
-
     data: dict[str, object]
 
     def deterministic_payload(self) -> dict[str, object]:
@@ -255,11 +213,6 @@ def real_evaluate(
     modes: Sequence[str] = VALID_MODES,
     timestamp_utc: str | None = None,
 ) -> tuple[RealEvaluationReport, Path]:
-    """Run the bounded real-local evaluation and write the separate report.
-
-    Returns the report plus the written output path. Never falls back to the
-    synthetic corpus; any source-manifest/verification failure raises.
-    """
     for mode in modes:
         if mode not in VALID_MODES:
             raise ValueError(f"unknown mode {mode!r}; expected one of {VALID_MODES}")
@@ -279,15 +232,23 @@ def real_evaluate(
     for mode in modes:
         for query in query_set.queries:
             record, trace = _run_query_mode(
-                corpus, retriever, generator, validator, query, mode,
-                top_k=top_k, min_score=MIN_FUSED_SCORE,
+                corpus,
+                retriever,
+                generator,
+                validator,
+                query,
+                mode,
+                top_k=top_k,
+                min_score=MIN_FUSED_SCORE,
                 corpus_manifest_id=query_set.corpus_manifest_id,
             )
             per_query[mode][query.query_id] = record.to_dict()
             traces[mode][query.query_id] = _quantize_trace(trace.to_dict())
 
     metrics = {
-        mode: _compute_mode_metrics(query_set, [per_query[mode][q.query_id] for q in query_set.queries])
+        mode: _compute_mode_metrics(
+            query_set, [per_query[mode][q.query_id] for q in query_set.queries]
+        )
         for mode in modes
     }
     failures.extend(_collect_failures(modes, per_query))
@@ -304,7 +265,8 @@ def real_evaluate(
         "traces": traces,
         "failures": failures,
         "implementation_commit": _current_commit(),
-        "timestamp_utc": timestamp_utc or datetime.now(UTC).isoformat(timespec="seconds"),
+        "timestamp_utc": timestamp_utc
+        or datetime.now(UTC).isoformat(timespec="seconds"),
         "deterministic_digest": "",
         "limitations": _limitations(),
     }
@@ -315,11 +277,6 @@ def real_evaluate(
     resolved_out.parent.mkdir(parents=True, exist_ok=True)
     resolved_out.write_text(_json_bytes(report.data).decode("utf-8"), encoding="utf-8")
     return report, resolved_out
-
-
-# --------------------------------------------------------------------------- #
-# per-query execution
-# --------------------------------------------------------------------------- #
 
 
 def _run_query_mode(
@@ -347,9 +304,6 @@ def _run_query_mode(
 
     generated = generator.generate(query.question, evidence_chunks)
 
-    # Mirror the serving pipeline's fail-closed discipline: a generation that
-    # answers without text/claims is malformed; an answered generation that
-    # fails citation validation is converted into a refusal.
     if generated.state is AnswerState.ANSWERED and (
         not generated.answer_text or not generated.claims
     ):
@@ -361,13 +315,20 @@ def _run_query_mode(
         validation = validator.validate(generated, exposed_ids)
         if generated.state is not AnswerState.ANSWERED:
             state = generated.state.value
-            reason = generated.abstention_reason.value if generated.abstention_reason else None
+            reason = (
+                generated.abstention_reason.value
+                if generated.abstention_reason
+                else None
+            )
             detail = generated.abstention_detail
         elif not validation.valid:
             state = AnswerState.ABSTAINED.value
             reason = "citation_validation_failed"
-            detail = "Generated citations failed validation; answer refused. " + "; ".join(
-                f"{issue.code}: {issue.message}" for issue in validation.issues
+            detail = (
+                "Generated citations failed validation; answer refused. "
+                + "; ".join(
+                    f"{issue.code}: {issue.message}" for issue in validation.issues
+                )
             )
         else:
             state = AnswerState.ANSWERED.value
@@ -382,8 +343,7 @@ def _run_query_mode(
         for claim in generated.claims
     ]
     citations = [
-        _citation_to_dict(citation, corpus)
-        for citation in generated.citations
+        _citation_to_dict(citation, corpus) for citation in generated.citations
     ]
     selected = sorted({citation.chunk_id for citation in generated.citations})
     cited_claims = sum(1 for claim in generated.claims if claim.citation_chunk_ids)
@@ -392,20 +352,24 @@ def _run_query_mode(
     answered = state == AnswerState.ANSWERED.value
     abstained = state in (AnswerState.ABSTAINED.value, AnswerState.CONFLICTING.value)
     reason_match = (
-        not query.is_answerable and reason is not None and reason in query.expected_abstention
+        not query.is_answerable
+        and reason is not None
+        and reason in query.expected_abstention
     )
     correct_abstention = (not query.is_answerable) and abstained and reason_match
     wrong_answer = answered and not query.is_answerable
 
     return (
         QueryModeRecord(
-        query_id=query.query_id,
-        case=query.case,
-        expected_status=query.expected_status,
-        state=state,
-        abstention_reason=reason,
-        abstention_detail=(detail[:300] + "…") if detail and len(detail) > 300 else detail,
-        retrieval_empty=hybrid.fused.empty,
+            query_id=query.query_id,
+            case=query.case,
+            expected_status=query.expected_status,
+            state=state,
+            abstention_reason=reason,
+            abstention_detail=(detail[:300] + "…")
+            if detail and len(detail) > 300
+            else detail,
+            retrieval_empty=hybrid.fused.empty,
             retrieved_chunk_ids=tuple(item.chunk_id for item in evidence),
             selected_chunk_ids=tuple(selected),
             claims=tuple(claims),
@@ -413,7 +377,9 @@ def _run_query_mode(
             validation=_validation_to_dict(validation),
             claim_count=total_claims,
             cited_claim_count=cited_claims,
-            citation_completeness=(cited_claims / total_claims) if total_claims else 0.0,
+            citation_completeness=(cited_claims / total_claims)
+            if total_claims
+            else 0.0,
             correct_abstention=correct_abstention,
             reason_match=reason_match,
             wrong_answer=wrong_answer,
@@ -452,16 +418,10 @@ def _validation_to_dict(validation: Any) -> dict[str, object] | None:
     }
 
 
-#: Decimal places retained for raw retrieval scores in the committed report.
-#: BM25's in-memory summation adds term contributions in Python dict/set
-#: iteration order, which differs by hash seed between processes and can move
-#: the last ulp of a float. Rankings (which the metrics use) never change, but
-#: the raw scores are quantized here so two runs serialize byte-identically.
 SCORE_QUANTIZATION_DECIMALS = 12
 
 
 def _quantize_trace(trace: dict[str, object]) -> dict[str, object]:
-    """Return a copy of a trace dict with raw scores quantized deterministically."""
     if isinstance(trace, dict):
         return {
             key: (_round_score(value) if key == "score" else _quantize_trace(value))
@@ -478,11 +438,6 @@ def _round_score(value: Any) -> Any:
     if isinstance(value, int):
         return value
     return value
-
-
-# --------------------------------------------------------------------------- #
-# metrics
-# --------------------------------------------------------------------------- #
 
 
 def _compute_mode_metrics(
@@ -525,9 +480,13 @@ def _group_retrieval_metrics(
     records: list[dict[str, object]],
     membership,
 ) -> dict[str, object]:
-    members = [record for record in records if membership(query_set.by_id(record["query_id"]))]
+    members = [
+        record for record in records if membership(query_set.by_id(record["query_id"]))
+    ]
     with_relevance = [
-        record for record in members if query_set.by_id(record["query_id"]).gold_chunk_ids
+        record
+        for record in members
+        if query_set.by_id(record["query_id"]).gold_chunk_ids
     ]
 
     def relevant(record: dict[str, object]) -> set[str]:
@@ -536,7 +495,10 @@ def _group_retrieval_metrics(
     ranked = [record["retrieved_chunk_ids"] for record in with_relevance]
 
     def macro_recall(k: int) -> float:
-        values = [recall_at_k(ids, relevant(record), k) for record, ids in zip(with_relevance, ranked)]
+        values = [
+            recall_at_k(ids, relevant(record), k)
+            for record, ids in zip(with_relevance, ranked)
+        ]
         return _mean(values)
 
     def macro_mrr() -> float:
@@ -549,7 +511,12 @@ def _group_retrieval_metrics(
         values = [
             ndcg_at_k(
                 ids,
-                {chunk_id: float(grade) for chunk_id, grade in query_set.by_id(record["query_id"]).relevance_by_chunk.items()},
+                {
+                    chunk_id: float(grade)
+                    for chunk_id, grade in query_set.by_id(
+                        record["query_id"]
+                    ).relevance_by_chunk.items()
+                },
                 k,
             )
             for record, ids in zip(with_relevance, ranked)
@@ -557,7 +524,11 @@ def _group_retrieval_metrics(
         return _mean(values)
 
     top_hits = {
-        k: sum(1 for record in with_relevance if relevant(record) & set(record["retrieved_chunk_ids"][:k]))
+        k: sum(
+            1
+            for record in with_relevance
+            if relevant(record) & set(record["retrieved_chunk_ids"][:k])
+        )
         for k in TOP_HIT_KS
     }
     no_result = _ratio(
@@ -579,14 +550,18 @@ def _faithfulness_metrics(
     records: list[dict[str, object]],
 ) -> dict[str, object]:
     answerable = [r for r in records if query_set.by_id(r["query_id"]).is_answerable]
-    non_answerable = [r for r in records if not query_set.by_id(r["query_id"]).is_answerable]
-    abstentions = [r for r in records if r["state"] in (AnswerState.ABSTAINED.value, AnswerState.CONFLICTING.value)]
+    non_answerable = [
+        r for r in records if not query_set.by_id(r["query_id"]).is_answerable
+    ]
+    abstentions = [
+        r
+        for r in records
+        if r["state"] in (AnswerState.ABSTAINED.value, AnswerState.CONFLICTING.value)
+    ]
     correct_abstentions = [r for r in records if r["correct_abstention"]]
 
     total_claims = sum(r["claim_count"] for r in records)
-    unsupported_claims = sum(
-        r["claim_count"] - r["cited_claim_count"] for r in records
-    )
+    unsupported_claims = sum(r["claim_count"] - r["cited_claim_count"] for r in records)
     checked_citations = sum(
         (r["validation"] or {}).get("checked_citations", 0) for r in records
     )
@@ -596,7 +571,9 @@ def _faithfulness_metrics(
         if r["validation"] is not None and r["validation"].get("valid")
     )
     validation_failures = sum(
-        1 for r in records if r["validation"] is not None and not r["validation"].get("valid")
+        1
+        for r in records
+        if r["validation"] is not None and not r["validation"].get("valid")
     )
 
     return {
@@ -634,11 +611,6 @@ def _ratio(numerator: int, denominator: int) -> float:
     return numerator / denominator if denominator else 0.0
 
 
-# --------------------------------------------------------------------------- #
-# report sections
-# --------------------------------------------------------------------------- #
-
-
 def _labels() -> dict[str, str]:
     return {
         "dense_mode": DENSE_MODE_LABEL,
@@ -667,7 +639,9 @@ def _corpus_facts(corpus: RealLocalCorpus, manifest_id: str) -> dict[str, object
     manifest = corpus.manifest
     documents = sorted(corpus.documents, key=lambda doc: doc.doc_id)
     canonical_checksum = hashlib.sha256(
-        "\n".join(f"{doc.doc_id}:{doc.normalized_sha256}" for doc in documents).encode("utf-8")
+        "\n".join(f"{doc.doc_id}:{doc.normalized_sha256}" for doc in documents).encode(
+            "utf-8"
+        )
     ).hexdigest()
     return {
         "corpus_id": corpus.corpus_id,
@@ -831,9 +805,9 @@ def _collect_failures(
                         "expected_status": record["expected_status"],
                     }
                 )
-            if (
-                record["expected_status"] == "answerable"
-                and record["state"] in (AnswerState.ABSTAINED.value, AnswerState.CONFLICTING.value)
+            if record["expected_status"] == "answerable" and record["state"] in (
+                AnswerState.ABSTAINED.value,
+                AnswerState.CONFLICTING.value,
             ):
                 failures.append(
                     {
@@ -862,11 +836,6 @@ def _current_commit() -> str:
 
 def _json_bytes(data: dict[str, object]) -> bytes:
     return (json.dumps(data, indent=2, sort_keys=True) + "\n").encode("utf-8")
-
-
-# --------------------------------------------------------------------------- #
-# CLI
-# --------------------------------------------------------------------------- #
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -901,20 +870,28 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     print(f"wrote real-local evaluation report: {out_path}")
-    print(f"corpus: {report.data['corpus']['corpus_id']} v{report.data['corpus']['corpus_version']} "
-          f"({report.data['corpus']['document_count']} docs / {report.data['corpus']['chunk_count']} chunks)")
-    print(f"query set: {report.data['query_set']['query_set_id']} v{report.data['query_set']['query_set_version']} "
-          f"— {report.data['query_set']['num_queries']} queries")
+    print(
+        f"corpus: {report.data['corpus']['corpus_id']} v{report.data['corpus']['corpus_version']} "
+        f"({report.data['corpus']['document_count']} docs / {report.data['corpus']['chunk_count']} chunks)"
+    )
+    print(
+        f"query set: {report.data['query_set']['query_set_id']} v{report.data['query_set']['query_set_version']} "
+        f"— {report.data['query_set']['num_queries']} queries"
+    )
     for mode, metrics in report.data["metrics"].items():
         overall = metrics["overall"]
         faith = metrics["faithfulness"]
         print(f"[{mode}]")
-        print(f"  recall@1={overall['recall@1']:.4f} recall@5={overall['recall@5']:.4f} "
-              f"recall@10={overall['recall@10']:.4f} mrr={overall['mrr']:.4f} ndcg@5={overall['ndcg@5']:.4f}")
-        print(f"  no_result_rate={overall['no_result_rate']:.4f} "
-              f"answerable_coverage={faith['answerable_coverage']:.4f} "
-              f"abstention_recall={faith['abstention_recall']:.4f} "
-              f"wrong_answer_count={faith['wrong_answer_count']}")
+        print(
+            f"  recall@1={overall['recall@1']:.4f} recall@5={overall['recall@5']:.4f} "
+            f"recall@10={overall['recall@10']:.4f} mrr={overall['mrr']:.4f} ndcg@5={overall['ndcg@5']:.4f}"
+        )
+        print(
+            f"  no_result_rate={overall['no_result_rate']:.4f} "
+            f"answerable_coverage={faith['answerable_coverage']:.4f} "
+            f"abstention_recall={faith['abstention_recall']:.4f} "
+            f"wrong_answer_count={faith['wrong_answer_count']}"
+        )
     print(f"digest={report.digest}")
     return 0
 

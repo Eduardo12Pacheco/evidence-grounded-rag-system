@@ -1,5 +1,3 @@
-"""Tests for the deterministic BM25 sparse retriever and tokenizer."""
-
 from __future__ import annotations
 
 from pathlib import Path

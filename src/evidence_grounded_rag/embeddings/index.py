@@ -1,16 +1,3 @@
-"""Dense index with cosine ranking.
-
-The index is built from a corpus of chunks and an embedding provider. Search
-ranks by cosine similarity (which for L2-normalized vectors is the dot
-product). Behavior is deterministic:
-
-- empty corpus search returns an empty result;
-- ties are broken by (score desc, chunk_id ascending);
-- a query vector whose dimension differs from the indexed dimension raises
-  ``EmbeddingDimensionError`` instead of silently mis-scoring;
-- ``top_k <= 0`` returns an empty result.
-"""
-
 from __future__ import annotations
 
 from collections.abc import Sequence
@@ -26,8 +13,6 @@ from evidence_grounded_rag.retrieval.models import RetrievalResult, ScoredChunk
 
 
 class DenseIndex:
-    """In-memory dense index over corpus chunks."""
-
     def __init__(self, chunks: Sequence[Chunk], provider: EmbeddingProvider) -> None:
         self.provider = provider
         self._chunks = list(chunks)

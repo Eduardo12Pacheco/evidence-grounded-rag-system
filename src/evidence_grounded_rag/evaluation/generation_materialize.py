@@ -1,36 +1,3 @@
-"""Separate real-local generation evaluation materializer.
-
-Runs a bounded, fully OFFLINE generation evaluation over the single approved
-real-local corpus (Python 3.12.13 documentation) with the unchanged real query
-set (``python-docs-real-v1``, 18 queries). It composes the deterministic
-offline extractive generator (``is_llm_generated=False``), the strict citation
-validator, and the deterministic claim-support evaluator over the committed
-BM25/hash/RRF retrieval, mirroring the serving pipeline's fail-closed rules.
-
-LIVE generation is deliberately NOT measured: no provider/model/credentials are
-configured, so live results are unmeasurable and the report labels them as
-such. The report never claims an LLM produced any number.
-
-The report is a SEPARATE artifact from the synthetic report, the hash
-materializer report, and the semantic materializer report: separate command,
-separate file (``data/evaluations/python-docs-real-generation-evaluation-v1.0.0.json``),
-separate labels, and it is never combined with any other report.
-
-Command::
-
-    uv run python -m evidence_grounded_rag.evaluation.generation_materialize \
-        --manifest data/manifests/corpus-source-v1.0.0.json \
-        --queries data/evaluation/queries/python-docs-real-v1.0.0.json \
-        --raw-dir data/raw/python-docs-3.12.13 \
-        --fixture data/fixtures/answer-evaluation-v1.0.0.json \
-        --output data/evaluations/python-docs-real-generation-evaluation-v1.0.0.json
-
-Determinism policy: ``timestamp_utc`` and ``runtime_seconds`` are runtime
-provenance — the ONLY fields allowed to differ between runs. Every other field
-is deterministic and covered by ``deterministic_digest``; two runs produce
-byte-identical deterministic portions.
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -95,9 +62,7 @@ from evidence_grounded_rag.versions import (
 REPORT_TYPE = "real-local-generation-evaluation"
 REPORT_VERSION = GENERATION_EVALUATION_VERSION
 
-GENERATION_LABEL = (
-    "Offline deterministic extractive evaluation — not an LLM result"
-)
+GENERATION_LABEL = "Offline deterministic extractive evaluation — not an LLM result"
 LIVE_GENERATION_LABEL = (
     "Live generation NOT measured — no provider/model/credentials are "
     "configured and no provider is selected; the offline report covers "
@@ -123,20 +88,11 @@ _FIXTURE_FIELDS = (
 )
 _FIXTURE_QUERY_FIELDS = ("query_id", "expected_status", "gold_chunk_ids")
 
-#: Decimal places retained for raw retrieval scores in the committed report
-#: (same policy as the hash materializer).
 SCORE_QUANTIZATION_DECIMALS = 12
 
 
 @dataclass(frozen=True)
 class GenerationEvaluationReport:
-    """The separate deterministic real-local generation evaluation report.
-
-    ``deterministic_payload`` covers every stable field. ``timestamp_utc`` and
-    ``runtime_seconds`` are runtime provenance and excluded from the digest,
-    exactly like the prior materializers.
-    """
-
     data: dict[str, object]
 
     def deterministic_payload(self) -> dict[str, object]:
@@ -159,13 +115,6 @@ def load_answer_evaluation_fixture(
     corpus: Any,
     query_set: RealQuerySet,
 ) -> dict[str, object]:
-    """Load and cross-validate the versioned answer-evaluation fixture.
-
-    The fixture must reference the UNCHANGED real query set: every fixture
-    query id must exist in *query_set*, no query may be missing, the gold chunk
-    ids must match the query set's gold chunks exactly, and every gold chunk
-    must exist in the derived corpus. Returns the raw fixture dict.
-    """
     fixture_path = Path(path)
     if not fixture_path.is_file():
         raise FileNotFoundError(
@@ -177,8 +126,7 @@ def load_answer_evaluation_fixture(
     missing = [f for f in _FIXTURE_FIELDS if f not in raw]
     if missing:
         raise ValueError(
-            "answer-evaluation fixture missing required fields: "
-            + ", ".join(missing)
+            "answer-evaluation fixture missing required fields: " + ", ".join(missing)
         )
     if str(raw["fixture_version"]) != ANSWER_EVALUATION_FIXTURE_VERSION:
         raise ValueError(
@@ -216,9 +164,7 @@ def load_answer_evaluation_fixture(
             raise TypeError(f"fixture query #{index} must be an object")
         for field in _FIXTURE_QUERY_FIELDS:
             if field not in record:
-                raise ValueError(
-                    f"fixture query #{index} missing field {field!r}"
-                )
+                raise ValueError(f"fixture query #{index} missing field {field!r}")
         query_id = str(record["query_id"])
         if query_id in fixture_by_id:
             raise ValueError(f"duplicate fixture query_id {query_id!r}")
@@ -275,14 +221,6 @@ def generation_evaluate(
     mode: str = MODE_HYBRID,
     timestamp_utc: str | None = None,
 ) -> tuple[GenerationEvaluationReport, Path]:
-    """Run the bounded offline generation evaluation and write the report.
-
-    Verifies the real corpus and the unchanged real query set against the
-    committed fixture, then evaluates the offline deterministic generator with
-    citation validation and claim support. Raises ``RealLocalEvaluationError``
-    on any corpus/query-set failure; there is no synthetic fallback. Never uses
-    the network and never measures a live provider.
-    """
     if mode not in (MODE_SPARSE, MODE_DENSE, MODE_HYBRID):
         raise ValueError(
             f"unknown mode {mode!r}; expected one of "
@@ -334,7 +272,8 @@ def generation_evaluate(
         "per_query": per_query,
         "failures": failures,
         "implementation_commit": _current_commit(),
-        "timestamp_utc": timestamp_utc or datetime.now(UTC).isoformat(timespec="seconds"),
+        "timestamp_utc": timestamp_utc
+        or datetime.now(UTC).isoformat(timespec="seconds"),
         "runtime_seconds": runtime_seconds,
         "deterministic_digest": "",
         "limitations": _limitations(),
@@ -346,11 +285,6 @@ def generation_evaluate(
     resolved_out.parent.mkdir(parents=True, exist_ok=True)
     resolved_out.write_text(_json_bytes(report.data).decode("utf-8"), encoding="utf-8")
     return report, resolved_out
-
-
-# --------------------------------------------------------------------------- #
-# per-query execution
-# --------------------------------------------------------------------------- #
 
 
 def _run_query(
@@ -376,7 +310,9 @@ def _run_query(
     generated = generator.generate(query.question, pack)
 
     failures: list[dict[str, object]] = []
-    provider_error = generated.abstention_reason is AbstentionReason.PROVIDER_UNAVAILABLE
+    provider_error = (
+        generated.abstention_reason is AbstentionReason.PROVIDER_UNAVAILABLE
+    )
     invalid_output = generated.abstention_reason is AbstentionReason.MALFORMED_OUTPUT
 
     validation = validator.validate(generated, exposed_ids)
@@ -390,7 +326,9 @@ def _run_query(
         invalid_output = True
     elif generated.state is not AnswerState.ANSWERED:
         state = generated.state.value
-        reason = generated.abstention_reason.value if generated.abstention_reason else None
+        reason = (
+            generated.abstention_reason.value if generated.abstention_reason else None
+        )
         detail = generated.abstention_detail
     elif not validation.valid:
         state = AnswerState.ABSTAINED.value
@@ -403,12 +341,18 @@ def _run_query(
         reason = None
         detail = None
 
-    support = support_evaluator.evaluate(generated, pack) if not provider_error else ClaimSupportEvaluation()
+    support = (
+        support_evaluator.evaluate(generated, pack)
+        if not provider_error
+        else ClaimSupportEvaluation()
+    )
 
     answered = state == AnswerState.ANSWERED.value
     abstained = state in (AnswerState.ABSTAINED.value, AnswerState.CONFLICTING.value)
     reason_match = (
-        not query.is_answerable and reason is not None and reason in query.expected_abstention
+        not query.is_answerable
+        and reason is not None
+        and reason in query.expected_abstention
     )
     correct_abstention = (not query.is_answerable) and abstained and reason_match
     wrong_answer = answered and not query.is_answerable
@@ -429,7 +373,9 @@ def _run_query(
         }
         for result in support.results
     ]
-    citations = [_citation_to_dict(citation, corpus) for citation in generated.citations]
+    citations = [
+        _citation_to_dict(citation, corpus) for citation in generated.citations
+    ]
     total_claims = len(generated.claims)
     cited_claims = sum(1 for claim in generated.claims if claim.citation_chunk_ids)
 
@@ -473,9 +419,9 @@ def _run_query(
                 "expected_status": query.expected_status,
             }
         )
-    if (
-        query.expected_status == "answerable"
-        and state in (AnswerState.ABSTAINED.value, AnswerState.CONFLICTING.value)
+    if query.expected_status == "answerable" and state in (
+        AnswerState.ABSTAINED.value,
+        AnswerState.CONFLICTING.value,
     ):
         failures.append(
             {
@@ -492,7 +438,9 @@ def _run_query(
         "expected_status": query.expected_status,
         "state": state,
         "abstention_reason": reason,
-        "abstention_detail": (detail[:300] + "…") if detail and len(detail) > 300 else detail,
+        "abstention_detail": (detail[:300] + "…")
+        if detail and len(detail) > 300
+        else detail,
         "answerable": query.is_answerable,
         "answered": answered,
         "abstained": abstained,
@@ -504,7 +452,11 @@ def _run_query(
         "retrieval_empty": hybrid.fused.empty,
         "retrieved_chunk_ids": [item.chunk_id for item in evidence],
         "evidence_ranks": [
-            {"chunk_id": item.chunk_id, "rank": item.rank, "score": round(item.score, SCORE_QUANTIZATION_DECIMALS)}
+            {
+                "chunk_id": item.chunk_id,
+                "rank": item.rank,
+                "score": round(item.score, SCORE_QUANTIZATION_DECIMALS),
+            }
             for item in evidence
         ],
         "claims": claims,
@@ -540,11 +492,6 @@ def _validation_to_dict(validation: Any) -> dict[str, object] | None:
     }
 
 
-# --------------------------------------------------------------------------- #
-# metrics
-# --------------------------------------------------------------------------- #
-
-
 def _compute_metrics(
     query_set: RealQuerySet,
     per_query: dict[str, dict[str, object]],
@@ -567,12 +514,29 @@ def _compute_metrics(
         if r["validation"] is not None and r["validation"].get("valid")
     )
     validation_failures = sum(
-        1 for r in records if r["validation"] is not None and not r["validation"].get("valid")
+        1
+        for r in records
+        if r["validation"] is not None and not r["validation"].get("valid")
     )
 
-    supported_claims = sum(1 for r in records for c in r["claim_support"] if c["support"] == ClaimSupport.SUPPORTED.value)
-    unsupported_claims = sum(1 for r in records for c in r["claim_support"] if c["support"] == ClaimSupport.UNSUPPORTED.value)
-    unknown_claims = sum(1 for r in records for c in r["claim_support"] if c["support"] == ClaimSupport.UNKNOWN.value)
+    supported_claims = sum(
+        1
+        for r in records
+        for c in r["claim_support"]
+        if c["support"] == ClaimSupport.SUPPORTED.value
+    )
+    unsupported_claims = sum(
+        1
+        for r in records
+        for c in r["claim_support"]
+        if c["support"] == ClaimSupport.UNSUPPORTED.value
+    )
+    unknown_claims = sum(
+        1
+        for r in records
+        for c in r["claim_support"]
+        if c["support"] == ClaimSupport.UNKNOWN.value
+    )
 
     return {
         "answer_coverage": _ratio(len(answered), len(answerable)),
@@ -610,11 +574,6 @@ def _compute_metrics(
 
 def _ratio(numerator: int, denominator: int) -> float:
     return numerator / denominator if denominator else 0.0
-
-
-# --------------------------------------------------------------------------- #
-# report sections
-# --------------------------------------------------------------------------- #
 
 
 def _labels() -> dict[str, str]:
@@ -722,11 +681,6 @@ def _limitations() -> list[str]:
     ]
 
 
-# --------------------------------------------------------------------------- #
-# CLI
-# --------------------------------------------------------------------------- #
-
-
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description=(
@@ -779,15 +733,23 @@ def main(argv: list[str] | None = None) -> int:
     )
     metrics = report.data["metrics"]
     print(f"  answer_coverage={metrics['answer_coverage']:.4f}")
-    print(f"  abstention_precision={metrics['abstention_precision']:.4f} "
-          f"abstention_recall={metrics['abstention_recall']:.4f}")
-    print(f"  citation_precision={metrics['citation_precision']:.4f} "
-          f"citation_completeness={metrics['citation_completeness']:.4f}")
+    print(
+        f"  abstention_precision={metrics['abstention_precision']:.4f} "
+        f"abstention_recall={metrics['abstention_recall']:.4f}"
+    )
+    print(
+        f"  citation_precision={metrics['citation_precision']:.4f} "
+        f"citation_completeness={metrics['citation_completeness']:.4f}"
+    )
     support = metrics["claim_support"]
-    print(f"  claim_support={support['supported']}/{support['total']} "
-          f"(rate={support['support_rate']:.4f})")
-    print(f"  invalid_output_count={metrics['invalid_output_count']} "
-          f"provider_error_count={metrics['provider_error_count']}")
+    print(
+        f"  claim_support={support['supported']}/{support['total']} "
+        f"(rate={support['support_rate']:.4f})"
+    )
+    print(
+        f"  invalid_output_count={metrics['invalid_output_count']} "
+        f"provider_error_count={metrics['provider_error_count']}"
+    )
     print(f"digest={report.digest}")
     return 0
 

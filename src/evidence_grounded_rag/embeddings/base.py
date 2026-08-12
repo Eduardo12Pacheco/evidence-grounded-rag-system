@@ -1,5 +1,3 @@
-"""Interfaces for the dense embedding layer."""
-
 from __future__ import annotations
 
 from collections.abc import Sequence
@@ -10,7 +8,6 @@ Vector = tuple[float, ...]
 
 
 def cosine_similarity(left: Vector, right: Vector) -> float:
-    """Return cosine similarity between two equal-length vectors."""
     if len(left) != len(right):
         raise EmbeddingDimensionError(
             f"cosine similarity dimension mismatch: {len(left)} != {len(right)}"
@@ -20,8 +17,6 @@ def cosine_similarity(left: Vector, right: Vector) -> float:
 
 @dataclass(frozen=True)
 class EmbeddingError(Exception):
-    """Base class for embedding-layer failures."""
-
     message: str
 
 
@@ -35,13 +30,6 @@ class EmbeddingDimensionError(EmbeddingError):
 
 @runtime_checkable
 class EmbeddingProvider(Protocol):
-    """Contract every embedding provider must satisfy.
-
-    ``semantic`` MUST be False for any embedding that does not encode learned
-    meaning. The deterministic test embedding is NOT semantic and is never
-    labeled as such.
-    """
-
     model_id: str
     mode: str
     semantic: bool

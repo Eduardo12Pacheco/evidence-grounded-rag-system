@@ -1,12 +1,3 @@
-"""Deterministic, offline, non-semantic embedding for development and tests.
-
-This embedding is a hashed bag-of-words vector with signed hashing, L2
-normalized to a fixed dimension. It is fully deterministic (no model weights,
-no network, no randomness) and it is NOT semantic: it cannot generalize beyond
-token overlap. It exists so the dense pipeline and hybrid fusion can be
-exercised offline. ``semantic`` is False and every report labels it as such.
-"""
-
 from __future__ import annotations
 
 import hashlib
@@ -21,14 +12,11 @@ from evidence_grounded_rag.embeddings.base import (
 from evidence_grounded_rag.text.tokenizer import tokenize
 from evidence_grounded_rag.versions import EMBEDDING_MODEL_ID
 
-#: "local"/"offline": no remote service, no weights, no downloads.
 MODE = "offline"
 DEFAULT_DIMENSION = 256
 
 
 class DeterministicEmbedding(EmbeddingProvider):
-    """Hashed bag-of-words embedding. Deterministic and explicitly non-semantic."""
-
     model_id: str = EMBEDDING_MODEL_ID
     mode: str = MODE
     semantic: bool = False

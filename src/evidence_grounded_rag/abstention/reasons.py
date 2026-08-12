@@ -1,18 +1,9 @@
-"""Mandatory abstention reason codes.
-
-An abstention is never silent: every refusal carries one of these stable
-reason codes plus a human-readable detail. These codes are the contract
-between the generator, the pipeline, and evaluation.
-"""
-
 from __future__ import annotations
 
 from enum import Enum
 
 
 class AbstentionReason(str, Enum):
-    """Stable reason codes for every abstention path."""
-
     INSUFFICIENT_EVIDENCE = "insufficient_evidence"
     UNSUPPORTED_QUERY = "unsupported_query"
     CONFLICTING_EVIDENCE = "conflicting_evidence"
@@ -54,8 +45,7 @@ REASON_DETAILS: dict[AbstentionReason, str] = {
         "independently confirmed."
     ),
     AbstentionReason.INVALID_CORPUS: (
-        "The corpus manifest failed validation (checksum, format, or "
-        "duplicate IDs)."
+        "The corpus manifest failed validation (checksum, format, or duplicate IDs)."
     ),
     AbstentionReason.STALE_CORPUS: (
         "The loaded corpus version does not match the version this pipeline "

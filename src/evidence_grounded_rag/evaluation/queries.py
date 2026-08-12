@@ -1,11 +1,3 @@
-"""Versioned, committed evaluation query set.
-
-The query set is a fixture artifact: it is committed, versioned, and frozen
-against a specific corpus version. It deliberately covers answerable,
-unanswerable, ambiguous, conflicting, citation-boundary, numeric, and
-multi-passage cases so abstention behavior is measured, not assumed.
-"""
-
 from __future__ import annotations
 
 import json
@@ -80,7 +72,12 @@ def load_query_set(path: str | Path) -> QuerySet:
     if not isinstance(raw, dict):
         raise TypeError("query set root must be an object")
 
-    for field_name in ("query_set_id", "query_set_version", "corpus_id", "corpus_version"):
+    for field_name in (
+        "query_set_id",
+        "query_set_version",
+        "corpus_id",
+        "corpus_version",
+    ):
         if field_name not in raw:
             raise ValueError(f"query set missing required field {field_name!r}")
 
@@ -88,7 +85,9 @@ def load_query_set(path: str | Path) -> QuerySet:
     if not isinstance(queries_raw, list) or not queries_raw:
         raise ValueError("query set must contain a non-empty 'queries' list")
 
-    queries = tuple(_parse_query(index, record) for index, record in enumerate(queries_raw))
+    queries = tuple(
+        _parse_query(index, record) for index, record in enumerate(queries_raw)
+    )
     _validate_unique_ids(queries)
     _validate_categories(queries)
     return QuerySet(

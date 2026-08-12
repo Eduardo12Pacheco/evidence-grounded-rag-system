@@ -1,5 +1,3 @@
-"""Tests for structured generation: extractive provider, states, and adapter."""
-
 from __future__ import annotations
 
 from evidence_grounded_rag.abstention import AbstentionReason
@@ -35,7 +33,9 @@ def test_empty_evidence_abstains_insufficient():
 
 def test_empty_query_abstains_unsupported():
     generator = ExtractiveTemplateGenerator()
-    answer = generator.generate("   ", [_chunk("doc-a::0", "doc-a", "The park is open.")])
+    answer = generator.generate(
+        "   ", [_chunk("doc-a::0", "doc-a", "The park is open.")]
+    )
     assert answer.state is AnswerState.ABSTAINED
     assert answer.abstention_reason is AbstentionReason.UNSUPPORTED_QUERY
 
@@ -50,7 +50,9 @@ def test_query_terms_absent_abstains_unsupported():
 
 def test_single_passage_answers_with_claim_and_citation():
     generator = ExtractiveTemplateGenerator()
-    evidence = [_chunk("doc-a::0", "doc-a", "The special event fee is 120 dollars per day.")]
+    evidence = [
+        _chunk("doc-a::0", "doc-a", "The special event fee is 120 dollars per day.")
+    ]
     answer = generator.generate("What is the special event fee?", evidence)
     assert answer.state is AnswerState.ANSWERED
     assert answer.answer_text
@@ -78,8 +80,12 @@ def test_generator_receives_only_exposed_evidence():
 def test_conflicting_scalar_values_abstain_conflicting():
     generator = ExtractiveTemplateGenerator()
     evidence = [
-        _chunk("fee-2024::0", "fee-2024", "The special event fee is 120 dollars per day."),
-        _chunk("fee-2025::0", "fee-2025", "The special event fee is 50 dollars per day."),
+        _chunk(
+            "fee-2024::0", "fee-2024", "The special event fee is 120 dollars per day."
+        ),
+        _chunk(
+            "fee-2025::0", "fee-2025", "The special event fee is 50 dollars per day."
+        ),
     ]
     answer = generator.generate("How much is the special event fee?", evidence)
     assert answer.state is AnswerState.CONFLICTING
@@ -100,8 +106,16 @@ def test_negation_pair_abstains_conflicting():
 def test_ambiguous_same_value_different_subjects_abstains():
     generator = ExtractiveTemplateGenerator()
     evidence = [
-        _chunk("pools-north::0", "pools-north", "The North Pool is open from June to August."),
-        _chunk("pools-south::0", "pools-south", "The South Pool is open from June to August."),
+        _chunk(
+            "pools-north::0",
+            "pools-north",
+            "The North Pool is open from June to August.",
+        ),
+        _chunk(
+            "pools-south::0",
+            "pools-south",
+            "The South Pool is open from June to August.",
+        ),
     ]
     answer = generator.generate("When is the pool open?", evidence)
     assert answer.state is AnswerState.ABSTAINED
@@ -111,8 +125,16 @@ def test_ambiguous_same_value_different_subjects_abstains():
 def test_multi_aspect_query_answers_multiple_passages():
     generator = ExtractiveTemplateGenerator()
     evidence = [
-        _chunk("doc-a::0", "doc-a", "A permit application must include a signed code of conduct."),
-        _chunk("doc-a::1", "doc-a", "Permit requests have a review time of up to 10 working days."),
+        _chunk(
+            "doc-a::0",
+            "doc-a",
+            "A permit application must include a signed code of conduct.",
+        ),
+        _chunk(
+            "doc-a::1",
+            "doc-a",
+            "Permit requests have a review time of up to 10 working days.",
+        ),
     ]
     answer = generator.generate(
         "What must a permit application include and how long does the review take?",
@@ -127,7 +149,13 @@ def test_provider_metadata_never_claims_llm():
     generator = ExtractiveTemplateGenerator()
     answer = generator.generate(
         "What must a permit application include?",
-        [_chunk("doc-a::0", "doc-a", "A permit application must include a code of conduct.")],
+        [
+            _chunk(
+                "doc-a::0",
+                "doc-a",
+                "A permit application must include a code of conduct.",
+            )
+        ],
     )
     assert generator.is_llm_generated is False
     assert answer.is_llm_generated is False
@@ -139,7 +167,13 @@ def test_env_adapter_default_uses_offline_provider():
     adapter = EnvConfiguredGenerator(env={})
     answer = adapter.generate(
         "What must a permit application include?",
-        [_chunk("doc-a::0", "doc-a", "A permit application must include a code of conduct.")],
+        [
+            _chunk(
+                "doc-a::0",
+                "doc-a",
+                "A permit application must include a code of conduct.",
+            )
+        ],
     )
     assert answer.state is AnswerState.ANSWERED
 
@@ -167,7 +201,9 @@ def test_sentence_and_predicate_helpers():
         "Second!",
         "Third?",
     ]
-    predicate, value = split_predicate_value("The North Pool is open from June to August.")
+    predicate, value = split_predicate_value(
+        "The North Pool is open from June to August."
+    )
     assert predicate == "north pool"
     assert value == "open from june to august."
     assert split_predicate_value("No separator here") == (None, None)

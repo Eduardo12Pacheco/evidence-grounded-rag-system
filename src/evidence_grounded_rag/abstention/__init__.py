@@ -1,5 +1,3 @@
-"""Mandatory abstention reason codes and detail text."""
-
 from __future__ import annotations
 
 from evidence_grounded_rag.abstention.reasons import (

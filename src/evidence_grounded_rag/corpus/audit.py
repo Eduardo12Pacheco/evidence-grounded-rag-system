@@ -1,30 +1,3 @@
-"""Source-manifest audit for the bounded real-local corpus boundary.
-
-A *source manifest* records where a corpus came from: official docs URL,
-source URL, publisher, exact license (name / version / URL / evidence
-excerpt), exact pinned revision, expected files with byte sizes and raw
-SHA-256 checksums, acquisition method, access date, document count, audit
-status, redistribution status, privacy status, and verification timestamp.
-
-The audit is deliberately narrow:
-
-- It approves exactly the corpus entries committed in ``APPROVED_CORPORA``
-  (today: Python 3.12.13 official documentation). Any other corpus id/version
-  is refused with ``unapproved_source``.
-- Only the explicit statuses ``approved-for-local-development`` and
-  ``approved-for-redistribution`` are accepted; ``blocked``, ``under-review``
-  and anything else fail closed.
-- Missing evidence, unsupported manifest versions, malformed fields, wrong
-  revisions, wrong licenses, missing files, size mismatches and checksum
-  mismatches all fail with stable error codes.
-
-This is a SEPARATE boundary from the synthetic-fixture gate in
-``license_gate.py``. It does not loosen that gate and it does not create a
-generic real-corpus bypass: the audited source is an explicit, opt-in,
-local-development-only corpus that never feeds the default demo or the
-synthetic evaluation.
-"""
-
 from __future__ import annotations
 
 import json
@@ -52,32 +25,22 @@ from evidence_grounded_rag.corpus.errors import (
 from evidence_grounded_rag.corpus.normalize import sha256_bytes
 from evidence_grounded_rag.versions import SOURCE_MANIFEST_VERSION
 
-#: Sole supported source-manifest version, sourced from ``versions.py`` so the
-#: schema version and the committed version contract stay in a single place.
 SUPPORTED_SOURCE_MANIFEST_VERSION = SOURCE_MANIFEST_VERSION
 
-#: Corpus audit statuses.
 STATUS_APPROVED_LOCAL = "approved-for-local-development"
 STATUS_APPROVED_REDISTRIBUTION = "approved-for-redistribution"
 STATUS_BLOCKED = "blocked"
 STATUS_UNDER_REVIEW = "under-review"
-ALLOWED_STATUSES = frozenset(
-    {STATUS_APPROVED_LOCAL, STATUS_APPROVED_REDISTRIBUTION}
-)
+ALLOWED_STATUSES = frozenset({STATUS_APPROVED_LOCAL, STATUS_APPROVED_REDISTRIBUTION})
 
-#: Redistribution status recorded on the manifest (how WE may handle the
-#: captured bytes, distinct from the license's own grant).
 REDISTRIBUTION_LOCAL_ONLY = "not-redistributed"
 ALLOWED_REDISTRIBUTION_STATUSES = frozenset(
     {REDISTRIBUTION_LOCAL_ONLY, STATUS_APPROVED_REDISTRIBUTION}
 )
 
-#: Privacy audit results that a manifest may declare.
 PRIVACY_STATUS_CLEAN = "no-private-content-detected"
 PRIVACY_STATUS_EXCLUDED = "private-content-excluded"
-ALLOWED_PRIVACY_STATUSES = frozenset(
-    {PRIVACY_STATUS_CLEAN, PRIVACY_STATUS_EXCLUDED}
-)
+ALLOWED_PRIVACY_STATUSES = frozenset({PRIVACY_STATUS_CLEAN, PRIVACY_STATUS_EXCLUDED})
 
 _COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
 _DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -107,8 +70,6 @@ _REQUIRED_FIELDS = (
 
 @dataclass(frozen=True)
 class ApprovedCorpus:
-    """Committed approval for exactly one bounded corpus."""
-
     corpus_id: str
     corpus_version: str
     revision: str
@@ -117,9 +78,6 @@ class ApprovedCorpus:
     license_version: str
 
 
-#: The single approved real-local corpus for this work unit. The audit refuses
-#: every corpus not listed here — this is what keeps the boundary bounded and
-#: prevents a generic real-corpus bypass.
 APPROVED_CORPORA: tuple[ApprovedCorpus, ...] = (
     ApprovedCorpus(
         corpus_id="python-docs-3.12.13",
@@ -134,8 +92,6 @@ APPROVED_CORPORA: tuple[ApprovedCorpus, ...] = (
 
 @dataclass(frozen=True)
 class SourceLicense:
-    """License evidence recorded on a source manifest."""
-
     name: str
     version: str
     url: str
@@ -144,8 +100,6 @@ class SourceLicense:
 
 @dataclass(frozen=True)
 class SourceFileEntry:
-    """One expected file with its byte-exact capture facts."""
-
     path: str
     size: int
     sha256: str
@@ -153,8 +107,6 @@ class SourceFileEntry:
 
 @dataclass(frozen=True)
 class SourceManifest:
-    """Validated source manifest for a bounded real-local corpus."""
-
     manifest_version: str
     corpus_id: str
     corpus_version: str
@@ -177,14 +129,11 @@ class SourceManifest:
 
 @dataclass(frozen=True)
 class AuditVerdict:
-    """Result of auditing a manifest. ``allowed`` is False unless every check passed."""
-
     allowed: bool
     reasons: tuple[str, ...]
 
 
 def load_source_manifest(path: str | Path) -> SourceManifest:
-    """Load and schema-validate a source manifest from *path*."""
     manifest_path = Path(path)
     if not manifest_path.is_file():
         raise SourceFileMissingError(f"source manifest file not found: {manifest_path}")
@@ -198,7 +147,6 @@ def load_source_manifest(path: str | Path) -> SourceManifest:
 
 
 def parse_source_manifest(data: Any) -> SourceManifest:
-    """Parse and schema-validate a source manifest dict into a typed model."""
     if not isinstance(data, dict):
         raise MalformedSourceManifestError("source manifest must be a JSON object")
 
@@ -233,12 +181,8 @@ def parse_source_manifest(data: Any) -> SourceManifest:
         if not isinstance(data[field], str):
             raise MalformedSourceManifestError(f"field {field!r} must be a string")
 
-    # Empty evidence values are caught by the audit as MissingSourceEvidenceError;
-    # the format checks here only apply when a value is actually present.
     if data["official_docs_url"] and not _HTTP_URL_RE.match(data["official_docs_url"]):
-        raise MalformedSourceManifestError(
-            "official_docs_url must be an http(s) URL"
-        )
+        raise MalformedSourceManifestError("official_docs_url must be an http(s) URL")
     if data["source_url"] and not _HTTP_URL_RE.match(data["source_url"]):
         raise MalformedSourceManifestError("source_url must be an http(s) URL")
     if not _COMMIT_RE.fullmatch(data["revision"]):
@@ -255,7 +199,9 @@ def parse_source_manifest(data: Any) -> SourceManifest:
     if not isinstance(license_raw, dict):
         raise MalformedSourceManifestError("'license' must be an object")
     license_missing = [
-        key for key in ("name", "version", "url", "evidence_excerpt") if key not in license_raw
+        key
+        for key in ("name", "version", "url", "evidence_excerpt")
+        if key not in license_raw
     ]
     if license_missing:
         raise MalformedSourceManifestError(
@@ -351,59 +297,70 @@ def _parse_file_entry(raw: Any, index: int) -> SourceFileEntry:
 
 
 def audit_source_manifest(manifest: SourceManifest) -> AuditVerdict:
-    """Audit a validated manifest against the committed approval policy.
-
-    Returns a verdict with all blocking reasons; use ``assert_audit_allowed``
-    when a single fail-closed error is preferred.
-    """
     reasons = [message for _, message in _iter_audit_failures(manifest)]
     return AuditVerdict(allowed=not reasons, reasons=tuple(reasons))
 
 
 def assert_audit_allowed(manifest: SourceManifest) -> None:
-    """Raise the first fail-closed audit error, with its stable code."""
     for error_type, message in _iter_audit_failures(manifest):
         raise error_type(message)
 
 
 def _iter_audit_failures(manifest: SourceManifest):
-    """Yield (error_type, message) for every policy violation in order."""
     if manifest.status == STATUS_BLOCKED:
         yield BlockedCorpusStatusError, "corpus status is 'blocked'"
     elif manifest.status == STATUS_UNDER_REVIEW:
         yield BlockedCorpusStatusError, "corpus status is 'under-review'"
     elif manifest.status not in ALLOWED_STATUSES:
-        yield BlockedCorpusStatusError, (
-            f"corpus status {manifest.status!r} is not approved; only "
-            f"{STATUS_APPROVED_LOCAL!r} or {STATUS_APPROVED_REDISTRIBUTION!r}"
+        yield (
+            BlockedCorpusStatusError,
+            (
+                f"corpus status {manifest.status!r} is not approved; only "
+                f"{STATUS_APPROVED_LOCAL!r} or {STATUS_APPROVED_REDISTRIBUTION!r}"
+            ),
         )
 
     approved = _find_approved(manifest.corpus_id, manifest.corpus_version)
     if approved is None:
-        yield UnapprovedSourceError, (
-            f"corpus {manifest.corpus_id} v{manifest.corpus_version} is not an "
-            "approved source corpus"
+        yield (
+            UnapprovedSourceError,
+            (
+                f"corpus {manifest.corpus_id} v{manifest.corpus_version} is not an "
+                "approved source corpus"
+            ),
         )
     else:
         if manifest.revision != approved.revision:
-            yield RevisionMismatchError, (
-                f"revision {manifest.revision!r} does not match the approved "
-                f"revision {approved.revision!r}"
+            yield (
+                RevisionMismatchError,
+                (
+                    f"revision {manifest.revision!r} does not match the approved "
+                    f"revision {approved.revision!r}"
+                ),
             )
         if manifest.revision_tag != approved.revision_tag:
-            yield RevisionMismatchError, (
-                f"revision tag {manifest.revision_tag!r} does not match the "
-                f"approved tag {approved.revision_tag!r}"
+            yield (
+                RevisionMismatchError,
+                (
+                    f"revision tag {manifest.revision_tag!r} does not match the "
+                    f"approved tag {approved.revision_tag!r}"
+                ),
             )
         if manifest.license.name != approved.license_name:
-            yield LicenseMismatchError, (
-                f"license {manifest.license.name!r} does not match the approved "
-                f"license {approved.license_name!r}"
+            yield (
+                LicenseMismatchError,
+                (
+                    f"license {manifest.license.name!r} does not match the approved "
+                    f"license {approved.license_name!r}"
+                ),
             )
         if manifest.license.version != approved.license_version:
-            yield LicenseMismatchError, (
-                f"license version {manifest.license.version!r} does not match the "
-                f"approved license version {approved.license_version!r}"
+            yield (
+                LicenseMismatchError,
+                (
+                    f"license version {manifest.license.version!r} does not match the "
+                    f"approved license version {approved.license_version!r}"
+                ),
             )
 
     for field, value in (
@@ -418,54 +375,71 @@ def _iter_audit_failures(manifest: SourceManifest):
             yield MissingSourceEvidenceError, f"missing source evidence: {field}"
 
     if manifest.privacy_status not in ALLOWED_PRIVACY_STATUSES:
-        yield PrivacyAuditError, (
-            f"privacy_status {manifest.privacy_status!r} is not a recorded audit "
-            "result (must be 'no-private-content-detected' or 'private-content-excluded')"
+        yield (
+            PrivacyAuditError,
+            (
+                f"privacy_status {manifest.privacy_status!r} is not a recorded audit "
+                "result (must be 'no-private-content-detected' or 'private-content-excluded')"
+            ),
         )
 
     if manifest.redistribution_status not in ALLOWED_REDISTRIBUTION_STATUSES:
-        yield InvalidRedistributionStatusError, (
-            f"redistribution_status {manifest.redistribution_status!r} is not a "
-            f"known value (must be {REDISTRIBUTION_LOCAL_ONLY!r} or "
-            f"{STATUS_APPROVED_REDISTRIBUTION!r})"
+        yield (
+            InvalidRedistributionStatusError,
+            (
+                f"redistribution_status {manifest.redistribution_status!r} is not a "
+                f"known value (must be {REDISTRIBUTION_LOCAL_ONLY!r} or "
+                f"{STATUS_APPROVED_REDISTRIBUTION!r})"
+            ),
         )
     elif (
         manifest.status == STATUS_APPROVED_LOCAL
         and manifest.redistribution_status != REDISTRIBUTION_LOCAL_ONLY
     ):
-        yield InvalidRedistributionStatusError, (
-            f"status {STATUS_APPROVED_LOCAL!r} cannot claim "
-            f"redistribution_status {manifest.redistribution_status!r}; local-only "
-            f"development requires {REDISTRIBUTION_LOCAL_ONLY!r}"
+        yield (
+            InvalidRedistributionStatusError,
+            (
+                f"status {STATUS_APPROVED_LOCAL!r} cannot claim "
+                f"redistribution_status {manifest.redistribution_status!r}; local-only "
+                f"development requires {REDISTRIBUTION_LOCAL_ONLY!r}"
+            ),
         )
     elif (
         manifest.status == STATUS_APPROVED_REDISTRIBUTION
         and manifest.redistribution_status != STATUS_APPROVED_REDISTRIBUTION
     ):
-        yield InvalidRedistributionStatusError, (
-            f"status {STATUS_APPROVED_REDISTRIBUTION!r} requires the matching "
-            f"redistribution_status {STATUS_APPROVED_REDISTRIBUTION!r}"
+        yield (
+            InvalidRedistributionStatusError,
+            (
+                f"status {STATUS_APPROVED_REDISTRIBUTION!r} requires the matching "
+                f"redistribution_status {STATUS_APPROVED_REDISTRIBUTION!r}"
+            ),
         )
 
     if (
         manifest.status == STATUS_APPROVED_REDISTRIBUTION
         and not (manifest.redistribution_justification or "").strip()
     ):
-        yield MissingRedistributionJustificationError, (
-            f"status {STATUS_APPROVED_REDISTRIBUTION!r} requires an explicit "
-            "redistribution_justification"
+        yield (
+            MissingRedistributionJustificationError,
+            (
+                f"status {STATUS_APPROVED_REDISTRIBUTION!r} requires an explicit "
+                "redistribution_justification"
+            ),
         )
 
 
 def _find_approved(corpus_id: str, corpus_version: str) -> ApprovedCorpus | None:
     for approved in APPROVED_CORPORA:
-        if approved.corpus_id == corpus_id and approved.corpus_version == corpus_version:
+        if (
+            approved.corpus_id == corpus_id
+            and approved.corpus_version == corpus_version
+        ):
             return approved
     return None
 
 
 def safe_raw_path(raw_dir: str | Path, rel_path: str) -> Path:
-    """Resolve a manifest file path inside *raw_dir*, refusing escapes."""
     root = Path(raw_dir).resolve()
     candidate = (root / rel_path).resolve()
     try:
@@ -478,7 +452,6 @@ def safe_raw_path(raw_dir: str | Path, rel_path: str) -> Path:
 
 
 def verify_source_files(manifest: SourceManifest, raw_dir: str | Path) -> None:
-    """Verify expected files exist with exact byte sizes and raw SHA-256 values."""
     root = Path(raw_dir)
     if not root.is_dir():
         raise SourceFileMissingError(f"raw directory not found: {root}")

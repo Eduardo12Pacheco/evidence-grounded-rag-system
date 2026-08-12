@@ -1,22 +1,3 @@
-"""Schema, audit, and offline verification for the embedding-model manifest.
-
-The embedding model is acquired EXACTLY ONCE per pinned Hugging Face revision,
-into a gitignored local cache, and every semantic use afterwards is local-only.
-The committed manifest (``data/manifests/embedding-model-v1.0.0.json``) is the
-source of truth for what was acquired: model identity, publisher, official
-URLs, license, exact revision, architecture/dimension/tokenizer metadata, the
-acquisition method, and the exact byte sizes and SHA-256 values of every
-acquired file. Weights are never committed; the manifest records their
-checksums only.
-
-This module mirrors the corpus source-manifest discipline
-(``corpus/audit.py``): the audit approves exactly the committed model
-id/revision, refuses any other model or revision, and verification re-checks
-schema, version, revision, dimension, file existence, byte sizes and raw
-SHA-256 values before any semantic inference is allowed. There is deliberately
-no network fallback at inference and no silent switch to another model.
-"""
-
 from __future__ import annotations
 
 import json
@@ -36,11 +17,8 @@ from evidence_grounded_rag.versions import (
     SEMANTIC_EMBEDDING_MODEL_ID,
 )
 
-#: Sole supported embedding-model manifest version, sourced from ``versions.py``
-#: so the schema version and the committed version contract stay in one place.
 SUPPORTED_EMBEDDING_MODEL_MANIFEST_VERSION = EMBEDDING_MODEL_MANIFEST_VERSION
 
-#: The single approved semantic embedding model for this work unit.
 MODEL_ID = SEMANTIC_EMBEDDING_MODEL_ID
 MODEL_VERSION = "1.5"
 MODEL_PUBLISHER = "Beijing Academy of Artificial Intelligence (BAAI)"
@@ -53,9 +31,9 @@ MODEL_LICENSE_VERSION = "1.0"
 MODEL_LICENSE_URL = "https://huggingface.co/BAAI/bge-small-en-v1.5"
 MODEL_LICENSE_EVIDENCE_EXCERPT = (
     "Official model card (BAAI/bge-small-en-v1.5, README.md, pinned revision "
-    "5c38ec7c): \"FlagEmbedding is licensed under the MIT License. The released "
-    "models can be used for commercial purposes free of charge.\" The card also "
-    "declares \"license: mit\" in its YAML metadata."
+    '5c38ec7c): "FlagEmbedding is licensed under the MIT License. The released '
+    'models can be used for commercial purposes free of charge." The card also '
+    'declares "license: mit" in its YAML metadata.'
 )
 MODEL_DIMENSION = 384
 MODEL_MAX_INPUT_TOKENS = 512
@@ -67,9 +45,6 @@ MODEL_ACQUISITION_METHOD = (
     "no mutable branch, no mirror, no fallback"
 )
 
-#: Approved architecture facts for the pinned model, sourced from its official
-#: ``config.json`` at the pinned revision. Single place of truth: the audit
-#: compares the manifest's architecture metadata against this constant.
 MODEL_ARCHITECTURE: dict[str, object] = {
     "name": "bert",
     "model_type": "BertModel",
@@ -82,8 +57,6 @@ MODEL_ARCHITECTURE: dict[str, object] = {
     "max_position_embeddings": 512,
 }
 
-#: Approved tokenizer facts for the pinned model (``tokenizer.json``,
-#: ``vocab.txt``, ``config.json`` at the pinned revision).
 MODEL_TOKENIZER: dict[str, object] = {
     "name": "WordPiece (bert-base-uncased)",
     "vocab_size": 30522,
@@ -92,7 +65,6 @@ MODEL_TOKENIZER: dict[str, object] = {
     "special_tokens": ["[CLS]", "[MASK]", "[PAD]", "[SEP]", "[UNK]"],
 }
 
-#: Approved pooling facts (``1_Pooling/config.json`` at the pinned revision).
 MODEL_POOLING: dict[str, object] = {
     "method": "cls",
     "note": (
@@ -102,7 +74,6 @@ MODEL_POOLING: dict[str, object] = {
     ),
 }
 
-#: Approved normalization facts (``modules.json`` plus our encode contract).
 MODEL_NORMALIZATION: dict[str, object] = {
     "l2_normalize": True,
     "apply_at": (
@@ -111,16 +82,11 @@ MODEL_NORMALIZATION: dict[str, object] = {
     ),
 }
 
-#: Where the acquired weights live and how they may be handled. Local-only and
-#: gitignored; weights are never committed, packaged, or redistributed.
 MODEL_CACHE_POLICY = (
     "local-only under data/raw/models/bge-small-en-v1.5 (gitignored); weights "
     "are never committed, packaged, or redistributed"
 )
 
-#: Files required for sentence-transformers to load the model from the local
-#: path. ``pytorch_model.bin``/``onnx/`` are intentionally NOT acquired: the
-#: single ``model.safetensors`` weight file is the only weights source used.
 REQUIRED_FILES: tuple[str, ...] = (
     "config.json",
     "config_sentence_transformers.json",
@@ -135,10 +101,6 @@ REQUIRED_FILES: tuple[str, ...] = (
     "README.md",
 )
 
-#: Extra files allowed in the cache beyond ``expected_files``. Deliberately
-#: empty: the verified cache must contain EXACTLY the declared files so a stray
-#: or dropped file cannot look like a valid snapshot. If a safe marker is ever
-#: needed it must be documented here (a name) and only that name is ignored.
 ALLOWED_CACHE_EXTRAS: frozenset[str] = frozenset()
 
 _COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
@@ -172,13 +134,6 @@ _REQUIRED_FIELDS = (
 
 
 class EmbeddingModelManifestError(Exception):
-    """Stable, machine-readable failure for the embedding-model boundary.
-
-    A plain (non-dataclass) exception so tracebacks can be assigned when the
-    error is re-raised through a context manager; ``str(exc)`` renders as
-    ``code: message`` and both ``exc.code`` and ``exc.message`` are available.
-    """
-
     def __init__(self, code: str, message: str) -> None:
         super().__init__(f"{code}: {message}")
         self.code = code
@@ -190,8 +145,6 @@ class EmbeddingModelManifestError(Exception):
 
 @dataclass(frozen=True)
 class ModelLicense:
-    """License evidence recorded on an embedding-model manifest."""
-
     name: str
     version: str
     url: str
@@ -200,8 +153,6 @@ class ModelLicense:
 
 @dataclass(frozen=True)
 class ModelFileEntry:
-    """One acquired model file with its byte-exact capture facts."""
-
     path: str
     size: int
     sha256: str
@@ -209,8 +160,6 @@ class ModelFileEntry:
 
 @dataclass(frozen=True)
 class EmbeddingModelManifest:
-    """Validated embedding-model manifest."""
-
     manifest_version: str
     model_id: str
     model_version: str
@@ -236,11 +185,11 @@ class EmbeddingModelManifest:
 
 
 def load_embedding_model_manifest(path: str | Path) -> EmbeddingModelManifest:
-    """Load and schema-validate an embedding-model manifest from *path*."""
     manifest_path = Path(path)
     if not manifest_path.is_file():
         raise EmbeddingModelManifestError(
-            "manifest_file_missing", f"embedding model manifest not found: {manifest_path}"
+            "manifest_file_missing",
+            f"embedding model manifest not found: {manifest_path}",
         )
     try:
         data = json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -252,7 +201,6 @@ def load_embedding_model_manifest(path: str | Path) -> EmbeddingModelManifest:
 
 
 def parse_embedding_model_manifest(data: Any) -> EmbeddingModelManifest:
-    """Parse and schema-validate an embedding-model manifest dict."""
     if not isinstance(data, dict):
         raise EmbeddingModelManifestError(
             "malformed_manifest", "embedding model manifest must be a JSON object"
@@ -266,7 +214,10 @@ def parse_embedding_model_manifest(data: Any) -> EmbeddingModelManifest:
         )
 
     version = data["manifest_version"]
-    if not isinstance(version, str) or version != SUPPORTED_EMBEDDING_MODEL_MANIFEST_VERSION:
+    if (
+        not isinstance(version, str)
+        or version != SUPPORTED_EMBEDDING_MODEL_MANIFEST_VERSION
+    ):
         raise EmbeddingModelManifestError(
             "unsupported_manifest_version",
             f"unsupported embedding model manifest version {version!r}; this "
@@ -306,7 +257,9 @@ def parse_embedding_model_manifest(data: Any) -> EmbeddingModelManifest:
 
     license_raw = data["license"]
     if not isinstance(license_raw, dict):
-        raise EmbeddingModelManifestError("malformed_manifest", "'license' must be an object")
+        raise EmbeddingModelManifestError(
+            "malformed_manifest", "'license' must be an object"
+        )
     license_missing = [
         key
         for key in ("name", "version", "url", "evidence_excerpt")
@@ -323,7 +276,9 @@ def parse_embedding_model_manifest(data: Any) -> EmbeddingModelManifest:
                 "malformed_manifest", f"license.{key} must be a string"
             )
     if license_raw["url"] and not _HTTP_URL_RE.match(license_raw["url"]):
-        raise EmbeddingModelManifestError("malformed_manifest", "license.url must be an http(s) URL")
+        raise EmbeddingModelManifestError(
+            "malformed_manifest", "license.url must be an http(s) URL"
+        )
 
     for field in ("architecture", "tokenizer", "pooling", "normalization"):
         if not isinstance(data[field], dict):
@@ -342,7 +297,9 @@ def parse_embedding_model_manifest(data: Any) -> EmbeddingModelManifest:
 
     files_raw = data["expected_files"]
     if not isinstance(files_raw, list):
-        raise EmbeddingModelManifestError("malformed_manifest", "'expected_files' must be a list")
+        raise EmbeddingModelManifestError(
+            "malformed_manifest", "'expected_files' must be a list"
+        )
     entries = [_parse_file_entry(raw, i) for i, raw in enumerate(files_raw)]
     if not entries:
         raise EmbeddingModelManifestError(
@@ -414,29 +371,15 @@ def _parse_file_entry(raw: Any, index: int) -> ModelFileEntry:
 
 
 def _is_safe_relative_model_path(path: str) -> bool:
-    """Return whether *path* is a plain relative path with no escape.
-
-    Rejects absolute paths in either slash style, empty or ``.``/``..`` path
-    components (in either slash style), empty strings, and NUL bytes. Only
-    forward-slash-separated, non-empty components are accepted so a manifest
-    can never name a file outside the cache directory on any platform.
-    """
     if not path or "\x00" in path:
         return False
     if path.startswith(("/", "\\")):
         return False
     parts = path.replace("\\", "/").split("/")
-    return bool(parts) and all(
-        part not in ("", ".", "..") for part in parts
-    )
+    return bool(parts) and all(part not in ("", ".", "..") for part in parts)
 
 
 def audit_embedding_model_manifest(manifest: EmbeddingModelManifest) -> None:
-    """Audit a validated manifest against the committed model approval policy.
-
-    Raises ``EmbeddingModelManifestError`` with a stable code on the first
-    failure; there is no fallback model and no other revision is acceptable.
-    """
     if manifest.model_status != STATUS_APPROVED_LOCAL:
         raise EmbeddingModelManifestError(
             "model_status_blocked",
@@ -552,11 +495,12 @@ def audit_embedding_model_manifest(manifest: EmbeddingModelManifest) -> None:
             "missing_evidence", "missing acquisition_method evidence"
         )
     if not (manifest.cache_policy or "").strip():
-        raise EmbeddingModelManifestError("missing_evidence", "missing cache_policy evidence")
+        raise EmbeddingModelManifestError(
+            "missing_evidence", "missing cache_policy evidence"
+        )
 
 
 def safe_model_path(cache_dir: str | Path, rel_path: str) -> Path:
-    """Resolve a manifest file path inside *cache_dir*, refusing escapes."""
     root = Path(cache_dir).resolve()
     candidate = (root / rel_path).resolve()
     try:
@@ -572,19 +516,11 @@ def safe_model_path(cache_dir: str | Path, rel_path: str) -> Path:
 def verify_embedding_model_files(
     manifest: EmbeddingModelManifest, cache_dir: str | Path
 ) -> None:
-    """Verify every manifest file exists with exact byte size and raw SHA-256.
-
-    Also rejects any extra file in the cache beyond the declared
-    ``expected_files`` (only names in ``ALLOWED_CACHE_EXTRAS`` are ignored), so
-    a stray file can never make an incomplete snapshot look valid.
-
-    Offline and local-only: no downloads, no network fallback. Raises a stable
-    ``EmbeddingModelManifestError`` on any missing file, extra file, size
-    mismatch, or checksum mismatch.
-    """
     root = Path(cache_dir)
     if not root.is_dir():
-        raise EmbeddingModelManifestError("cache_dir_missing", f"cache directory not found: {root}")
+        raise EmbeddingModelManifestError(
+            "cache_dir_missing", f"cache directory not found: {root}"
+        )
 
     declared = {Path(entry.path).as_posix() for entry in manifest.expected_files}
     for current_dir, _subdirs, files in os.walk(root):

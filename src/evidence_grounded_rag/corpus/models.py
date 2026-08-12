@@ -1,9 +1,3 @@
-"""Typed models for the license-gated corpus layer.
-
-Every object carries its provenance forward so downstream traces, citations,
-and evaluation reports can record where a piece of evidence came from.
-"""
-
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -18,8 +12,6 @@ from evidence_grounded_rag.corpus.normalize import sha256_hex
 
 @dataclass(frozen=True)
 class Chunk:
-    """A retrievable passage of text with a stable identity and location."""
-
     chunk_id: str
     document_id: str
     seq: int
@@ -31,8 +23,6 @@ class Chunk:
 
 @dataclass(frozen=True)
 class Document:
-    """A source document with full provenance metadata."""
-
     doc_id: str
     title: str
     version: str
@@ -48,8 +38,6 @@ class Document:
 
 @dataclass(frozen=True)
 class LicenseInfo:
-    """License terms attached to a corpus manifest."""
-
     status: str
     terms: str
     redistribution: str
@@ -57,20 +45,12 @@ class LicenseInfo:
 
 @dataclass(frozen=True)
 class RealCorpusGate:
-    """State of the real-corpus gate for this manifest.
-
-    A manifest that declares ``real_corpus`` must prove its license has been
-    independently confirmed. No such corpus is authorized today.
-    """
-
     blocked: bool
     blocker: str
 
 
 @dataclass(frozen=True)
 class Corpus:
-    """A fully validated, license-gated corpus ready for retrieval."""
-
     corpus_id: str
     corpus_version: str
     provenance: str
@@ -102,7 +82,6 @@ def build_chunks(
     document_id: str,
     texts: list[str],
 ) -> tuple[Chunk, ...]:
-    """Build chunk records with derived IDs and stable ``synthetic://`` locations."""
     return _build_chunks_with_location(
         corpus_id, corpus_version, document_id, texts, synthetic_location
     )
@@ -114,11 +93,6 @@ def build_local_chunks(
     document_id: str,
     texts: list[str],
 ) -> tuple[Chunk, ...]:
-    """Build chunk records with derived IDs and stable ``local://`` locations.
-
-    Used by the real-local corpus boundary. Locations use the ``local://``
-    scheme so real-local content is never mistaken for synthetic fixtures.
-    """
     return _build_chunks_with_location(
         corpus_id, corpus_version, document_id, texts, local_location
     )

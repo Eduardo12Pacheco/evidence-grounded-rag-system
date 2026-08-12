@@ -1,17 +1,3 @@
-"""Verify the approved Python 3.12.13 documentation corpus against its manifest.
-
-Run:  uv run python scripts/verify_corpus.py --manifest data/manifests/corpus-source-v1.0.0.json
-
-An offline, local-only check (never downloads). It validates the source
-manifest schema and version, audits the status/license/revision/privacy
-policy, verifies the expected files exist with exact byte sizes and raw
-SHA-256 checksums, re-runs the privacy scan, then derives the real-local
-corpus in memory and prints a summary. Exits non-zero with a stable error code
-on any failure.
-
-Standard library only. No secrets are logged.
-"""
-
 from __future__ import annotations
 
 import argparse

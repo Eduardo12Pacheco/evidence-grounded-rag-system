@@ -1,57 +1,61 @@
 # Demo Script — evidence-grounded-rag-system
 
-Status: **implemented — offline Streamlit demo over committed synthetic fixtures.**
+Estado: **implementada — demo offline de Streamlit sobre fixtures sintéticos
+comprometidos.**
 
-## What the demo shows
+## Qué muestra la demo
 
-A user asks a question and sees, in one screen:
+Un usuario hace una pregunta y ve, en una sola pantalla:
 
-1. The **corpus/license panel**: corpus id/version, provenance
-   (`project-generated-synthetic`), license status, and the exact
-   real-corpus blocker (Gob.ec unauthorized; license discrepancy unresolved).
-2. A **SYNTHETIC / OFFLINE** banner — all content is fictional fixture data,
-   no network calls, no credentials.
-3. **Modes**: hybrid (default), sparse, dense; plus a `top_k` slider.
-4. **Sparse / dense / hybrid results**: ranked chunks with rank, score, chunk
-   id, and snippet.
-5. **Passage / source metadata** for the top evidence chunk (document id,
-   title, version, captured date, source, license note, SHA-256 checksum,
-   `synthetic://` location).
-6. **Structured answer** with numbered claims and their citations.
-7. **Citation validation**: valid, or the exact failing issue codes (answer is
-   refused, never shown as verified).
-8. **Abstention reason** when the system refuses (e.g. conflicting evidence),
-   with the stable reason code and detail.
-9. **Versions & configuration** and the full **trace** (sparse/dense/fused
-   candidates, versions, config) as JSON.
+1. El **panel de corpus/licencia**: id/versión del corpus, procedencia
+   (`project-generated-synthetic`), estado de licencia y el bloqueador de corpus
+   real exacto (Gob.ec no autorizado; discrepancia de licencia sin resolver).
+2. Un banner **SINTÉTICO / OFFLINE** — todo el contenido son datos de fixtures
+   ficticios, sin llamadas de red, sin credenciales.
+3. **Modos**: hybrid (por defecto), sparse, dense; más un slider de `top_k`.
+4. **Resultados sparse / dense / hybrid**: fragmentos clasificados con rango,
+   puntaje, id de fragmento y snippet.
+5. **Metadatos de pasaje / fuente** para el fragmento de evidencia principal (id
+   de documento, título, versión, fecha de captura, fuente, nota de licencia,
+   checksum SHA-256, ubicación `synthetic://`).
+6. **Respuesta estructurada** con afirmaciones numeradas y sus citas.
+7. **Validación de citas**: válida, o los códigos exactos de problemas que fallan
+   (la respuesta se rechaza, nunca se muestra como verificada).
+8. **Razón de abstención** cuando el sistema se niega (por ejemplo, evidencia
+   conflictiva), con el código de razón estable y el detalle.
+9. **Versiones y configuración** y el **trace** completo (candidatos
+   sparse/dense/fusionados, versiones, configuración) como JSON.
 
-Failures are visible: gate failures, validation failures, and empty queries
-render as explicit error/warning panels, never as silent empty screens.
+Los fallos son visibles: fallos de gate, fallos de validación y consultas vacías
+se renderizan como paneles de error/advertencia explícitos, nunca como pantallas
+vacías silenciosas.
 
-## Constraint
+## Restricción
 
-The demo runs ONLY on the committed synthetic fixture corpus
-(`data/fixtures/synthetic_manifest.json`). It performs no live fetches, uses
-no credentials, and never touches an unlicensed corpus. The real-corpus gate
-is shown as BLOCKED.
+La demo se ejecuta SOLO sobre el corpus de fixture sintético comprometido
+(`data/fixtures/synthetic_manifest.json`). No realiza fetches en vivo, no usa
+credenciales y nunca toca un corpus sin licencia. El gate de corpus real se
+muestra como BLOQUEADO.
 
-## Real-local corpus is NOT part of the demo
+## El corpus local real NO es parte de la demo
 
-The approved real-local corpus (Python 3.12.13 documentation,
-`approved-for-local-development`) is intentionally absent from the demo. It is
-an explicit, opt-in, local-development boundary exercised only by the offline
-scripts — the demo, the default pipeline, and synthetic evaluation are
-unchanged and remain synthetic-only:
+El corpus local real aprobado (documentación de Python 3.12.13,
+`approved-for-local-development`) está intencionalmente ausente de la demo. Es un
+límite explícito, opt-in, de desarrollo local ejercitado solo por los scripts
+offline — la demo, el pipeline por defecto y la evaluación sintética permanecen
+sin cambios y solo sintéticos:
 
 ```bash
-uv run python scripts/acquire_corpus.py \
-    # writes data/raw/python-docs-3.12.13/ (gitignored) + the source manifest
+uv run python scripts/acquire_corpus.py
 uv run python scripts/verify_corpus.py --manifest data/manifests/corpus-source-v1.0.0.json
-    # offline verification of manifest, revision, files, sizes, SHA-256, privacy
 ```
 
-See `docs/corpus-license-contract.md` for the license decision and why Gob.ec
-is not used, and `README.md` for the synthetic / real-local / blocked modes.
+`acquire_corpus.py` escribe `data/raw/python-docs-3.12.13/` (gitignored) + el
+source manifest. `verify_corpus.py` hace la verificación offline de manifest,
+revisión, archivos, tamaños, SHA-256 y privacidad.
+
+Ver `docs/corpus-license-contract.md` para la decisión de licencia y por qué
+Gob.ec no se usa, y `README.md` para los modos sintético / local real / bloqueado.
 
 ## Run book
 
@@ -60,33 +64,37 @@ uv sync --dev --extra demo
 uv run --extra demo streamlit run scripts/demo_retrieval.py
 ```
 
-Open the printed local URL. The app builds the pipeline in memory from the
-committed fixture manifest (gate + checksum validated on load).
+Abra la URL local impresa. La aplicación construye el pipeline en memoria desde
+el manifest de fixture comprometido (gate + checksum validados en la carga).
 
-## Walkthrough (60–90 seconds)
+## Recorrido (60–90 segundos)
 
-1. **Open** — the SYNTHETIC/OFFLINE banner and the corpus/license panel are
-   immediately visible, including the real-corpus blocker.
-2. **Supported query** — the default query `What must a permit application
-   include?` answers with a cited claim:
-   - Answer: "A permit application must include a signed code of conduct and a
-     contact phone number. [1]"
-   - Claim cites `doc-aurora-park-permits::1` at its `synthetic://` location.
-   - Citation validation shows VALID.
-3. **Conflicting evidence** — ask `How much is the special event fee per day?`:
-   the corpus contains two contradictory fee schedules, so the system shows
-   `CONFLICTING EVIDENCE: conflicting_evidence` and explains the contradiction.
-4. **Out-of-corpus** — ask `What is the fine for littering in Millbrook?`:
-   the system abstains with `unsupported_query`.
-5. **Modes** — switch to sparse or dense and re-run to compare rankings; the
-   answer is grounded on the selected mode while both systems' candidates stay
-   visible.
-6. **Close** — the trace and versions/config panels let any claim be traced
-   back to a specific chunk, rank, score, and committed version.
+1. **Abra** — el banner SINTÉTICO/OFFLINE y el panel de corpus/licencia son
+   inmediatamente visibles, incluido el bloqueador de corpus real.
+2. **Consulta soportada** — la consulta por defecto `What must a permit
+   application include?` responde con una afirmación citada:
+   - Respuesta: "A permit application must include a signed code of conduct and
+     a contact phone number. [1]"
+   - La afirmación cita `doc-aurora-park-permits::1` en su ubicación
+     `synthetic://`.
+   - La validación de citas muestra VÁLIDA.
+3. **Evidencia conflictiva** — pregunte `How much is the special event fee per
+   day?`: el corpus contiene dos tarifas contradictorias, por lo que el sistema
+   muestra `CONFLICTING EVIDENCE: conflicting_evidence` y explica la
+   contradicción.
+4. **Fuera de corpus** — pregunte `What is the fine for littering in
+   Millbrook?`: el sistema se abstiene con `unsupported_query`.
+5. **Modos** — cambie a sparse o dense y re-ejecute para comparar rankings; la
+   respuesta se fundamenta en el modo seleccionado mientras los candidatos de
+   ambos sistemas permanecen visibles.
+6. **Cierre** — los paneles de trace y versiones/configuración permiten trazar
+   cualquier afirmación de vuelta a un fragmento, rango, puntaje y versión
+   comprometida específicos.
 
-## What the demo must NOT claim
+## Qué la demo NO debe afirmar
 
-- No real accuracy numbers: the committed metrics describe synthetic fixtures
-  only and are labeled as such.
-- No Gob.ec corpus use, ever, until the corpus/license contract is satisfied.
-- No hallucination-free, trustworthy, or production-ready wording.
+- Sin números de precisión reales: las métricas comprometidas describen solo
+  fixtures sintéticos y están etiquetadas como tales.
+- Sin uso del corpus Gob.ec, jamás, hasta que el contract de corpus/licencia se
+  satisfaga.
+- Sin redacción de libre-de-alucinaciones, confiable o apta para producción.

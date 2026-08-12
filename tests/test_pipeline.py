@@ -1,5 +1,3 @@
-"""End-to-end pipeline tests: answering, fail-closed gates, and validation."""
-
 from __future__ import annotations
 
 import json
@@ -29,7 +27,10 @@ def test_pipeline_answers_supported_query(pipeline):
     assert record.validation.valid is True
     assert record.validation.skipped is False
     assert record.citations
-    assert all(citation.chunk_id in {item.chunk_id for item in record.evidence} for citation in record.citations)
+    assert all(
+        citation.chunk_id in {item.chunk_id for item in record.evidence}
+        for citation in record.citations
+    )
 
 
 def test_pipeline_abstains_on_conflicting_evidence(pipeline):
@@ -130,7 +131,11 @@ def test_forged_citation_fails_closed_to_citation_validation():
                 excerpt="forged excerpt",
                 location="synthetic://nowhere",
             )
-            claim = Claim(claim_id="claim-1", text="forged claim", citation_chunk_ids=("doc-never-exists::0",))
+            claim = Claim(
+                claim_id="claim-1",
+                text="forged claim",
+                citation_chunk_ids=("doc-never-exists::0",),
+            )
             return GeneratedAnswer(
                 state=AnswerState.ANSWERED,
                 answer_text="forged answer",
@@ -258,7 +263,9 @@ def _single_chunk_evidence(query: str) -> GeneratedAnswer:
         excerpt=chunk.text,
         location=chunk.location,
     )
-    claim = Claim(claim_id="claim-1", text=chunk.text, citation_chunk_ids=(chunk.chunk_id,))
+    claim = Claim(
+        claim_id="claim-1", text=chunk.text, citation_chunk_ids=(chunk.chunk_id,)
+    )
     return GeneratedAnswer(
         state=AnswerState.ANSWERED,
         answer_text=chunk.text,

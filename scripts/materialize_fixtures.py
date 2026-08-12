@@ -1,15 +1,3 @@
-"""Regenerate the committed synthetic fixture corpus manifest.
-
-Run:  uv run python scripts/materialize_fixtures.py
-
-Writes ``data/fixtures/synthetic_manifest.json`` and verifies it loads through
-the real license gate and loader (including checksum validation). The output is
-deterministic: identical content produces identical bytes.
-
-All content is fictional, project-generated, and explicitly labeled synthetic.
-It does not represent any real institution, regulation, or dataset.
-"""
-
 from __future__ import annotations
 
 import json
@@ -20,7 +8,6 @@ from evidence_grounded_rag.corpus.normalize import sha256_hex
 
 OUT_PATH = Path("data/fixtures/synthetic_manifest.json")
 
-#: Exact blocker text for the real-corpus gate, mirrored from the license gate.
 REAL_CORPUS_BLOCKER = (
     "No external corpus license has been independently confirmed. The Gob.ec "
     "corpus is explicitly unauthorized: its 'Creative Commons Attribution 4.0 "
@@ -104,7 +91,9 @@ def build_manifest() -> dict[str, object]:
                 "attribution": attribution,
                 "license": "Project-generated synthetic content; covered by this "
                 "repository's MIT license as original content.",
-                "chunks": [{"seq": seq, "text": text} for seq, text in enumerate(texts)],
+                "chunks": [
+                    {"seq": seq, "text": text} for seq, text in enumerate(texts)
+                ],
                 "checksum_sha256": sha256_hex("\n".join(texts)),
             }
         )

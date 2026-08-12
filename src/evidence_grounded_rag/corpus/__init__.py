@@ -1,15 +1,3 @@
-"""License-gated corpus layer.
-
-Loads versioned synthetic fixture manifests, derives stable document/chunk
-identities, validates checksums, rejects duplicates, and fails closed on any
-blocked or unapproved corpus. No real corpus is authorized yet.
-
-The corpus source-manifest boundary (``corpus/audit.py``, ``corpus/real_local.py``)
-is a SEPARATE, explicit, opt-in local-development path for the single approved
-corpus (Python 3.12.13 documentation). It never loosens the synthetic gate and
-never feeds the default demo or synthetic evaluation.
-"""
-
 from __future__ import annotations
 
 from evidence_grounded_rag.corpus.audit import (

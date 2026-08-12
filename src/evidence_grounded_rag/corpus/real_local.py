@@ -1,20 +1,3 @@
-"""Real-local corpus derivation from an audited source manifest.
-
-This is the minimum real-local integration for the bounded corpus-onboarding
-work unit (Python 3.12.13 official documentation). It takes an audited source
-manifest plus the local raw files and derives an in-memory corpus with:
-
-- stable document IDs derived from source paths;
-- stable chunk IDs (``derive_chunk_id``) and ``local://`` locations;
-- raw (byte-exact) and normalized SHA-256 checksums carried forward;
-- source provenance, license, and revision carried forward on every document;
-- privacy exclusion enforced: flagged documents never enter derived data.
-
-The derived corpus is EXPLICITLY local-only. It is never the default corpus,
-never the demo corpus, and never part of synthetic evaluation. No real text is
-committed: the raw files live only under the gitignored ``data/raw/`` tree.
-"""
-
 from __future__ import annotations
 
 import re
@@ -39,8 +22,6 @@ from evidence_grounded_rag.corpus.normalize import (
 )
 from evidence_grounded_rag.corpus.privacy import PrivacyAuditResult, audit_privacy_texts
 
-#: Committed maximum characters per derived chunk. Chunking is deterministic:
-#: paragraphs first, then hard splits at the limit for over-long paragraphs.
 DEFAULT_CHUNK_MAX_CHARS = 2000
 
 _PATH_ID_RE = re.compile(r"[^a-z0-9._-]+")
@@ -48,8 +29,6 @@ _PATH_ID_RE = re.compile(r"[^a-z0-9._-]+")
 
 @dataclass(frozen=True)
 class RealLocalDocument:
-    """One derived document carrying its full source provenance forward."""
-
     doc_id: str
     source_path: str
     title: str
@@ -70,8 +49,6 @@ class RealLocalDocument:
 
 @dataclass(frozen=True)
 class RealLocalCorpus:
-    """A fully audited, verified, privacy-screened local corpus."""
-
     corpus_id: str
     corpus_version: str
     status: str
@@ -97,19 +74,15 @@ class RealLocalCorpus:
 
 
 def derive_source_doc_id(source_path: str) -> str:
-    """Derive a stable document ID from a relative source path.
-
-    The ID is a deterministic transformation of the path, so it is stable
-    across reloads as long as the captured file layout does not change.
-    """
     stem = _PATH_ID_RE.sub("-", source_path.lower()).strip(".-_")
     if not stem or not stem[0].isalnum():
         stem = f"doc-{stem}"
     return stem[:127]
 
 
-def chunk_paragraphs(text: str, *, max_chars: int = DEFAULT_CHUNK_MAX_CHARS) -> list[str]:
-    """Split normalized text into deterministic chunks (paragraphs first)."""
+def chunk_paragraphs(
+    text: str, *, max_chars: int = DEFAULT_CHUNK_MAX_CHARS
+) -> list[str]:
     paragraphs = [p for p in re.split(r"\n\s*\n", text) if p.strip()]
     chunks: list[str] = []
     for paragraph in paragraphs:
@@ -132,11 +105,6 @@ def build_real_local_corpus(
     excluded_document_ids: frozenset[str] = frozenset(),
     chunk_max_chars: int = DEFAULT_CHUNK_MAX_CHARS,
 ) -> RealLocalCorpus:
-    """Audit, verify, privacy-screen, and derive the real-local corpus.
-
-    Raises the corresponding ``SourceManifestError`` subclass on any audit,
-    verification, privacy, or derivation failure.
-    """
     assert_audit_allowed(source_manifest)
     verify_source_files(source_manifest, raw_dir)
     root = Path(raw_dir)

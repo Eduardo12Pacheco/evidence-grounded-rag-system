@@ -1,19 +1,3 @@
-"""Tests for the separate semantic-materializer evaluation.
-
-Fully offline: the semantic provider is a fake (no weights), model manifests
-and cache dirs live in temporary directories, and the real corpus content comes
-from the existing gitignored ``data/raw/python-docs-3.12.13/`` capture (copied
-or read directly, never network). Coverage:
-
-- four separately labeled modes (sparse / hash / semantic / hybrid);
-- prior committed report, query set, and corpus manifest untouched;
-- missing/unverified model → SemanticModelUnavailableError, never a hash
-  fallback, and no report written;
-- invalid model manifest refused with a stable error;
-- report schema: metrics, per-query rankings/hits, ranking stability, model
-  facts, no chunk text, network-free module.
-"""
-
 from __future__ import annotations
 
 import json
@@ -59,7 +43,9 @@ MANIFEST = ROOT / "data" / "manifests" / "corpus-source-v1.0.0.json"
 QUERY_SET = ROOT / "data" / "evaluation" / "queries" / "python-docs-real-v1.0.0.json"
 RAW_DIR = ROOT / "data" / "raw" / "python-docs-3.12.13"
 PRIOR_REPORT = ROOT / "data" / "evaluations" / "python-docs-real-evaluation-v1.0.0.json"
-MODULE = ROOT / "src" / "evidence_grounded_rag" / "evaluation" / "semantic_materialize.py"
+MODULE = (
+    ROOT / "src" / "evidence_grounded_rag" / "evaluation" / "semantic_materialize.py"
+)
 
 REVISION = "5c38ec7c405ec4b44b94cc5a9bb96e735b38267a"
 
@@ -121,11 +107,6 @@ def _read(path: Path) -> bytes:
     return path.read_bytes()
 
 
-# --------------------------------------------------------------------------- #
-# four separated modes
-# --------------------------------------------------------------------------- #
-
-
 def test_semantic_evaluate_reports_four_separate_modes(
     tmp_path, model_manifest, cache_dir
 ):
@@ -141,11 +122,14 @@ def test_semantic_evaluate_reports_four_separate_modes(
     data = report.data
     assert data["report_type"] == "real-local-semantic-evaluation"
     assert data["report_version"] == "1.0.0"
-    assert set(data["metrics"].keys()) == {
-        "sparse", "hash", "semantic", "hybrid"
-    }
+    assert set(data["metrics"].keys()) == {"sparse", "hash", "semantic", "hybrid"}
     assert set(data["per_query"].keys()) == {"sparse", "hash", "semantic", "hybrid"}
-    assert set(data["ranking_stability"].keys()) == {"sparse", "hash", "semantic", "hybrid"}
+    assert set(data["ranking_stability"].keys()) == {
+        "sparse",
+        "hash",
+        "semantic",
+        "hybrid",
+    }
     assert data["labels"]["sparse_mode"] == SPARSE_MODE_LABEL
     assert data["labels"]["hash_mode"] == HASH_MODE_LABEL
     assert data["labels"]["semantic_mode"] == SEMANTIC_MODE_LABEL
@@ -153,9 +137,13 @@ def test_semantic_evaluate_reports_four_separate_modes(
     assert out_path.is_file()
 
 
-def test_hash_mode_label_is_exact_and_semantic_never_hash(tmp_path, model_manifest, cache_dir):
+def test_hash_mode_label_is_exact_and_semantic_never_hash(
+    tmp_path, model_manifest, cache_dir
+):
     report, _ = semantic_evaluate(
-        MANIFEST, QUERY_SET, RAW_DIR,
+        MANIFEST,
+        QUERY_SET,
+        RAW_DIR,
         model_manifest_path=model_manifest,
         cache_dir=cache_dir,
         out_path=tmp_path / "report.json",
@@ -167,12 +155,16 @@ def test_hash_mode_label_is_exact_and_semantic_never_hash(tmp_path, model_manife
     assert "no_hash_fallback" in report.data["labels"]
 
 
-def test_semantic_evaluate_leaves_prior_reports_untouched(tmp_path, model_manifest, cache_dir):
+def test_semantic_evaluate_leaves_prior_reports_untouched(
+    tmp_path, model_manifest, cache_dir
+):
     before_report = _read(PRIOR_REPORT)
     before_queries = _read(QUERY_SET)
     before_corpus = _read(MANIFEST)
     semantic_evaluate(
-        MANIFEST, QUERY_SET, RAW_DIR,
+        MANIFEST,
+        QUERY_SET,
+        RAW_DIR,
         model_manifest_path=model_manifest,
         cache_dir=cache_dir,
         out_path=tmp_path / "report.json",
@@ -185,7 +177,9 @@ def test_semantic_evaluate_leaves_prior_reports_untouched(tmp_path, model_manife
 
 def test_semantic_report_model_facts(tmp_path, model_manifest, cache_dir):
     report, _ = semantic_evaluate(
-        MANIFEST, QUERY_SET, RAW_DIR,
+        MANIFEST,
+        QUERY_SET,
+        RAW_DIR,
         model_manifest_path=model_manifest,
         cache_dir=cache_dir,
         out_path=tmp_path / "report.json",
@@ -201,14 +195,11 @@ def test_semantic_report_model_facts(tmp_path, model_manifest, cache_dir):
     assert "max_input_tokens" in model
 
 
-# --------------------------------------------------------------------------- #
-# report schema / rankings
-# --------------------------------------------------------------------------- #
-
-
 def test_semantic_report_schema_and_rankings(tmp_path, model_manifest, cache_dir):
     report, _ = semantic_evaluate(
-        MANIFEST, QUERY_SET, RAW_DIR,
+        MANIFEST,
+        QUERY_SET,
+        RAW_DIR,
         model_manifest_path=model_manifest,
         cache_dir=cache_dir,
         out_path=tmp_path / "report.json",
@@ -217,7 +208,14 @@ def test_semantic_report_schema_and_rankings(tmp_path, model_manifest, cache_dir
     data = report.data
     for mode in ("sparse", "hash", "semantic", "hybrid"):
         overall = data["metrics"][mode]["overall"]
-        for key in ("recall@1", "recall@5", "recall@10", "mrr", "ndcg@5", "no_result_rate"):
+        for key in (
+            "recall@1",
+            "recall@5",
+            "recall@10",
+            "mrr",
+            "ndcg@5",
+            "no_result_rate",
+        ):
             assert key in overall
         stability = data["ranking_stability"][mode]
         assert stability["num_queries"] == 18
@@ -231,16 +229,21 @@ def test_semantic_report_schema_and_rankings(tmp_path, model_manifest, cache_dir
     assert data["corpus"]["chunk_count"] == 70
 
 
-def test_semantic_report_has_digest_and_stores_no_chunk_text(tmp_path, model_manifest, cache_dir, real_corpus):
+def test_semantic_report_has_digest_and_stores_no_chunk_text(
+    tmp_path, model_manifest, cache_dir, real_corpus
+):
     report, _ = semantic_evaluate(
-        MANIFEST, QUERY_SET, RAW_DIR,
+        MANIFEST,
+        QUERY_SET,
+        RAW_DIR,
         model_manifest_path=model_manifest,
         cache_dir=cache_dir,
         out_path=tmp_path / "report.json",
         provider=FakeSemanticProvider(dimension=8),
     )
     payload = {
-        k: v for k, v in report.data.items()
+        k: v
+        for k, v in report.data.items()
         if k not in ("timestamp_utc", "deterministic_digest", "runtime_observations")
     }
     import hashlib
@@ -254,15 +257,14 @@ def test_semantic_report_has_digest_and_stores_no_chunk_text(tmp_path, model_man
     assert report.data["deterministic_digest"] == expected
 
 
-# --------------------------------------------------------------------------- #
-# unavailable model / invalid manifest
-# --------------------------------------------------------------------------- #
-
-
 def test_missing_model_fails_without_hash_fallback(tmp_path, model_manifest, cache_dir):
-    with pytest.raises(SemanticModelUnavailableError, match="cache directory not found"):
+    with pytest.raises(
+        SemanticModelUnavailableError, match="cache directory not found"
+    ):
         semantic_evaluate(
-            MANIFEST, QUERY_SET, RAW_DIR,
+            MANIFEST,
+            QUERY_SET,
+            RAW_DIR,
             model_manifest_path=model_manifest,
             cache_dir=cache_dir,
             out_path=tmp_path / "report.json",
@@ -279,7 +281,9 @@ def test_invalid_model_manifest_refused(tmp_path, model_manifest, cache_dir):
     )
     with pytest.raises(EmbeddingModelManifestError, match="revision_mismatch"):
         semantic_evaluate(
-            MANIFEST, QUERY_SET, RAW_DIR,
+            MANIFEST,
+            QUERY_SET,
+            RAW_DIR,
             model_manifest_path=bad,
             cache_dir=cache_dir,
             out_path=tmp_path / "report.json",
@@ -295,32 +299,37 @@ def test_cli_fails_clearly_on_invalid_model_manifest(tmp_path):
     )
     code = semantic_main(
         [
-            "--manifest", str(MANIFEST),
-            "--queries", str(QUERY_SET),
-            "--raw-dir", str(RAW_DIR),
-            "--model-manifest", str(bad),
-            "--cache-dir", str(tmp_path / "cache"),
-            "--output", str(tmp_path / "report.json"),
+            "--manifest",
+            str(MANIFEST),
+            "--queries",
+            str(QUERY_SET),
+            "--raw-dir",
+            str(RAW_DIR),
+            "--model-manifest",
+            str(bad),
+            "--cache-dir",
+            str(tmp_path / "cache"),
+            "--output",
+            str(tmp_path / "report.json"),
         ]
     )
     assert code == 1
     assert not (tmp_path / "report.json").exists()
 
 
-# --------------------------------------------------------------------------- #
-# offline discipline
-# --------------------------------------------------------------------------- #
-
-
 def test_semantic_materialize_module_is_network_free():
     source = MODULE.read_text(encoding="utf-8")
-    for forbidden in ("urllib", "requests", "httpx", "socket.", "aiohttp", "hf_hub_download"):
-        assert forbidden not in source, f"semantic_materialize must not use {forbidden!r}"
-
-
-# --------------------------------------------------------------------------- #
-# real corpus build integration (shared fixture)
-# --------------------------------------------------------------------------- #
+    for forbidden in (
+        "urllib",
+        "requests",
+        "httpx",
+        "socket.",
+        "aiohttp",
+        "hf_hub_download",
+    ):
+        assert forbidden not in source, (
+            f"semantic_materialize must not use {forbidden!r}"
+        )
 
 
 @pytest.fixture(scope="module")

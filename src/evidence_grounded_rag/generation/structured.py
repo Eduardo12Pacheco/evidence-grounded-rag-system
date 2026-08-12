@@ -1,24 +1,3 @@
-"""Strict parser/validator for provider-neutral structured generation output.
-
-The bundled generation providers are deterministic and never produce raw JSON,
-but a LIVE provider returns arbitrary text. That text is only ever admitted
-through this module, which fails closed:
-
-- ``StructuredAnswerParser`` parses the raw text against the exact JSON schema
-  of ``grounded-answer-prompt-v1.0.0``. Any malformed JSON, missing field,
-  invalid status, missing/duplicate claim or citation id, or uncited claim
-  produces a stable issue code; the caller converts that into a fail-closed
-  abstention (``malformed_output``), never into an answer.
-- ``StructuredAnswerValidator`` checks the parsed answer's citations against
-  the bounded ``EvidencePack`` (the exposed surface): unknown/unexposed chunk,
-  stale corpus version, excerpt mismatch, location mismatch, and orphaned
-  citations. These checks are distinct from the pipeline's corpus-level
-  ``CitationValidator``; the pipeline re-runs that one after conversion.
-- ``to_generated_answer`` converts a validated ``StructuredAnswer`` into the
-  existing ``GeneratedAnswer`` so the pipeline and the existing citation
-  validator keep working unchanged.
-"""
-
 from __future__ import annotations
 
 import json
@@ -35,24 +14,18 @@ from evidence_grounded_rag.generation.models import (
 )
 from evidence_grounded_rag.versions import STRUCTURED_ANSWER_SCHEMA_VERSION
 
-#: Schema version of the structured JSON produced/consumed here.
 SCHEMA_VERSION = STRUCTURED_ANSWER_SCHEMA_VERSION
 
 
 class StructuredAnswerStatus(str, Enum):
-    """Status values admitted by the structured answer schema."""
-
     ANSWERED = "answered"
     ABSTAINED = "abstained"
     CONFLICTING = "conflicting"
     INVALID = "invalid"
 
 
-#: Statuses that require an answer payload (text + claims + citations).
 _ANSWERED_STATUSES = frozenset({StructuredAnswerStatus.ANSWERED})
 
-#: Abstention reason strings a live provider may declare for non-answered
-#: statuses (a subset of ``AbstentionReason`` values).
 _VALID_ABSTENTION_STRINGS = frozenset(
     {
         "insufficient_evidence",
@@ -74,8 +47,6 @@ _REQUIRED_CITATION_FIELDS = (
 
 @dataclass(frozen=True)
 class StructuredParseIssue:
-    """One stable, deterministic failure of structured parsing/validation."""
-
     code: str
     message: str
     field: str | None = None
@@ -86,13 +57,6 @@ class StructuredParseIssue:
 
 @dataclass(frozen=True)
 class StructuredAnswer:
-    """Typed, validated structured output of a live generation provider.
-
-    Carries the four-status schema (``answered`` / ``abstained`` /
-    ``conflicting`` / ``invalid``) plus provider/model/mode provenance and the
-    retrieval trace and corpus metadata the answer was grounded on.
-    """
-
     status: StructuredAnswerStatus
     answer_text: str | None
     claims: tuple[Claim, ...] = field(default_factory=tuple)
@@ -108,8 +72,6 @@ class StructuredAnswer:
 
 @dataclass(frozen=True)
 class StructuredParseResult:
-    """Outcome of parsing raw provider text."""
-
     answer: StructuredAnswer | None = None
     issues: tuple[StructuredParseIssue, ...] = field(default_factory=tuple)
 
@@ -119,8 +81,6 @@ class StructuredParseResult:
 
 
 class StructuredAnswerParser:
-    """Strict schema parser for the grounded-answer structured JSON."""
-
     def parse(self, raw: str) -> StructuredParseResult:
         if not isinstance(raw, str):
             return StructuredParseResult(
@@ -191,9 +151,7 @@ class StructuredAnswerParser:
                 issues.append(
                     StructuredParseIssue(
                         code="unexpected_answer_text",
-                        message=(
-                            f"{status.value} status must not carry answer_text."
-                        ),
+                        message=(f"{status.value} status must not carry answer_text."),
                         field="answer_text",
                     )
                 )
@@ -202,14 +160,16 @@ class StructuredAnswerParser:
                     StructuredParseIssue(
                         code="unexpected_payload",
                         message=(
-                            f"{status.value} status must not carry claims or "
-                            "citations."
+                            f"{status.value} status must not carry claims or citations."
                         ),
                         field="claims",
                     )
                 )
 
-        if status in (StructuredAnswerStatus.ANSWERED, StructuredAnswerStatus.CONFLICTING):
+        if status in (
+            StructuredAnswerStatus.ANSWERED,
+            StructuredAnswerStatus.CONFLICTING,
+        ):
             cited_chunks = {citation.chunk_id for citation in citations}
             seen: set[str] = set()
             for citation in citations:
@@ -258,10 +218,6 @@ class StructuredAnswerParser:
                 ),
             )
         )
-
-    # ------------------------------------------------------------------ #
-    # field parsers
-    # ------------------------------------------------------------------ #
 
     def _parse_status(
         self, payload: dict[str, object], issues: list[StructuredParseIssue]
@@ -439,9 +395,7 @@ class StructuredAnswerParser:
             issues.append(
                 StructuredParseIssue(
                     code="missing_abstention_reason",
-                    message=(
-                        f"{status.value} status requires abstention_reason."
-                    ),
+                    message=(f"{status.value} status requires abstention_reason."),
                     field="abstention_reason",
                 )
             )
@@ -462,14 +416,6 @@ class StructuredAnswerParser:
 
 
 class StructuredAnswerValidator:
-    """Validates a parsed structured answer against the exposed evidence pack.
-
-    The pack IS the exposed surface: a citation to a chunk id not in the pack
-    is unknown to the generator (and unexposed by definition). Corpus-level
-    re-validation (does the chunk exist at all, is it the served version) is
-    delegated to the pipeline's ``CitationValidator`` after conversion.
-    """
-
     def validate(
         self,
         answer: StructuredAnswer,
@@ -549,7 +495,6 @@ class StructuredAnswerValidator:
         return tuple(issues)
 
 
-#: Deterministic mapping from structured status to the existing AnswerState.
 _STATUS_TO_STATE = {
     StructuredAnswerStatus.ANSWERED: AnswerState.ANSWERED,
     StructuredAnswerStatus.ABSTAINED: AnswerState.ABSTAINED,
@@ -565,14 +510,6 @@ def to_generated_answer(
     model_id: str = "",
     mode: str = "",
 ) -> GeneratedAnswer:
-    """Convert a validated ``StructuredAnswer`` into ``GeneratedAnswer``.
-
-    Status mapping is deterministic and documented: ``invalid`` becomes an
-    abstention with reason ``malformed_output``; ``abstained`` uses the
-    declared reason string when it maps to a real ``AbstentionReason`` and
-    ``insufficient_evidence`` otherwise; ``conflicting`` always carries
-    ``conflicting_evidence``.
-    """
     state = _STATUS_TO_STATE[answer.status]
     abstention_reason: AbstentionReason | None = None
     abstention_detail: str | None = answer.abstention_detail
@@ -588,7 +525,7 @@ def to_generated_answer(
             or "Generation provider returned status 'invalid'; no structured "
             "answer could be produced."
         )
-    else:  # abstained
+    else:
         try:
             abstention_reason = (
                 AbstentionReason(answer.abstention_reason)

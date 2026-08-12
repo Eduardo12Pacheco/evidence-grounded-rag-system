@@ -1,11 +1,3 @@
-"""Evidence-grounded RAG system.
-
-Hybrid retrieval (sparse + dense), evidence-grounded generation with
-citations, mandatory abstention, and faithfulness evaluation. The bundled
-corpus is a small synthetic fixture corpus; no real corpus is implemented or
-authorized (see ``docs/corpus-license-contract.md``).
-"""
-
 from __future__ import annotations
 
 from evidence_grounded_rag.abstention import AbstentionReason

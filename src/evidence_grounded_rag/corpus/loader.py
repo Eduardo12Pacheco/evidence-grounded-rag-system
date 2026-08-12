@@ -1,25 +1,3 @@
-"""Synthetic fixture manifest loader with checksum validation.
-
-Supports two committed formats:
-
-- ``.json``: a single object with ``manifest`` (metadata) and ``documents``
-  (list of document records).
-- ``.jsonl``: the first line carries ``{"manifest": {...}}`` and each following
-  line carries one document record as ``{"document": {...}}``.
-
-Loading always:
-
-1. parses and validates the manifest schema and format version;
-2. applies the license gate (fails closed on blocked real corpora / unapproved
-   licenses);
-3. derives stable chunk IDs from document identity and position;
-4. recomputes every document SHA-256 checksum over the normalized text and
-   rejects any mismatch;
-5. rejects duplicate document IDs and duplicate chunk IDs.
-
-Every loaded corpus is the result of the full gate: no bypass path exists.
-"""
-
 from __future__ import annotations
 
 import json
@@ -49,7 +27,6 @@ _REQUIRED_MANIFEST_FIELDS = ("corpus_id", "corpus_version", "provenance")
 
 
 def load_corpus(path: str | Path) -> Corpus:
-    """Load, gate, and validate a synthetic fixture manifest from *path*."""
     manifest_path = Path(path)
     if not manifest_path.is_file():
         raise ManifestFormatError(f"manifest file not found: {manifest_path}")
@@ -101,7 +78,9 @@ def _parse_json(path: Path) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     if not isinstance(raw, dict):
         raise ManifestFormatError("JSON manifest root must be an object")
     if "manifest" not in raw or "documents" not in raw:
-        raise ManifestFormatError("JSON manifest must contain 'manifest' and 'documents'")
+        raise ManifestFormatError(
+            "JSON manifest must contain 'manifest' and 'documents'"
+        )
     documents = raw["documents"]
     if not isinstance(documents, list):
         raise ManifestFormatError("JSON 'documents' must be a list")
@@ -114,7 +93,9 @@ def _parse_json(path: Path) -> tuple[dict[str, Any], list[dict[str, Any]]]:
 def _parse_jsonl(path: Path) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     manifest: dict[str, Any] | None = None
     documents: list[dict[str, Any]] = []
-    for line_no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+    for line_no, line in enumerate(
+        path.read_text(encoding="utf-8").splitlines(), start=1
+    ):
         stripped = line.strip()
         if not stripped:
             continue
@@ -123,7 +104,9 @@ def _parse_jsonl(path: Path) -> tuple[dict[str, Any], list[dict[str, Any]]]:
             raise ManifestFormatError(f"JSONL line {line_no} must be an object")
         if "manifest" in record:
             if manifest is not None:
-                raise ManifestFormatError("JSONL must contain exactly one manifest header line")
+                raise ManifestFormatError(
+                    "JSONL must contain exactly one manifest header line"
+                )
             manifest = record["manifest"]
         elif "document" in record:
             documents.append(record["document"])
@@ -139,7 +122,9 @@ def _parse_jsonl(path: Path) -> tuple[dict[str, Any], list[dict[str, Any]]]:
 def _validate_manifest_schema(manifest: dict[str, Any]) -> None:
     missing = [field for field in _REQUIRED_MANIFEST_FIELDS if field not in manifest]
     if missing:
-        raise ManifestFormatError(f"manifest missing required fields: {', '.join(missing)}")
+        raise ManifestFormatError(
+            f"manifest missing required fields: {', '.join(missing)}"
+        )
     declared_format = str(manifest.get("format_version", ""))
     if declared_format != CORPUS_FORMAT_VERSION:
         raise ManifestFormatError(
@@ -191,7 +176,10 @@ def _build_documents(
         declared_checksum = record.get("checksum_sha256")
         document_text = "\n".join(texts)
         actual_checksum = sha256_hex(document_text)
-        if not isinstance(declared_checksum, str) or declared_checksum.lower() != actual_checksum:
+        if (
+            not isinstance(declared_checksum, str)
+            or declared_checksum.lower() != actual_checksum
+        ):
             raise ChecksumMismatchError(
                 f"document {doc_id} checksum mismatch: declared "
                 f"{declared_checksum!r}, computed {actual_checksum}"
@@ -203,7 +191,9 @@ def _build_documents(
                 title=str(record.get("title", doc_id)),
                 version=str(record.get("version", "1.0.0")),
                 captured_at=str(record.get("captured_at", "")),
-                source_name=str(record.get("source_name", "project-generated-synthetic")),
+                source_name=str(
+                    record.get("source_name", "project-generated-synthetic")
+                ),
                 source_url=record.get("source_url"),
                 attribution=str(record.get("attribution", "")),
                 license_note=str(record.get("license", "")),

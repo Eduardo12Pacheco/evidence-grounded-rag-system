@@ -1,31 +1,3 @@
-"""Deterministic retrieval and faithfulness metrics.
-
-Every formula below is committed here and reproduced in
-``docs/retrieval-evaluation-protocol.md``. All metrics are pure functions of
-their inputs: same query set, same corpus, same pipeline → same numbers.
-
-Retrieval metrics are macro-averaged over queries that have at least one
-relevant judgment (unanswerable queries have none and contribute nothing to a
-denominator of zero).
-
-- Recall@k: fraction of relevant chunks found in the top k.
-- MRR: reciprocal rank of the first relevant chunk.
-- nDCG@k: graded relevance discounted by rank (``rel / log2(i + 1)``),
-  normalized by the ideal order.
-
-Faithfulness metrics over the generated records:
-
-- answerable coverage: answered / answerable queries.
-- abstention rate: abstained (including conflicting) / all queries.
-- abstention precision: correct abstentions / abstentions.
-- abstention recall: correct abstentions / unanswerable queries. A rejection is
-  "correct" when the query is not answerable AND the recorded reason matches
-  the committed expected reason (when one is declared).
-- unsupported-claim rate: claims that failed citation validation / total claims.
-- citation precision: valid citations / citations checked.
-- citation completeness: claims with at least one valid citation / total claims.
-"""
-
 from __future__ import annotations
 
 import math
@@ -41,7 +13,9 @@ NDCG_KS = (5, 10)
 RECALL_KS = (1, 5, 10)
 
 
-def recall_at_k(ranked_ids: Sequence[str], relevant: Sequence[str] | set[str], k: int) -> float:
+def recall_at_k(
+    ranked_ids: Sequence[str], relevant: Sequence[str] | set[str], k: int
+) -> float:
     relevant = set(relevant)
     if not relevant or k <= 0:
         return 0.0
@@ -49,7 +23,9 @@ def recall_at_k(ranked_ids: Sequence[str], relevant: Sequence[str] | set[str], k
     return len(top_k & relevant) / len(relevant)
 
 
-def mean_reciprocal_rank(ranked_ids: Sequence[str], relevant: Sequence[str] | set[str]) -> float:
+def mean_reciprocal_rank(
+    ranked_ids: Sequence[str], relevant: Sequence[str] | set[str]
+) -> float:
     relevant = set(relevant)
     for rank, chunk_id in enumerate(ranked_ids, start=1):
         if chunk_id in relevant:
@@ -68,14 +44,14 @@ def ndcg_at_k(
     for index, chunk_id in enumerate(ranked_ids[:k], start=1):
         dcg += relevance.get(chunk_id, 0.0) / math.log2(index + 1)
     ideal = sorted(relevance.values(), reverse=True)
-    idcg = sum(grade / math.log2(index + 1) for index, grade in enumerate(ideal[:k], start=1))
+    idcg = sum(
+        grade / math.log2(index + 1) for index, grade in enumerate(ideal[:k], start=1)
+    )
     return dcg / idcg if idcg > 0 else 0.0
 
 
 @dataclass(frozen=True)
 class QueryOutcome:
-    """Per-query evaluation outcome."""
-
     query_id: str
     category: str
     answerable: bool
@@ -97,8 +73,6 @@ class QueryOutcome:
 
 @dataclass(frozen=True)
 class EvaluationReport:
-    """Full deterministic evaluation report."""
-
     metrics: dict[str, float]
     per_query: tuple[QueryOutcome, ...]
     versions: dict[str, str]
@@ -147,7 +121,6 @@ def evaluate_answers(
     query_set: QuerySet,
     records: Sequence[AnswerRecord],
 ) -> EvaluationReport:
-    """Compute the committed metrics over pipeline answers for a query set."""
     if len(records) != len(query_set.queries):
         raise ValueError(
             f"expected {len(query_set.queries)} answers, got {len(records)}"
@@ -157,12 +130,12 @@ def evaluate_answers(
         _outcome(query, record) for query, record in zip(query_set.queries, records)
     ]
 
-    # ---- retrieval metrics (over queries with relevance judgments) -------- #
     with_relevance = [o for o in outcomes if o.has_relevance]
 
     def macro_recall(k: int) -> float:
         values = [
-            recall_at_k(record.retrieval_ids, record.relevance, k) for record in with_relevance
+            recall_at_k(record.retrieval_ids, record.relevance, k)
+            for record in with_relevance
         ]
         return _mean(values)
 
@@ -176,7 +149,12 @@ def evaluate_answers(
         values = [
             ndcg_at_k(
                 record.retrieval_ids,
-                {chunk_id: float(grade) for chunk_id, grade in _relevance_grades(query_set, record.query_id).items()},
+                {
+                    chunk_id: float(grade)
+                    for chunk_id, grade in _relevance_grades(
+                        query_set, record.query_id
+                    ).items()
+                },
                 k,
             )
             for record in with_relevance
@@ -189,9 +167,7 @@ def evaluate_answers(
     correct_abstentions = [o for o in outcomes if o.correct_abstention]
 
     answered_claims = sum(len(record.claims) for record in records)
-    unsupported_claims = sum(
-        _count_unsupported_claims(record) for record in records
-    )
+    unsupported_claims = sum(_count_unsupported_claims(record) for record in records)
     citations_checked = sum(
         record.validation.checked_citations for record in records if record.validation
     )
@@ -209,7 +185,9 @@ def evaluate_answers(
         **{f"recall@{k}": macro_recall(k) for k in RECALL_KS},
         "mrr": macro_mrr(),
         **{f"ndcg@{k}": macro_ndcg(k) for k in NDCG_KS},
-        "answerable_coverage": _ratio(sum(1 for o in answerable if o.answered), len(answerable)),
+        "answerable_coverage": _ratio(
+            sum(1 for o in answerable if o.answered), len(answerable)
+        ),
         "abstention_rate": _ratio(len(abstentions), len(outcomes)),
         "abstention_precision": _ratio(len(correct_abstentions), len(abstentions)),
         "abstention_recall": _ratio(len(correct_abstentions), len(unanswerable)),
@@ -275,15 +253,18 @@ def _outcome(query: EvaluationQuery, record: AnswerRecord) -> QueryOutcome:
 
 def _relevance_grades(query_set: QuerySet, query_id: str) -> dict[str, int]:
     query = query_set.by_id(query_id)
-    return {chunk_id: grade for chunk_id, grade in (query.relevance_by_chunk.items() if query else {})}
+    return {
+        chunk_id: grade
+        for chunk_id, grade in (query.relevance_by_chunk.items() if query else {})
+    }
 
 
 def _count_unsupported_claims(record: AnswerRecord) -> int:
     if not record.validation or record.validation.skipped:
         return 0
-    return sum(
-        1 for claim in record.claims if not claim.citation_chunk_ids
-    ) + sum(1 for issue in record.validation.issues if issue.code == "excerpt_mismatch")
+    return sum(1 for claim in record.claims if not claim.citation_chunk_ids) + sum(
+        1 for issue in record.validation.issues if issue.code == "excerpt_mismatch"
+    )
 
 
 def _mean(values: Sequence[float]) -> float:

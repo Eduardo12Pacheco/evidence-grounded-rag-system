@@ -1,21 +1,3 @@
-"""Hybrid retriever combining sparse and dense rankings.
-
-``HybridRetriever`` owns a BM25 index and a dense index over one corpus. Each
-``search`` returns a ``HybridResult`` whose trace records every candidate from
-both systems, the fused ranking, and the committed versions/configuration, so
-the demo and evaluation can show exactly how a result was produced.
-
-Modes:
-
-- ``hybrid`` (default): sparse and dense candidates fused with committed RRF;
-- ``sparse``: BM25 ranking only (trace still includes the dense candidates);
-- ``dense``: cosine ranking only (trace still includes the sparse candidates).
-
-Deterministic behavior: candidates are deduplicated, a ``min_score`` threshold
-(if given) is applied to the fused score, ``top_k <= 0`` yields an empty result,
-and ties are broken by (score desc, chunk id ascending).
-"""
-
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -35,8 +17,6 @@ VALID_MODES = (MODE_HYBRID, MODE_SPARSE, MODE_DENSE)
 
 @dataclass(frozen=True)
 class HybridTrace:
-    """Complete, structured trace of one hybrid retrieval."""
-
     query: str
     mode: str
     sparse: RetrievalResult
@@ -78,15 +58,11 @@ def _result_to_dict(result: RetrievalResult) -> dict[str, object]:
 
 @dataclass(frozen=True)
 class HybridResult:
-    """Fused retrieval plus its full trace."""
-
     fused: RetrievalResult
     trace: HybridTrace
 
 
 class HybridRetriever:
-    """Sparse + dense retrieval with committed RRF fusion."""
-
     def __init__(
         self,
         corpus: Corpus,
@@ -104,7 +80,6 @@ class HybridRetriever:
         self.dense_index = self._build_dense_index(chunks)
 
     def _build_dense_index(self, chunks):
-        # Local import keeps DenseIndex construction optional for sparse-only use.
         from evidence_grounded_rag.embeddings.index import DenseIndex
 
         return DenseIndex(chunks, self.embedding_provider)

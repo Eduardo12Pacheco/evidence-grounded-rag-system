@@ -1,13 +1,3 @@
-"""Structured generation with citations, abstention, and fail-closed adapters.
-
-The bundled provider is a deterministic offline extractive/template generator
-(``is_llm_generated=False``). The environment-configured adapter fails closed:
-no remote provider is ever contacted. An explicit optional live adapter
-(``LiveGenerator``) exists but requires an injected transport — no
-provider/model/credentials are configured, and live generation never falls
-back to offline.
-"""
-
 from __future__ import annotations
 
 from evidence_grounded_rag.generation.adapter import (

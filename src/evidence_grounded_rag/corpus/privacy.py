@@ -1,17 +1,3 @@
-"""Privacy audit and exclusion for source documents.
-
-The scanner is a deliberately conservative, stdlib-only heuristic. It looks for
-high-precision markers of private or sensitive content: contact patterns
-(emails, phones, government IDs, passports), financial/medical/credential
-keywords, and secret-bearing phrases. Documents with any finding are excluded
-from derived data.
-
-Exclusion is fail-safe: a false positive excludes a document (reducing derived
-coverage), never lets private content through. Findings never carry the matched
-text — only the category, pattern, and line — so the audit does not itself
-expose private content.
-"""
-
 from __future__ import annotations
 
 import re
@@ -27,9 +13,6 @@ CREDIT_CARD_RE = re.compile(
 )
 PASSPORT_RE = re.compile(r"\b[A-Z][0-9]{6,9}\b")
 
-#: High-precision keyword markers. Word lists like "token" or "private" are
-#: deliberately ABSENT: they are ordinary technical terms (e.g. lexical
-#: analysis tokens, class-private names) in the approved Python docs.
 _KEYWORD_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = tuple(
     (category, re.compile(rf"\b{re.escape(phrase)}\b", re.IGNORECASE))
     for category, phrase in (
@@ -75,7 +58,6 @@ _KEYWORD_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = tuple(
     )
 )
 
-#: Categories produced by the regex-based scanners above.
 _PATTERN_CATEGORIES: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("email", EMAIL_RE),
     ("phone", PHONE_RE),
@@ -84,14 +66,11 @@ _PATTERN_CATEGORIES: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("passport", PASSPORT_RE),
 )
 
-#: Cap on findings per file to keep the audit bounded on pathological input.
 _MAX_FINDINGS_PER_FILE = 100
 
 
 @dataclass(frozen=True)
 class PrivacyFinding:
-    """A single privacy scan hit. ``excerpt`` is intentionally absent."""
-
     doc_id: str
     source_path: str
     category: str
@@ -100,15 +79,12 @@ class PrivacyFinding:
 
 @dataclass(frozen=True)
 class PrivacyAuditResult:
-    """Result of scanning a set of documents."""
-
     clean: bool
     findings: tuple[PrivacyFinding, ...]
     excluded_document_ids: frozenset[str]
 
 
 def scan_text(doc_id: str, source_path: str, text: str) -> tuple[PrivacyFinding, ...]:
-    """Scan *text* for private/sensitive markers and return findings."""
     findings: list[PrivacyFinding] = []
     seen: set[tuple[str, int]] = set()
 
@@ -137,11 +113,6 @@ def scan_text(doc_id: str, source_path: str, text: str) -> tuple[PrivacyFinding,
 def audit_privacy_texts(
     documents: list[tuple[str, str, str]],
 ) -> PrivacyAuditResult:
-    """Audit a list of ``(doc_id, source_path, text)`` tuples.
-
-    Any document with at least one finding is excluded. ``excluded_document_ids``
-    holds the ids of documents that must never enter derived data.
-    """
     findings: list[PrivacyFinding] = []
     excluded: set[str] = set()
     for doc_id, source_path, text in documents:

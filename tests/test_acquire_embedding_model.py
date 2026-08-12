@@ -1,16 +1,3 @@
-"""Tests for trusted-manifest model acquisition.
-
-Fully offline: the network seam (``_download_file_bytes``) is monkeypatched, so
-no bytes are ever fetched. Coverage:
-
-- normal mode uses the committed manifest as the trust anchor and NEVER rewrites it;
-- a missing manifest fails clearly and is not bootstrapped implicitly;
-- a tampered download is rejected and the manifest stays untouched;
-- a staging/download failure leaves an existing verified cache untouched;
-- ``--bootstrap`` is the only path that writes a manifest, and only when absent;
-- the resulting cache contains exactly the manifest's expected files.
-"""
-
 from __future__ import annotations
 
 import importlib.util
@@ -137,11 +124,6 @@ def fake_download(monkeypatch):
     return install
 
 
-# --------------------------------------------------------------------------- #
-# normal (trust-anchor) mode
-# --------------------------------------------------------------------------- #
-
-
 def test_normal_acquire_uses_committed_manifest_and_never_rewrites_it(
     tmp_path, fake_download
 ):
@@ -155,7 +137,9 @@ def test_normal_acquire_uses_committed_manifest_and_never_rewrites_it(
     )
 
     assert code == 0
-    assert manifest_path.read_bytes() == before, "committed manifest must not be rewritten"
+    assert manifest_path.read_bytes() == before, (
+        "committed manifest must not be rewritten"
+    )
     assert _cache_snapshot(cache_dir) == _FILES
     loaded = load_embedding_model_manifest(manifest_path)
     audit_embedding_model_manifest(loaded)
@@ -165,9 +149,7 @@ def test_normal_acquire_uses_committed_manifest_and_never_rewrites_it(
 def test_normal_acquire_missing_manifest_fails_clearly(tmp_path):
     missing = tmp_path / "nope.json"
     cache_dir = tmp_path / "cache"
-    code = acquire.main(
-        ["--manifest", str(missing), "--cache-dir", str(cache_dir)]
-    )
+    code = acquire.main(["--manifest", str(missing), "--cache-dir", str(cache_dir)])
     assert code == 2
     assert not cache_dir.exists()
 
@@ -187,7 +169,9 @@ def test_normal_acquire_tampered_download_rejected_manifest_unchanged(
     )
 
     assert code == 1
-    assert manifest_path.read_bytes() == before, "committed manifest must not be rewritten"
+    assert manifest_path.read_bytes() == before, (
+        "committed manifest must not be rewritten"
+    )
     assert not cache_dir.exists() or _cache_snapshot(cache_dir) != _FILES
 
 
@@ -213,12 +197,9 @@ def test_normal_acquire_staging_failure_leaves_existing_cache_untouched(
     )
 
     assert code == 1
-    assert _cache_snapshot(cache_dir) == before, "existing verified cache must be untouched"
-
-
-# --------------------------------------------------------------------------- #
-# bootstrap (explicit, separate action)
-# --------------------------------------------------------------------------- #
+    assert _cache_snapshot(cache_dir) == before, (
+        "existing verified cache must be untouched"
+    )
 
 
 def test_bootstrap_refused_when_manifest_exists(tmp_path, fake_download):

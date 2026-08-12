@@ -1,28 +1,3 @@
-"""Citation validation: strict, deterministic, fail-closed.
-
-An answered generation is only ever reported as verified if EVERY check below
-passes. On any failure ``valid`` is False and the pipeline refuses the answer
-(converting it to an abstention with reason ``citation_validation_failed``).
-Validation is skipped (``skipped=True``) for abstained and conflicting answers:
-a refusal carries no citations, so there is nothing to verify and it is never
-presented as a verified answer.
-
-Rules (each maps to a stable issue code):
-
-- ``citation_not_found``: citation chunk does not exist in the corpus.
-- ``citation_not_exposed``: citation chunk was not part of the retrieved
-  evidence handed to the generator.
-- ``corpus_version_mismatch``: citation chunk belongs to a different corpus
-  version than the one being served.
-- ``excerpt_mismatch``: the cited excerpt is not byte-for-byte identical to the
-  chunk text.
-- ``invalid_location``: the citation's location is missing or does not match
-  the chunk's stable ``synthetic://`` location.
-- ``claim_without_citation``: a non-abstained claim cites nothing.
-- ``unused_citation``: a citation is not referenced by any claim (orphaned /
-  forged citation).
-"""
-
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -54,8 +29,6 @@ class CitationValidationResult:
 
 
 class CitationValidator:
-    """Validates generated citations against the served corpus and evidence."""
-
     def __init__(self, corpus: Corpus) -> None:
         self.corpus = corpus
 

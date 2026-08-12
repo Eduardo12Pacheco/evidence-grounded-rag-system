@@ -1,12 +1,3 @@
-"""Stable identity derivation for documents and chunks.
-
-Document IDs come from the committed manifest (stable identity). Chunk IDs are
-*derived* from the document identity plus the chunk's positional sequence, so a
-chunk's ID is stable across reloads as long as the document ID and ordering do
-not change. Locations use the ``synthetic://`` scheme: fixtures are
-project-generated and must never be presented as real external sources.
-"""
-
 from __future__ import annotations
 
 import re
@@ -16,7 +7,6 @@ _CHUNK_ID_RE = re.compile(r"^[a-z0-9][a-z0-9._-]{0,127}::\d+$")
 
 
 def derive_chunk_id(document_id: str, seq: int) -> str:
-    """Derive a stable chunk ID from a document identity and positional index."""
     validate_document_id(document_id)
     if not isinstance(seq, int) or seq < 0:
         raise ValueError(f"chunk seq must be a non-negative int, got {seq!r}")
@@ -24,17 +14,10 @@ def derive_chunk_id(document_id: str, seq: int) -> str:
 
 
 def synthetic_location(corpus_id: str, document_id: str, seq: int) -> str:
-    """Return the stable ``synthetic://`` location for a chunk."""
     return f"synthetic://{corpus_id}/{document_id}/chunk/{seq}"
 
 
 def local_location(corpus_id: str, document_id: str, seq: int) -> str:
-    """Return the stable ``local://`` location for a locally derived chunk.
-
-    Real-local corpora are explicitly local-only: the ``local://`` scheme keeps
-    them distinct from ``synthetic://`` fixtures and never presents real
-    content as an authorized external source.
-    """
     return f"local://{corpus_id}/{document_id}/chunk/{seq}"
 
 

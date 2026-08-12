@@ -1,49 +1,55 @@
 # Product — evidence-grounded-rag-system
 
-Status: **implementation in progress — offline synthetic-fixture evaluation only.**
+Estado: **implementación en curso — solo evaluación offline con fixture
+sintético.**
 
-## Platform
+## Plataforma
 
-Web (local demo) + offline evaluation pipeline.
+Web (demo local) + pipeline de evaluación offline.
 
-## Users
+## Usuarios
 
-- Evaluators who must decide whether a RAG answer can be trusted.
-- Researchers and engineers who want a reproducible faithfulness benchmark.
-- The author: demonstrating retrieval, embeddings, and evidence discipline.
+- Evaluadores que deben decidir si se puede confiar en una respuesta RAG.
+- Investigadores e ingenieros que quieren un benchmark de fidelidad reproducible.
+- El autor: demostrar habilidades de retrieval, embeddings y disciplina de
+  evidencia.
 
-## Problem
+## Problema
 
-Fluent answers are not trustworthy answers. Without mandatory citation and
-abstention, a RAG system can sound certain while fabricating. This product
-makes evidence the product: answers are only as good as the passages that
-support them, and the system says "I don't know" when evidence is missing.
+Las respuestas fluidas no son respuestas confiables. Sin cita obligatoria y
+abstención, un sistema RAG puede sonar seguro mientras fabrica. Este producto
+hace de la evidencia el producto: las respuestas solo son tan buenas como los
+pasajes que las respaldan, y el sistema dice "no sé" cuando falta la evidencia.
 
-## What it is NOT yet
+## Qué NO es todavía
 
-- Not a search engine, no API, no production deployment.
-- Not using any real corpus (none is licensed yet); only synthetic fixtures.
-- Not claiming any accuracy number for real content — all committed metrics
-  describe synthetic fixtures only.
+- No es un motor de búsqueda, sin API, sin despliegue de producción.
+- No usa ningún corpus real (ninguno está licenciado todavía); solo fixtures
+  sintéticos.
+- No afirma ningún número de precisión para contenido real — todas las métricas
+  comprometidas describen solo fixtures sintéticos.
 
-## Success metric (product)
+## Métrica de éxito (producto)
 
-A reviewer can ask a question, see the cited passages, verify each citation,
-and observe a clean abstention — in under a minute, without reading code.
+Un revisor puede hacer una pregunta, ver los pasajes citados, verificar cada cita
+y observar una abstención limpia — en menos de un minuto, sin leer código.
 
-## Risks
+## Riesgos
 
-- Corpus access: nothing runs on real documents until licenses are confirmed.
-- Faithfulness is hard to measure well → protocol committed before results.
+- Acceso al corpus: nada se ejecuta sobre documentos reales hasta que las
+  licencias estén confirmadas.
+- La fidelidad es difícil de medir bien → protocolo comprometido antes de los
+  resultados.
 
-## No-goals
+## No-objetivos
 
-- No multi-tenant SaaS, no user accounts.
-- No mobile app.
-- No unlicensed corpus indexing.
+- Sin SaaS multi-tenant, sin cuentas de usuario.
+- Sin aplicación móvil.
+- Sin indexación de corpus sin licencia.
 
-## Definition of done
+## Definición de terminado
 
-- [ ] Demo answers "can I trust this answer and why" with citations in a minute.
-- [ ] Every reported number is reproducible with one command.
-- [ ] Abstention and citation limits are tested and documented.
+- [ ] La demo responde "¿puedo confiar en esta respuesta y por qué?" con citas en
+      un minuto.
+- [ ] Cada número reportado es reproducible con un comando.
+- [ ] La abstención y los límites de cita están testeados y documentados.

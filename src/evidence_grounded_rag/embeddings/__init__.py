@@ -1,18 +1,3 @@
-"""Dense embedding interface with a deterministic offline test embedding.
-
-The bundled ``DeterministicEmbedding`` is a hashed bag-of-words embedding with
-``semantic=False``: it is never described as semantic, downloads no weights,
-and makes no network calls. A real embedding model can be plugged in behind the
-same ``EmbeddingProvider`` protocol.
-
-``SemanticLocalEmbedding`` is the optional semantic provider: it loads an
-explicitly acquired local sentence-transformers model with
-``local_files_only=True`` and is the only provider allowed to report
-``semantic=True``. It is NEVER a silent fallback: if the local model is
-unavailable, ``SemanticModelUnavailableError`` is raised instead of degrading
-to hash embeddings.
-"""
-
 from __future__ import annotations
 
 from evidence_grounded_rag.embeddings.base import (

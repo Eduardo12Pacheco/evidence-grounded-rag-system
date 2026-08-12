@@ -1,11 +1,3 @@
-"""Tests for the deterministic claim-support evaluator.
-
-The support evaluator is DISTINCT from structural citation validation: it
-checks whether the claim text is exactly contained in the cited evidence under
-the committed normalized-containment rule, not whether citation metadata
-matches.
-"""
-
 from __future__ import annotations
 
 from evidence_grounded_rag.corpus.models import Chunk
@@ -59,7 +51,9 @@ def test_normalize_collapses_case_and_whitespace():
 
 def test_supported_when_claim_contained_in_cited_chunk():
     chunk = _chunk("doc-a::0", "The park is open from June to August.")
-    answer = _answered(_claim("c-1", "The park is open from June to August.", "doc-a::0"))
+    answer = _answered(
+        _claim("c-1", "The park is open from June to August.", "doc-a::0")
+    )
     evaluation = ClaimSupportEvaluator().evaluate(answer, _pack(chunk))
     assert evaluation.results[0].support is ClaimSupport.SUPPORTED
     assert evaluation.results[0].matched_chunk_id == "doc-a::0"
@@ -102,7 +96,9 @@ def test_supported_when_any_of_multiple_cited_chunks_contains_claim():
 
 def test_case_insensitive_containment():
     chunk = _chunk("doc-a::0", "PERMITS require a signed Code of Conduct.")
-    answer = _answered(_claim("c-1", "permits require a signed code of conduct.", "doc-a::0"))
+    answer = _answered(
+        _claim("c-1", "permits require a signed code of conduct.", "doc-a::0")
+    )
     evaluation = ClaimSupportEvaluator().evaluate(answer, _pack(chunk))
     assert evaluation.results[0].support is ClaimSupport.SUPPORTED
 
@@ -123,7 +119,11 @@ def test_evaluation_rates_and_serialization():
         _claim("c-3", "Uncited statement."),
     )
     evaluation = ClaimSupportEvaluator().evaluate(answer, _pack(chunk_a, chunk_b))
-    assert (evaluation.supported, evaluation.unsupported, evaluation.unknown) == (1, 1, 1)
+    assert (evaluation.supported, evaluation.unsupported, evaluation.unknown) == (
+        1,
+        1,
+        1,
+    )
     assert evaluation.total == 3
     assert evaluation.support_rate == 1 / 3
     serialized = evaluation.to_dict()
@@ -135,8 +135,6 @@ def test_evaluation_rates_and_serialization():
 
 
 def test_support_is_distinct_from_structural_validation():
-    """A structurally valid citation (exact excerpt/location) can still be
-    unsupported if the claim text is not contained in the chunk."""
     chunk = _chunk("doc-a::0", "The library opens at nine.")
     citation = Citation(
         citation_id="cit-1",

@@ -1,24 +1,3 @@
-"""Okapi BM25 sparse retriever.
-
-The implementation and its parameters are committed and versioned. Scoring:
-
-    score(q, d) = sum over terms t in q of:
-        idf(t) * (tf(t, d) * (k1 + 1)) / (tf(t, d) + k1 * (1 - b + b * |d| / avgdl))
-
-with Robertson-Sparck Jones idf
-
-    idf(t) = ln(1 + (N - df(t) + 0.5) / (df(t) + 0.5))
-
-Behavior is fully deterministic:
-
-- empty query returns an empty result (``empty=True``);
-- empty corpus returns an empty result;
-- ``top_k <= 0`` returns an empty result;
-- ``top_k`` greater than the corpus size returns every scored chunk;
-- ties are broken by (score desc, chunk_id ascending) so ordering never depends
-  on set iteration order.
-"""
-
 from __future__ import annotations
 
 import math
@@ -36,8 +15,6 @@ IDF_MODE = "robertson-sparck-jones"
 
 @dataclass(frozen=True)
 class BM25Config:
-    """Committed Okapi BM25 parameters."""
-
     k1: float = 1.5
     b: float = 0.75
     idf_mode: str = IDF_MODE
@@ -53,11 +30,11 @@ class BM25Config:
 
 
 class BM25:
-    """In-memory Okapi BM25 index over a corpus of chunks."""
-
     version: str = BM25_VERSION
 
-    def __init__(self, chunks: Sequence[Chunk], config: BM25Config | None = None) -> None:
+    def __init__(
+        self, chunks: Sequence[Chunk], config: BM25Config | None = None
+    ) -> None:
         self.config = config or BM25Config()
         self._chunks = list(chunks)
         self._doc_lengths: list[int] = []

@@ -1,41 +1,3 @@
-"""Separate semantic-materializer for the real-local corpus.
-
-Runs a bounded, fully offline RETRIEVAL evaluation over the single approved
-real-local corpus (Python 3.12.13 documentation) in four explicitly separated
-modes:
-
-- ``sparse``: BM25 only, labeled ``BM25 sparse baseline``;
-- ``hash``: the deterministic non-semantic hash embedding, labeled exactly
-  ``Deterministic hash embedding diagnostic — not semantic retrieval``;
-- ``semantic``: the local semantic embedding model, labeled
-  ``Local semantic embedding model``;
-- ``hybrid``: BM25 + local semantic embeddings with the committed RRF
-  (``k = 60``), labeled ``Hybrid BM25 plus local semantic embeddings``.
-
-The semantic model is loaded ONLY from a verified local cache
-(``local_files_only=True``). If the model manifest cannot be validated, the
-files do not verify byte-exact, or the provider cannot load, a clear
-``SemanticModelUnavailableError`` is raised and semantic modes are refused —
-there is NO silent fallback to hash embeddings under a semantic label.
-
-This module performs retrieval evaluation only: it never runs generation or
-faithfulness metrics, never calls an LLM, and never claims that retrieval
-quality implies answer faithfulness. The existing hash-materializer report
-(``data/evaluations/python-docs-real-evaluation-v1.0.0.json``) is untouched;
-this module writes its own report
-(``data/evaluations/python-docs-real-semantic-evaluation-v1.0.0.json``).
-
-Command::
-
-    uv run python -m evidence_grounded_rag.evaluation.semantic_materialize \
-        --manifest data/manifests/corpus-source-v1.0.0.json \
-        --queries data/evaluation/queries/python-docs-real-v1.0.0.json \
-        --raw-dir data/raw/python-docs-3.12.13 \
-        --model-manifest data/manifests/embedding-model-v1.0.0.json \
-        --cache-dir data/raw/models/bge-small-en-v1.5 \
-        --output data/evaluations/python-docs-real-semantic-evaluation-v1.0.0.json
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -88,8 +50,6 @@ from evidence_grounded_rag.versions import (
     TOKENIZER_VERSION,
 )
 
-#: Report identity. This is a SEPARATE artifact from the synthetic report and
-#: from the hash-materializer report; it is never merged with either.
 REPORT_TYPE = "real-local-semantic-evaluation"
 REPORT_VERSION = "1.0.0"
 
@@ -111,7 +71,6 @@ MODE_LABELS: dict[str, str] = {
     MODE_HYBRID_KEY: HYBRID_MODE_LABEL,
 }
 
-#: Which retrieval mode drives each evaluated mode key.
 _MODE_SEARCH_MODE = {
     MODE_SPARSE_KEY: MODE_SPARSE,
     MODE_HASH_KEY: MODE_DENSE,
@@ -119,7 +78,6 @@ _MODE_SEARCH_MODE = {
     MODE_HYBRID_KEY: MODE_HYBRID,
 }
 
-#: Which modes require the semantic provider.
 _SEMANTIC_MODES = frozenset({MODE_SEMANTIC_KEY, MODE_HYBRID_KEY})
 
 DEFAULT_MANIFEST = Path("data/manifests/corpus-source-v1.0.0.json")
@@ -132,21 +90,14 @@ DEFAULT_OUT = Path("data/evaluations/python-docs-real-semantic-evaluation-v1.0.0
 
 @dataclass(frozen=True)
 class SemanticEvaluationReport:
-    """The separate semantic-materializer report.
-
-    ``deterministic_payload`` covers every stable field. Runtime observations
-    (wall-clock seconds, peak RSS) and the timestamp are runtime provenance,
-    not deterministic content, so they are excluded from the digest exactly
-    like ``timestamp_utc``.
-    """
-
     data: dict[str, object]
 
     def deterministic_payload(self) -> dict[str, object]:
         return {
             key: value
             for key, value in self.data.items()
-            if key not in (
+            if key
+            not in (
                 "timestamp_utc",
                 "deterministic_digest",
                 "runtime_observations",
@@ -167,24 +118,6 @@ def _load_semantic_provider(
     *,
     provider: EmbeddingProvider | None = None,
 ) -> tuple[EmbeddingProvider, Any]:
-    """Validate the model manifest and return (provider, manifest).
-
-    Error contract:
-
-    - Manifest schema/load failures and audit-policy failures (unapproved
-      model, revision/license/dimension/metadata mismatch, blocked status)
-      propagate as ``EmbeddingModelManifestError`` with a stable code — they
-      are NOT wrapped as ``SemanticModelUnavailableError``.
-    - Cache/file failures (missing cache, missing/tampered/extra files,
-      checksum mismatch) and provider load/dimension failures raise
-      ``SemanticModelUnavailableError``. The ``SemanticLocalEmbedding``
-      constructor itself audits and byte-verifies the cache, so no
-      caller-supplied metadata is trusted.
-
-    When *provider* is injected (tests), it is used as-is but the manifest is
-    still loaded and audited so the report carries real, approved model facts.
-    Either way there is never a hash fallback.
-    """
     manifest = load_embedding_model_manifest(model_manifest_path)
     audit_embedding_model_manifest(manifest)
     if provider is not None:
@@ -205,13 +138,6 @@ def semantic_evaluate(
     provider: EmbeddingProvider | None = None,
     timestamp_utc: str | None = None,
 ) -> tuple[SemanticEvaluationReport, Path]:
-    """Run the bounded semantic-materializer evaluation and write its report.
-
-    Verifies the real corpus first, then the semantic model manifest/cache, then
-    evaluates the four modes. Raises ``SemanticModelUnavailableError`` if the
-    local semantic model is unavailable; there is no synthetic and no hash
-    fallback.
-    """
     for mode in modes:
         if mode not in VALID_MODES:
             raise ValueError(f"unknown mode {mode!r}; expected one of {VALID_MODES}")
@@ -225,18 +151,14 @@ def semantic_evaluate(
     )
 
     hash_retriever = HybridRetriever(corpus)
-    semantic_retriever = HybridRetriever(
-        corpus, embedding_provider=semantic_provider
-    )
+    semantic_retriever = HybridRetriever(corpus, embedding_provider=semantic_provider)
 
     per_query: dict[str, dict[str, dict[str, object]]] = {mode: {} for mode in modes}
     ranking_stability: dict[str, dict[str, object]] = {}
     runtime_seconds: dict[str, float] = {}
 
     for mode in modes:
-        retriever = (
-            semantic_retriever if mode in _SEMANTIC_MODES else hash_retriever
-        )
+        retriever = semantic_retriever if mode in _SEMANTIC_MODES else hash_retriever
         search_mode = _MODE_SEARCH_MODE[mode]
         started = time.monotonic()
         rankings: dict[str, tuple[str, ...]] = {}
@@ -266,15 +188,11 @@ def semantic_evaluate(
             )
         runtime_seconds[mode] = time.monotonic() - started
 
-        identical = sum(
-            1 for qid in rankings if second_pass[qid] == rankings[qid]
-        )
+        identical = sum(1 for qid in rankings if second_pass[qid] == rankings[qid])
         ranking_stability[mode] = {
             "num_queries": len(rankings),
             "identical_rankings": identical,
-            "fraction_identical": (
-                identical / len(rankings) if rankings else 0.0
-            ),
+            "fraction_identical": (identical / len(rankings) if rankings else 0.0),
         }
 
         for query in query_set.queries:
@@ -299,12 +217,10 @@ def semantic_evaluate(
             }
 
     records_by_mode = {
-        mode: [per_query[mode][q.query_id] for q in query_set.queries]
-        for mode in modes
+        mode: [per_query[mode][q.query_id] for q in query_set.queries] for mode in modes
     }
     metrics = {
-        mode: _retrieval_metrics(query_set, records_by_mode[mode])
-        for mode in modes
+        mode: _retrieval_metrics(query_set, records_by_mode[mode]) for mode in modes
     }
 
     data: dict[str, object] = {
@@ -320,7 +236,8 @@ def semantic_evaluate(
         "ranking_stability": ranking_stability,
         "runtime_observations": _runtime_observations(runtime_seconds),
         "implementation_commit": _current_commit(),
-        "timestamp_utc": timestamp_utc or datetime.now(UTC).isoformat(timespec="seconds"),
+        "timestamp_utc": timestamp_utc
+        or datetime.now(UTC).isoformat(timespec="seconds"),
         "deterministic_digest": "",
         "limitations": _limitations(),
     }
@@ -339,9 +256,7 @@ def _retrieval_metrics(
 ) -> dict[str, object]:
     overall = _group_retrieval_metrics(query_set, records, lambda _query: True)
     groups = {
-        group: _group_retrieval_metrics(
-            query_set, records, _group_membership(group)
-        )
+        group: _group_retrieval_metrics(query_set, records, _group_membership(group))
         for group in RETRIEVAL_GROUPS
     }
     return {"overall": overall, "groups": groups}
@@ -455,8 +370,7 @@ def _runtime_observations(
         },
         "process_peak_rss_kb": peak_rss_kb,
         "memory_note": (
-            "Only process-wide peak RSS is recorded; per-mode memory was not "
-            "measured."
+            "Only process-wide peak RSS is recorded; per-mode memory was not measured."
         ),
     }
 
@@ -524,7 +438,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--manifest", default=str(DEFAULT_MANIFEST), type=Path)
     parser.add_argument("--queries", default=str(DEFAULT_QUERIES), type=Path)
     parser.add_argument("--raw-dir", default=str(DEFAULT_RAW_DIR), type=Path)
-    parser.add_argument("--model-manifest", default=str(DEFAULT_MODEL_MANIFEST), type=Path)
+    parser.add_argument(
+        "--model-manifest", default=str(DEFAULT_MODEL_MANIFEST), type=Path
+    )
     parser.add_argument("--cache-dir", default=str(DEFAULT_CACHE_DIR), type=Path)
     parser.add_argument("--output", default=str(DEFAULT_OUT), type=Path)
     parser.add_argument("--top-k", type=int, default=10)
@@ -557,24 +473,37 @@ def main(argv: list[str] | None = None) -> int:
             file=sys.stderr,
         )
         return 1
-    except (EmbeddingModelManifestError, RealLocalEvaluationError, ValueError, OSError) as exc:
+    except (
+        EmbeddingModelManifestError,
+        RealLocalEvaluationError,
+        ValueError,
+        OSError,
+    ) as exc:
         print(f"SEMANTIC EVALUATION FAILED: {exc}", file=sys.stderr)
         return 1
 
     print(f"wrote semantic-materializer report: {out_path}")
-    print(f"model: {report.data['model']['model_id']} revision {report.data['model']['revision'][:12]}...")
-    print(f"corpus: {report.data['corpus']['corpus_id']} v{report.data['corpus']['corpus_version']} "
-          f"({report.data['corpus']['document_count']} docs / {report.data['corpus']['chunk_count']} chunks)")
+    print(
+        f"model: {report.data['model']['model_id']} revision {report.data['model']['revision'][:12]}..."
+    )
+    print(
+        f"corpus: {report.data['corpus']['corpus_id']} v{report.data['corpus']['corpus_version']} "
+        f"({report.data['corpus']['document_count']} docs / {report.data['corpus']['chunk_count']} chunks)"
+    )
     print(f"query set: {report.data['query_set']['num_queries']} queries")
     for mode, metrics in report.data["metrics"].items():
         overall = metrics["overall"]
         stability = report.data["ranking_stability"][mode]
         print(f"[{mode}] {report.data['configs']['mode_labels'][mode]}")
-        print(f"  recall@1={overall['recall@1']:.4f} recall@5={overall['recall@5']:.4f} "
-              f"recall@10={overall['recall@10']:.4f} mrr={overall['mrr']:.4f} "
-              f"ndcg@5={overall['ndcg@5']:.4f} no_result_rate={overall['no_result_rate']:.4f}")
-        print(f"  ranking stability: {stability['identical_rankings']}/{stability['num_queries']} "
-              f"identical ({stability['fraction_identical']:.3f})")
+        print(
+            f"  recall@1={overall['recall@1']:.4f} recall@5={overall['recall@5']:.4f} "
+            f"recall@10={overall['recall@10']:.4f} mrr={overall['mrr']:.4f} "
+            f"ndcg@5={overall['ndcg@5']:.4f} no_result_rate={overall['no_result_rate']:.4f}"
+        )
+        print(
+            f"  ranking stability: {stability['identical_rankings']}/{stability['num_queries']} "
+            f"identical ({stability['fraction_identical']:.3f})"
+        )
     print(f"digest={report.digest}")
     return 0
 

@@ -1,5 +1,3 @@
-"""Tests for the dense embedding interface and deterministic test embedding."""
-
 from __future__ import annotations
 
 import math

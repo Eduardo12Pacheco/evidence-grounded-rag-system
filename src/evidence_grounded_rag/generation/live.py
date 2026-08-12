@@ -1,24 +1,3 @@
-"""Explicit optional live generation adapter — provider-neutral, fail-closed.
-
-This adapter exists so the system can OPTIONALLY call a live generation
-provider WITHOUT naming one: no provider, model, or credentials are configured
-anywhere, and nothing in this module opens a network connection. A live run
-requires the caller to inject a callable *transport* that takes the built
-prompt text and returns the provider's raw output text.
-
-Fail-closed contract (never falls back to offline, ever):
-
-- no transport injected  -> ``provider_unavailable``
-- transport raises ``TimeoutError``  -> ``provider_unavailable`` (timeout)
-- transport raises anything else  -> ``provider_unavailable``
-- transport returns non-text  -> ``malformed_output``
-- transport returns malformed JSON / schema violations  -> ``malformed_output``
-- parsed answer fails evidence validation  -> ``malformed_output``
-
-Under the live label the adapter never invokes the deterministic offline
-provider; unavailability is surfaced as a structured abstention instead.
-"""
-
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -43,14 +22,10 @@ PROVIDER_ID = "injected-live-provider"
 MODEL_ID = LIVE_GENERATOR_VERSION
 MODE = "live"
 
-#: A transport is a callable ``prompt_text -> raw output text``. It owns any
-#: network/credentials it needs; this system never provides them.
 Transport = Callable[[str], str]
 
 
 class LiveGenerator:
-    """Provider-neutral live adapter requiring an injected transport."""
-
     provider_id: str = PROVIDER_ID
     model_id: str = MODEL_ID
     is_llm_generated: bool = True

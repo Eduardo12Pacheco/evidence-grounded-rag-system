@@ -1,26 +1,3 @@
-"""Deterministic claim-support evaluator.
-
-This is a SEPARATE layer from structural citation validity. Structural validity
-(``validation/citations.py``) verifies that a citation *points at* an exposed
-chunk with matching version/excerpt/location. Claim support verifies that the
-claim *text itself* is contained in the cited evidence — a faithfulness
-signal, not a metadata check.
-
-The rule is committed and versioned (``CLAIM_SUPPORT_VERSION``):
-
-- ``normalize(text)``: NFKC-normalize, case-fold, then collapse all whitespace
-  runs to single ASCII spaces and strip.
-- A claim is **supported** when its normalized text is a substring of the
-  normalized text of AT LEAST ONE of the cited evidence chunks.
-- A claim is **unsupported** when it cites chunks, every cited chunk is present
-  in the evidence pack, and none of them contains the claim text.
-- A claim is **unknown** when it has no citations, or when at least one cited
-  chunk is absent from the evidence pack (so containment cannot be evaluated).
-
-The rule is intentionally narrow: it measures verbatim containment, not
-semantic entailment. This is a documented limitation, not understanding.
-"""
-
 from __future__ import annotations
 
 import unicodedata
@@ -36,23 +13,18 @@ RULE_VERSION = CLAIM_SUPPORT_VERSION
 
 
 class ClaimSupport(str, Enum):
-    """Per-claim support verdict under the exact containment rule."""
-
     SUPPORTED = "supported"
     UNSUPPORTED = "unsupported"
     UNKNOWN = "unknown"
 
 
 def normalize(text: str) -> str:
-    """Deterministic normalization used by the containment rule."""
     normalized = unicodedata.normalize("NFKC", text).casefold()
     return " ".join(normalized.split())
 
 
 @dataclass(frozen=True)
 class ClaimSupportResult:
-    """One claim's support verdict plus the evidence it was judged against."""
-
     claim_id: str
     support: ClaimSupport
     cited_chunk_ids: tuple[str, ...] = field(default_factory=tuple)
@@ -71,8 +43,6 @@ class ClaimSupportResult:
 
 @dataclass(frozen=True)
 class ClaimSupportEvaluation:
-    """Support verdicts for every claim in one answer."""
-
     results: tuple[ClaimSupportResult, ...] = field(default_factory=tuple)
     rule: str = RULE_VERSION
 
@@ -115,8 +85,6 @@ class ClaimSupportEvaluation:
 
 
 class ClaimSupportEvaluator:
-    """Applies the exact normalized-containment rule per claim."""
-
     def evaluate(
         self,
         answer: GeneratedAnswer | StructuredAnswer,

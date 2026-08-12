@@ -1,18 +1,3 @@
-"""Tests for the separate real-local generation evaluation.
-
-Fully offline: manifests, tampered copies, and raw-file copies are created in
-temporary directories; the only real corpus content used comes from the
-existing gitignored ``data/raw/python-docs-3.12.13/`` capture. Coverage:
-
-- versioned answer-evaluation fixture loading and cross-validation;
-- separate labeled offline report with generation metrics and per-query fields;
-- deterministic content across two runs (timestamp/runtime excluded);
-- no claim/chunk text stored in the report;
-- live generation explicitly unmeasured / no provider selected;
-- offline generation produces zero invalid/provider errors;
-- network-free module.
-"""
-
 from __future__ import annotations
 
 import json
@@ -44,7 +29,9 @@ MANIFEST = ROOT / "data" / "manifests" / "corpus-source-v1.0.0.json"
 QUERY_SET = ROOT / "data" / "evaluation" / "queries" / "python-docs-real-v1.0.0.json"
 FIXTURE = ROOT / "data" / "fixtures" / "answer-evaluation-v1.0.0.json"
 RAW_DIR = ROOT / "data" / "raw" / "python-docs-3.12.13"
-GEN_MODULE = ROOT / "src" / "evidence_grounded_rag" / "evaluation" / "generation_materialize.py"
+GEN_MODULE = (
+    ROOT / "src" / "evidence_grounded_rag" / "evaluation" / "generation_materialize.py"
+)
 
 pytestmark = pytest.mark.skipif(
     not RAW_DIR.is_dir(),
@@ -78,11 +65,6 @@ def raw_copy(tmp_path):
 def real_corpus():
     manifest = load_source_manifest(MANIFEST)
     return build_real_local_corpus(manifest, RAW_DIR)
-
-
-# --------------------------------------------------------------------------- #
-# fixture cross-validation
-# --------------------------------------------------------------------------- #
 
 
 def test_fixture_references_unchanged_18_real_queries(real_corpus):
@@ -126,15 +108,13 @@ def test_fixture_rejects_unknown_chunk(tmp_path, real_corpus):
         load_answer_evaluation_fixture(path, real_corpus, query_set)
 
 
-# --------------------------------------------------------------------------- #
-# end-to-end generation evaluation
-# --------------------------------------------------------------------------- #
-
-
 def test_generation_evaluate_writes_separate_labeled_report(tmp_path, raw_copy):
     _, out_path = generation_evaluate(
-        MANIFEST, QUERY_SET, raw_copy,
-        fixture_path=FIXTURE, out_path=tmp_path / "gen.json",
+        MANIFEST,
+        QUERY_SET,
+        raw_copy,
+        fixture_path=FIXTURE,
+        out_path=tmp_path / "gen.json",
     )
     raw = json.loads(out_path.read_text(encoding="utf-8"))
     assert raw["report_type"] == REPORT_TYPE
@@ -150,8 +130,11 @@ def test_generation_evaluate_writes_separate_labeled_report(tmp_path, raw_copy):
 
 def test_generation_report_metrics_and_configs(tmp_path, raw_copy):
     report, _ = generation_evaluate(
-        MANIFEST, QUERY_SET, raw_copy,
-        fixture_path=FIXTURE, out_path=tmp_path / "gen.json",
+        MANIFEST,
+        QUERY_SET,
+        raw_copy,
+        fixture_path=FIXTURE,
+        out_path=tmp_path / "gen.json",
     )
     data = report.data
     metrics = data["metrics"]
@@ -176,18 +159,34 @@ def test_generation_report_metrics_and_configs(tmp_path, raw_copy):
 
 def test_generation_report_per_query_fields(tmp_path, raw_copy):
     report, _ = generation_evaluate(
-        MANIFEST, QUERY_SET, raw_copy,
-        fixture_path=FIXTURE, out_path=tmp_path / "gen.json",
+        MANIFEST,
+        QUERY_SET,
+        raw_copy,
+        fixture_path=FIXTURE,
+        out_path=tmp_path / "gen.json",
     )
     per_query = report.data["per_query"]
     assert set(per_query.keys()) == {f"real-q-{i:03d}" for i in range(1, 19)}
     for qid, record in per_query.items():
         for field in (
-            "query_id", "case", "expected_status", "state", "abstention_reason",
-            "answerable", "answered", "abstained", "correct_abstention",
-            "retrieval_empty", "retrieved_chunk_ids", "claim_support",
-            "claim_count", "citation_completeness", "validation", "generation",
-            "provider_error", "invalid_output",
+            "query_id",
+            "case",
+            "expected_status",
+            "state",
+            "abstention_reason",
+            "answerable",
+            "answered",
+            "abstained",
+            "correct_abstention",
+            "retrieval_empty",
+            "retrieved_chunk_ids",
+            "claim_support",
+            "claim_count",
+            "citation_completeness",
+            "validation",
+            "generation",
+            "provider_error",
+            "invalid_output",
         ):
             assert field in record, f"{qid} missing {field}"
         assert record["generation"]["mode"] == "offline"
@@ -200,17 +199,31 @@ def test_generation_report_per_query_fields(tmp_path, raw_copy):
 
 def test_generation_report_deterministic_across_runs(tmp_path, raw_copy):
     _, first_path = generation_evaluate(
-        MANIFEST, QUERY_SET, raw_copy,
-        fixture_path=FIXTURE, out_path=tmp_path / "r1.json",
+        MANIFEST,
+        QUERY_SET,
+        raw_copy,
+        fixture_path=FIXTURE,
+        out_path=tmp_path / "r1.json",
     )
     _, second_path = generation_evaluate(
-        MANIFEST, QUERY_SET, raw_copy,
-        fixture_path=FIXTURE, out_path=tmp_path / "r2.json",
+        MANIFEST,
+        QUERY_SET,
+        raw_copy,
+        fixture_path=FIXTURE,
+        out_path=tmp_path / "r2.json",
     )
     first = json.loads(first_path.read_text(encoding="utf-8"))
     second = json.loads(second_path.read_text(encoding="utf-8"))
-    p1 = {k: v for k, v in first.items() if k not in ("timestamp_utc", "deterministic_digest", "runtime_seconds")}
-    p2 = {k: v for k, v in second.items() if k not in ("timestamp_utc", "deterministic_digest", "runtime_seconds")}
+    p1 = {
+        k: v
+        for k, v in first.items()
+        if k not in ("timestamp_utc", "deterministic_digest", "runtime_seconds")
+    }
+    p2 = {
+        k: v
+        for k, v in second.items()
+        if k not in ("timestamp_utc", "deterministic_digest", "runtime_seconds")
+    }
     assert _json_bytes(p1) == _json_bytes(p2)
     assert first["deterministic_digest"] == second["deterministic_digest"]
     assert first["deterministic_digest"] == _deterministic_digest(first)
@@ -218,10 +231,15 @@ def test_generation_report_deterministic_across_runs(tmp_path, raw_copy):
     assert first["per_query"] == second["per_query"]
 
 
-def test_generation_report_stores_no_claim_or_chunk_text(tmp_path, raw_copy, real_corpus):
+def test_generation_report_stores_no_claim_or_chunk_text(
+    tmp_path, raw_copy, real_corpus
+):
     report, _ = generation_evaluate(
-        MANIFEST, QUERY_SET, raw_copy,
-        fixture_path=FIXTURE, out_path=tmp_path / "gen.json",
+        MANIFEST,
+        QUERY_SET,
+        raw_copy,
+        fixture_path=FIXTURE,
+        out_path=tmp_path / "gen.json",
     )
     blob = _json_bytes(report.data).decode("utf-8")
     for chunk in real_corpus.chunks():
@@ -235,8 +253,11 @@ def test_generation_report_stores_no_claim_or_chunk_text(tmp_path, raw_copy, rea
 
 def test_generation_report_live_explicitly_unmeasured(tmp_path, raw_copy):
     report, _ = generation_evaluate(
-        MANIFEST, QUERY_SET, raw_copy,
-        fixture_path=FIXTURE, out_path=tmp_path / "gen.json",
+        MANIFEST,
+        QUERY_SET,
+        raw_copy,
+        fixture_path=FIXTURE,
+        out_path=tmp_path / "gen.json",
     )
     limitations = report.data["limitations"]
     assert any("live generation is NOT measured" in item for item in limitations)
@@ -245,26 +266,29 @@ def test_generation_report_live_explicitly_unmeasured(tmp_path, raw_copy):
 
 def test_generation_report_failures_and_support(tmp_path, raw_copy):
     report, _ = generation_evaluate(
-        MANIFEST, QUERY_SET, raw_copy,
-        fixture_path=FIXTURE, out_path=tmp_path / "gen.json",
+        MANIFEST,
+        QUERY_SET,
+        raw_copy,
+        fixture_path=FIXTURE,
+        out_path=tmp_path / "gen.json",
     )
     data = report.data
     kinds = {failure["kind"] for failure in data["failures"]}
     assert "wrong_answer" in kinds
     assert "answerable_abstention" in kinds
-    assert all(failure["kind"] not in ("provider_error", "invalid_output") for failure in data["failures"])
+    assert all(
+        failure["kind"] not in ("provider_error", "invalid_output")
+        for failure in data["failures"]
+    )
     for failure in data["failures"]:
         assert failure["mode"] == "hybrid"
     assert data["metrics"]["claim_support"]["supported"] > 0
     assert data["metrics"]["claim_support"]["support_rate"] > 0
 
 
-# --------------------------------------------------------------------------- #
-# network-free behavior
-# --------------------------------------------------------------------------- #
-
-
 def test_generation_materialize_module_is_network_free():
     source = GEN_MODULE.read_text(encoding="utf-8")
     for forbidden in ("urllib", "requests", "httpx", "socket.", "aiohttp"):
-        assert forbidden not in source, f"generation_materialize must not use {forbidden!r}"
+        assert forbidden not in source, (
+            f"generation_materialize must not use {forbidden!r}"
+        )

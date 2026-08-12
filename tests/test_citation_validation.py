@@ -1,5 +1,3 @@
-"""Tests for strict citation validation."""
-
 from __future__ import annotations
 
 from pathlib import Path
@@ -67,7 +65,9 @@ def _valid_answer(corpus):
 
 def test_valid_answer_passes(corpus, validator):
     answer = _valid_answer(corpus)
-    result = validator.validate(answer, exposed_chunk_ids={answer.citations[0].chunk_id})
+    result = validator.validate(
+        answer, exposed_chunk_ids={answer.citations[0].chunk_id}
+    )
     assert result.valid is True
     assert result.skipped is False
     assert result.issues == ()
@@ -115,9 +115,7 @@ def test_corpus_version_mismatch_fails(corpus, validator):
     answer = _valid_answer(corpus)
     stale = _replace(answer.citations[0], corpus_version="0.9.0")
     answer = _answered([stale], answer.claims)
-    result = validator.validate(
-        answer, exposed_chunk_ids={stale.chunk_id}
-    )
+    result = validator.validate(answer, exposed_chunk_ids={stale.chunk_id})
     assert result.valid is False
     assert "corpus_version_mismatch" in result.issue_codes
 
@@ -126,9 +124,7 @@ def test_excerpt_mismatch_fails(corpus, validator):
     answer = _valid_answer(corpus)
     altered = _replace(answer.citations[0], excerpt="A different sentence entirely.")
     answer = _answered([altered], answer.claims)
-    result = validator.validate(
-        answer, exposed_chunk_ids={altered.chunk_id}
-    )
+    result = validator.validate(answer, exposed_chunk_ids={altered.chunk_id})
     assert result.valid is False
     assert "excerpt_mismatch" in result.issue_codes
 

@@ -1,17 +1,3 @@
-"""Versioned, committed real-local evaluation query set.
-
-This is a SEPARATE query-set contract from the synthetic query set
-(``evaluation/queries.py``). It is deliberately narrowly scoped to the single
-approved real-local corpus (Python 3.12.13 documentation, 3 files / 70
-chunks): every gold chunk ID is validated against the derived real-local
-corpus, every query declares the corpus manifest reference and version it was
-annotated against, and loading is fully deterministic.
-
-The synthetic loader's seven-category contract is intentionally untouched.
-Synthetic validation stays as committed; the real loader enforces its own,
-explicitly documented schema instead.
-"""
-
 from __future__ import annotations
 
 import json
@@ -21,17 +7,12 @@ from typing import Any
 
 from evidence_grounded_rag.corpus.ids import validate_chunk_id
 
-#: Minimum number of committed queries the real query set must contain.
 MIN_REAL_QUERIES = 15
 
-#: Expected statuses a query may declare. ``answerable`` means a human
-#: annotator considers the question answerable from the corpus; the others
-#: declare which abstention behavior is expected.
 VALID_EXPECTED_STATUSES = frozenset(
     {"answerable", "unanswerable", "ambiguous", "abstain"}
 )
 
-#: Every case type the query set must cover at least once.
 REQUIRED_CASES = frozenset(
     {
         "single_passage",
@@ -47,7 +28,6 @@ REQUIRED_CASES = frozenset(
     }
 )
 
-#: All accepted case labels (superset of REQUIRED_CASES).
 VALID_CASES = frozenset(
     {
         "single_passage",
@@ -63,7 +43,6 @@ VALID_CASES = frozenset(
     }
 )
 
-#: Acceptable abstention reason codes (subset of AbstentionReason values).
 VALID_ABSTENTION_REASONS = frozenset(
     {
         "insufficient_evidence",
@@ -97,24 +76,18 @@ _QUERY_FIELDS = (
 
 @dataclass(frozen=True)
 class RealGoldJudgment:
-    """One graded relevance judgment against a real derived chunk."""
-
     chunk_id: str
     grade: int
 
 
 @dataclass(frozen=True)
 class CitationExpectation:
-    """Expected citation-count range for a query."""
-
     min: int
     max: int
 
 
 @dataclass(frozen=True)
 class RealEvaluationQuery:
-    """One annotated query over the real-local corpus."""
-
     query_id: str
     case: str
     question: str
@@ -140,8 +113,6 @@ class RealEvaluationQuery:
 
 @dataclass(frozen=True)
 class RealQuerySet:
-    """Fully validated real-local query set frozen against one corpus."""
-
     query_set_id: str
     query_set_version: str
     corpus_id: str
@@ -170,17 +141,6 @@ def load_real_query_set(
     *,
     manifest_id: str | None = None,
 ) -> RealQuerySet:
-    """Load, schema-validate, and reference-check a real query set.
-
-    *corpus* is the derived real-local corpus (``RealLocalCorpus``); the loader
-    reads only ``corpus_id``, ``corpus_version``, and ``chunk_by_id``. Every
-    gold chunk ID must exist in that corpus. When *manifest_id* is given it must
-    equal the query set's declared ``corpus_manifest_id``.
-
-    Raises ``ValueError`` with a stable message on any schema, duplicate-ID,
-    reference, or unknown-chunk failure. Loading is deterministic: the same
-    file plus the same corpus always yields an equal object.
-    """
     query_path = Path(path)
     if not query_path.is_file():
         raise FileNotFoundError(f"real query set file not found: {query_path}")
@@ -204,7 +164,8 @@ def load_real_query_set(
         )
 
     queries = tuple(
-        _parse_real_query(index, record, corpus) for index, record in enumerate(queries_raw)
+        _parse_real_query(index, record, corpus)
+        for index, record in enumerate(queries_raw)
     )
     _validate_unique_query_ids(queries)
     _validate_case_coverage(queries)
@@ -275,7 +236,10 @@ def _parse_real_query(
 
     gold = tuple(
         sorted(
-            (_parse_gold_judgment(query_id, item, corpus) for item in (record.get("gold_relevant") or [])),
+            (
+                _parse_gold_judgment(query_id, item, corpus)
+                for item in (record.get("gold_relevant") or [])
+            ),
             key=lambda judgment: judgment.chunk_id,
         )
     )
@@ -291,12 +255,17 @@ def _parse_real_query(
     expected_citation_count = _parse_citation_expectation(
         query_id, record.get("expected_citation_count")
     )
-    if status != "answerable" and expected_citation_count not in (None, CitationExpectation(0, 0)):
+    if status != "answerable" and expected_citation_count not in (
+        None,
+        CitationExpectation(0, 0),
+    ):
         raise ValueError(
             f"non-answerable query {query_id!r} must expect zero citations"
         )
 
-    abstention = tuple(sorted(str(r) for r in (record.get("expected_abstention") or [])))
+    abstention = tuple(
+        sorted(str(r) for r in (record.get("expected_abstention") or []))
+    )
     unknown_reasons = [r for r in abstention if r not in VALID_ABSTENTION_REASONS]
     if unknown_reasons:
         raise ValueError(
@@ -314,7 +283,9 @@ def _parse_real_query(
 
     annotation_raw = record.get("annotation") or {}
     annotation = {
-        str(key): str(value) for key, value in annotation_raw.items() if isinstance(annotation_raw, dict)
+        str(key): str(value)
+        for key, value in annotation_raw.items()
+        if isinstance(annotation_raw, dict)
     }
 
     return RealEvaluationQuery(

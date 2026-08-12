@@ -1,12 +1,3 @@
-"""Tests for the strict structured parser/validator and the live adapter.
-
-Covers schema parsing (malformed JSON, missing/duplicate ids, invalid
-statuses, uncited claims), evidence-scoped citation rules (unknown/unexposed,
-stale version, excerpt/location mismatch), deterministic conversion to
-``GeneratedAnswer``, and the live adapter's fail-closed behavior with fake
-success / timeout / unavailable / malformed providers and NO offline fallback.
-"""
-
 from __future__ import annotations
 
 import json
@@ -68,11 +59,6 @@ def _valid_payload(chunk: Chunk) -> dict[str, object]:
 
 PARSER = StructuredAnswerParser()
 VALIDATOR = StructuredAnswerValidator()
-
-
-# --------------------------------------------------------------------------- #
-# parser: schema
-# --------------------------------------------------------------------------- #
 
 
 def test_parser_rejects_malformed_json():
@@ -185,11 +171,6 @@ def test_parser_rejects_claim_citing_missing_citation_record():
     assert any(issue.code == "citation_record_missing" for issue in result.issues)
 
 
-# --------------------------------------------------------------------------- #
-# validator: citation rules against the evidence pack
-# --------------------------------------------------------------------------- #
-
-
 def _parsed(payload: dict[str, object]) -> StructuredAnswer:
     result = PARSER.parse(json.dumps(payload))
     assert result.ok, [i.code for i in result.issues]
@@ -269,47 +250,51 @@ def test_validator_skips_non_answered_statuses():
     assert VALIDATOR.validate(answer, _pack()) == ()
 
 
-# --------------------------------------------------------------------------- #
-# conversion to GeneratedAnswer
-# --------------------------------------------------------------------------- #
-
-
 def test_conversion_maps_all_statuses():
     chunk = _chunk("doc-a::0", "The park is open.")
 
-    answered = to_generated_answer(_parsed(_valid_payload(chunk)), provider_id="p", model_id="m", mode="live")
+    answered = to_generated_answer(
+        _parsed(_valid_payload(chunk)), provider_id="p", model_id="m", mode="live"
+    )
     assert answered.state is AnswerState.ANSWERED
     assert answered.is_llm_generated is True
     assert answered.mode == "live"
 
     abstained_payload = {
-        "status": "abstained", "answer_text": None, "claims": [], "citations": [],
-        "abstention_reason": "unsupported_query", "abstention_detail": "scope",
+        "status": "abstained",
+        "answer_text": None,
+        "claims": [],
+        "citations": [],
+        "abstention_reason": "unsupported_query",
+        "abstention_detail": "scope",
     }
     abstained = to_generated_answer(_parsed(abstained_payload), mode="live")
     assert abstained.state is AnswerState.ABSTAINED
     assert abstained.abstention_reason is AbstentionReason.UNSUPPORTED_QUERY
 
     conflicting_payload = {
-        "status": "conflicting", "answer_text": None, "claims": [], "citations": [],
-        "abstention_reason": "conflicting_evidence", "abstention_detail": "A vs B",
+        "status": "conflicting",
+        "answer_text": None,
+        "claims": [],
+        "citations": [],
+        "abstention_reason": "conflicting_evidence",
+        "abstention_detail": "A vs B",
     }
     conflicting = to_generated_answer(_parsed(conflicting_payload), mode="live")
     assert conflicting.state is AnswerState.CONFLICTING
     assert conflicting.abstention_reason is AbstentionReason.CONFLICTING_EVIDENCE
 
     invalid_payload = {
-        "status": "invalid", "answer_text": None, "claims": [], "citations": [],
-        "abstention_reason": None, "abstention_detail": "could not produce JSON",
+        "status": "invalid",
+        "answer_text": None,
+        "claims": [],
+        "citations": [],
+        "abstention_reason": None,
+        "abstention_detail": "could not produce JSON",
     }
     invalid = to_generated_answer(_parsed(invalid_payload), mode="live")
     assert invalid.state is AnswerState.ABSTAINED
     assert invalid.abstention_reason is AbstentionReason.MALFORMED_OUTPUT
-
-
-# --------------------------------------------------------------------------- #
-# live adapter: fake providers, fail closed, no fallback
-# --------------------------------------------------------------------------- #
 
 
 def _live_pack() -> EvidencePack:
@@ -372,7 +357,9 @@ def test_live_generator_malformed_output_fails_closed():
 
 def test_live_generator_schema_failure_fails_closed():
     def bad_transport(prompt: str) -> str:
-        return json.dumps({"status": "answered", "answer_text": "x", "claims": [], "citations": []})
+        return json.dumps(
+            {"status": "answered", "answer_text": "x", "claims": [], "citations": []}
+        )
 
     gen = LiveGenerator(bad_transport)
     answer = gen.generate("anything", _live_pack())
@@ -388,8 +375,6 @@ def test_live_generator_non_text_output_fails_closed():
 
 
 def test_live_generator_never_falls_back_to_offline():
-    """Under the live label, unavailability must NEVER invoke the extractive
-    generator: the result is a structured abstention, not an offline answer."""
 
     def broken_transport(prompt: str) -> str:
         raise RuntimeError("boom")

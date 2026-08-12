@@ -1,40 +1,52 @@
-# Embedding Model Contract — BAAI/bge-small-en-v1.5 (local, opt-in)
+# Contract del modelo de embeddings — BAAI/bge-small-en-v1.5 (local, opt-in)
 
-Status: **`approved-for-local-development`** — pinned revision `5c38ec7c405ec4b44b94cc5a9bb96e735b38267a`, acquired locally, never committed, never redistributed.
+Estado: **`approved-for-local-development`** — revisión fijada `5c38ec7c405ec4b44b94cc5a9bb96e735b38267a`, adquirido localmente, nunca comprometido, nunca redistribuido.
 
-## Quick path
+## Ruta rápida
+
+Paso 1: instalar el stack de dependencias opcionales (torch/transformers son un
+gran footprint).
 
 ```bash
-# 1. Install the optional dependency stack (torch/transformers are a large footprint)
 uv sync --dev --extra demo --extra embeddings
+```
 
-# 2. Acquire the pinned model into the gitignored cache (the ONLY network step)
+Paso 2: adquirir el modelo fijado en el caché gitignored (el ÚNICO paso de red).
+
+```bash
 uv run python scripts/acquire_embedding_model.py --manifest data/manifests/embedding-model-v1.0.0.json
+```
 
-Normal acquisition treats the **committed manifest as the trust anchor**: it
-loads and audits the committed manifest, downloads exactly the manifest's
-pinned files into a temporary staging directory, verifies them byte-exact
-against the manifest's declared sizes/SHA-256 **before** touching the cache,
-then atomically renames the verified staging directory over the cache. A
-failed or partial run can never leave a seemingly-valid cache, and the
-committed manifest is **never rewritten** — a compromised download cannot
-self-certify by overwriting the committed checksums. First-time bootstrap (no
-manifest yet) is an explicit, separate action:
+La adquisición normal trata el **manifest comprometido como el ancla de
+confianza**: carga y audita el manifest comprometido, descarga exactamente los
+archivos fijados del manifest a un directorio de staging temporal, los verifica
+byte-exacto contra los tamaños/SHA-256 declarados del manifest **antes** de tocar
+el caché, y luego renombra atómicamente el directorio de staging verificado sobre
+el caché. Una ejecución fallida o parcial nunca puede dejar un caché aparentemente
+válido, y el manifest comprometido **nunca se reescribe** — una descarga
+comprometida no puede auto-certificarse sobrescribiendo los checksums
+comprometidos. El bootstrap de primera vez (sin manifest todavía) es una acción
+explícita y separada:
 
 ```bash
 uv run python scripts/acquire_embedding_model.py --bootstrap \
     --manifest data/manifests/embedding-model-v1.0.0.json
 ```
 
-Bootstrap is the only mode that writes a new manifest, it requires the manifest
-to be absent, and its checksums are self-certified (no trust anchor existed):
-the command prints a loud warning that the new manifest must be reviewed and
-committed before it is treated as approved.
+El bootstrap es el único modo que escribe un manifest nuevo, requiere que el
+manifest esté ausente y sus checksums están auto-certificados (no existía un ancla
+de confianza): el comando imprime una advertencia clara de que el manifest nuevo
+debe revisarse y comprometerse antes de tratarse como aprobado.
 
-# 3. Verify the local snapshot byte-exact (offline, no downloads)
+Paso 3: verificar el snapshot local byte-exacto (offline, sin descargas).
+
+```bash
 uv run python scripts/verify_embedding_model.py --manifest data/manifests/embedding-model-v1.0.0.json
+```
 
-# 4. Run the separate semantic-materializer evaluation
+Paso 4: ejecutar la evaluación separada del materializer semántico.
+
+```bash
 uv run python -m evidence_grounded_rag.evaluation.semantic_materialize \
     --manifest data/manifests/corpus-source-v1.0.0.json \
     --queries data/evaluation/queries/python-docs-real-v1.0.0.json \
@@ -44,155 +56,161 @@ uv run python -m evidence_grounded_rag.evaluation.semantic_materialize \
     --output data/evaluations/python-docs-real-semantic-evaluation-v1.0.0.json
 ```
 
-The semantic model is **opt-in and explicit**. The default embedding remains the
-deterministic, non-semantic hash embedding (`semantic = False`, no weights, no
-network). There is **no silent fallback**: if the local model or its verified
-snapshot is unavailable, semantic retrieval raises
-`SemanticModelUnavailableError` and is refused.
+El modelo semántico es **opt-in y explícito**. El embedding por defecto sigue
+siendo el embedding hash determinista, no semántico (`semantic = False`, sin
+pesos, sin red). **No hay fallback silencioso**: si el modelo local o su snapshot
+verificado no está disponible, la recuperación semántica lanza
+`SemanticModelUnavailableError` y se rechaza.
 
-## Candidate audit (recorded 2026-08-11)
+## Auditoría de candidatos (registrada 2026-08-11)
 
-All six candidates are official Hugging Face model pages. Selection is
-reproducible from official evidence; rejection reasons are recorded so the
-decision does not have to be re-derived.
+Los seis candidatos son páginas oficiales de modelo de Hugging Face. La selección
+es reproducible desde evidencia oficial; las razones de rechazo se registran para
+que la decisión no deba re-derivarse.
 
-| Candidate (official page) | Rejected? | Reason |
+| Candidato (página oficial) | ¿Rechazado? | Razón |
 | --- | --- | --- |
-| **BAAI/bge-small-en-v1.5** | **SELECTED** | English retrieval-oriented, MIT licensed, 384-dim, 512-token input, no mandatory query prefix for v1.5, compact and CPU-feasible, public and non-gated. |
-| sentence-transformers/all-MiniLM-L6-v2 | Rejected | 256-token truncation conflicts with the corpus's 2000-char chunks (would silently cut evidence). |
-| sentence-transformers/all-mpnet-base-v2 | Rejected | Larger footprint (~420 MB) than needed for a 70-chunk bounded evaluation. |
-| Snowflake/snowflake-arctic-embed-xs | Rejected | Mandatory query prefix (`query:`) adds a brittle preprocessing contract. |
-| intfloat/multilingual-e5-small | Rejected | Mandatory prefix conventions (`query:`/`passage:`) and heavier multilingual weights; the current corpus is English. |
-| nomic-ai/nomic-embed-text-v1 | Rejected | Custom `trust_remote_code` remote code path — more fragile and harder to pin than a plain BERT WordPiece model. |
+| **BAAI/bge-small-en-v1.5** | **SELECCIONADO** | Orientado a retrieval en inglés, con licencia MIT, 384-dim, entrada de 512 tokens, sin prefijo de consulta obligatorio para v1.5, compacto y factible en CPU, público y sin gate. |
+| sentence-transformers/all-MiniLM-L6-v2 | Rechazado | La truncación de 256 tokens entra en conflicto con los fragmentos de 2000 caracteres del corpus (cortaría la evidencia silenciosamente). |
+| sentence-transformers/all-mpnet-base-v2 | Rechazado | Footprint mayor (~420 MB) del necesario para una evaluación acotada de 70 fragmentos. |
+| Snowflake/snowflake-arctic-embed-xs | Rechazado | El prefijo de consulta obligatorio (`query:`) agrega un contract de preprocesamiento frágil. |
+| intfloat/multilingual-e5-small | Rechazado | Convenciones de prefijo obligatorias (`query:`/`passage:`) y pesos multilingües más pesados; el corpus actual es inglés. |
+| nomic-ai/nomic-embed-text-v1 | Rechazado | Ruta de código remoto personalizada `trust_remote_code` — más frágil y difícil de fijar que un modelo BERT WordPiece plano. |
 
-No candidate is claimed to be universally best, and no model-card benchmark
-number is ever reported as a project metric.
+Ningún candidato se afirma como universalmente mejor, y ningún número de
+benchmark de la tarjeta del modelo se reporta jamás como métrica de proyecto.
 
-## Selected model — official evidence
+## Modelo seleccionado — evidencia oficial
 
-| Field | Value |
+| Campo | Valor |
 | --- | --- |
-| Model id | `BAAI/bge-small-en-v1.5` |
-| Publisher | Beijing Academy of Artificial Intelligence (BAAI) |
-| Official model page | https://huggingface.co/BAAI/bge-small-en-v1.5 |
-| Official model card (raw) | https://huggingface.co/BAAI/bge-small-en-v1.5/raw/main/README.md |
-| Official API / config | https://huggingface.co/api/models/BAAI/bge-small-en-v1.5/revision/5c38ec7c405ec4b44b94cc5a9bb96e735b38267a |
-| Pinned revision (commit SHA) | `5c38ec7c405ec4b44b94cc5a9bb96e735b38267a` |
-| Revision tag | none (pinned by commit SHA; never a mutable branch) |
-| License | MIT License (`license: mit` in the card's YAML; "FlagEmbedding is licensed under the MIT License. The released models can be used for commercial purposes free of charge.") |
-| License text | https://github.com/FlagOpen/FlagEmbedding/blob/master/LICENSE |
-| Acquisition date | 2026-08-11 |
-| Model status | `approved-for-local-development` |
+| Id del modelo | `BAAI/bge-small-en-v1.5` |
+| Editor | Beijing Academy of Artificial Intelligence (BAAI) |
+| Página oficial del modelo | https://huggingface.co/BAAI/bge-small-en-v1.5 |
+| Tarjeta oficial del modelo (cruda) | https://huggingface.co/BAAI/bge-small-en-v1.5/raw/main/README.md |
+| API / configuración oficial | https://huggingface.co/api/models/BAAI/bge-small-en-v1.5/revision/5c38ec7c405ec4b44b94cc5a9bb96e735b38267a |
+| Revisión fijada (SHA del commit) | `5c38ec7c405ec4b44b94cc5a9bb96e735b38267a` |
+| Tag de revisión | ninguno (fijado por SHA de commit; nunca una rama mutable) |
+| Licencia | MIT License (`license: mit` en el YAML de la tarjeta; "FlagEmbedding is licensed under the MIT License. The released models can be used for commercial purposes free of charge.") |
+| Texto de la licencia | https://github.com/FlagOpen/FlagEmbedding/blob/master/LICENSE |
+| Fecha de adquisición | 2026-08-11 |
+| Estado del modelo | `approved-for-local-development` |
 
-## Model facts (from the pinned config files)
+## Hechos del modelo (desde los archivos de configuración fijados)
 
-| Fact | Value | Source |
+| Hecho | Valor | Fuente |
 | --- | --- | --- |
-| Architecture | BERT, `BertModel`, 12 layers, 12 heads | `config.json` |
-| Embedding dimension | **384** (`hidden_size` = 384) | `config.json`, `1_Pooling/config.json` |
-| Max input | **512** tokens (`max_seq_length` = 512, `max_position_embeddings` = 512) | `sentence_bert_config.json`, `config.json` |
-| Pooling | **CLS** — `1_Pooling/config.json` sets `pooling_mode_cls_token: true`; the official README instructs "Perform pooling. In this case, cls pooling. `sentence_embeddings = model_output[0][:, 0]`" | `1_Pooling/config.json`, official README |
-| Normalization | **L2** — official README: "normalize embeddings `torch.nn.functional.normalize(..., p=2, dim=1)`"; the sentence-transformers module chain adds a `2_Normalize` module | official README, `modules.json` |
-| Tokenizer | WordPiece, `bert-base-uncased` (vocab 30522, lowercasing), `special_tokens_map.json` `[CLS] [MASK] [PAD] [SEP] [UNK]` | `tokenizer.json`, `vocab.txt`, `config.json` |
-| Weights format | single `model.safetensors` (float32) | repo file tree |
-| Device | CPU (single thread for deterministic inference) | our provider contract |
+| Arquitectura | BERT, `BertModel`, 12 capas, 12 cabezas | `config.json` |
+| Dimensión del embedding | **384** (`hidden_size` = 384) | `config.json`, `1_Pooling/config.json` |
+| Entrada máxima | **512** tokens (`max_seq_length` = 512, `max_position_embeddings` = 512) | `sentence_bert_config.json`, `config.json` |
+| Pooling | **CLS** — `1_Pooling/config.json` define `pooling_mode_cls_token: true`; el README oficial instruye "Perform pooling. In this case, cls pooling. `sentence_embeddings = model_output[0][:, 0]`" | `1_Pooling/config.json`, README oficial |
+| Normalización | **L2** — README oficial: "normalize embeddings `torch.nn.functional.normalize(..., p=2, dim=1)`"; la cadena de módulos de sentence-transformers agrega un módulo `2_Normalize` | README oficial, `modules.json` |
+| Tokenizador | WordPiece, `bert-base-uncased` (vocab 30522, lowercasing), `special_tokens_map.json` `[CLS] [MASK] [PAD] [SEP] [UNK]` | `tokenizer.json`, `vocab.txt`, `config.json` |
+| Formato de pesos | un único `model.safetensors` (float32) | árbol de archivos del repo |
+| Dispositivo | CPU (un solo hilo para inferencia determinista) | nuestro contract de proveedor |
 
-Pooling note: the official BGE README shows CLS pooling for direct
-`transformers` usage. The sentence-transformers wrapper manages pooling and
-normalization through its own `modules.json` chain (Transformer →
-`1_Pooling` CLS → `2_Normalize`); the wrapper's output is the 384-dim L2
-normalized vector.
+Nota de pooling: el README oficial de BGE muestra pooling CLS para uso directo de
+`transformers`. El wrapper de sentence-transformers gestiona el pooling y la
+normalización a través de su propia cadena `modules.json` (Transformer →
+`1_Pooling` CLS → `2_Normalize`); la salida del wrapper es el vector normalizado
+L2 de 384-dim.
 
-## Permitted use and redistribution policy
+## Política de uso permitido y redistribución
 
-- The MIT license permits local reproduction, analysis, testing, display, and
-  derivative use; retained for local development of this repository.
-- **Redistribution policy is `not-redistributed`** (see
-  `data/manifests/embedding-model-v1.0.0.json`): the weights are downloaded
-  once into the gitignored `data/raw/models/bge-small-en-v1.5/` cache and are
-  **never committed, packaged, or published** by this repository.
-- The committed artifact is the small manifest
-  (`data/manifests/embedding-model-v1.0.0.json`) containing metadata and the
-  **actual SHA-256 checksums and byte sizes** of every acquired file — never the
-  weights.
-- Third-party artifacts retain their own terms (MIT for this model); this
-  repo's MIT license covers only original code and the synthetic fixtures.
+- La licencia MIT permite la reproducción, análisis, testing, exhibición y uso
+  derivado locales; retenida para el desarrollo local de este repositorio.
+- **La política de redistribución es `not-redistributed`** (ver
+  `data/manifests/embedding-model-v1.0.0.json`): los pesos se descargan una vez al
+  caché gitignored `data/raw/models/bge-small-en-v1.5/` y **nunca se comprometen,
+  empaquetan ni publican** por este repositorio.
+- El artefacto comprometido es el manifest pequeño
+  (`data/manifests/embedding-model-v1.0.0.json`) que contiene metadatos y los
+  **checksums SHA-256 reales y tamaños de bytes** de cada archivo adquirido —
+  nunca los pesos.
+- Los artefactos de terceros conservan sus propios términos (MIT para este
+  modelo); la licencia MIT de este repo cubre solo el código original y los
+  fixtures sintéticos.
 
-## Checksum policy
+## Política de checksum
 
-- Every acquired file is recorded in the manifest with its byte-exact size and
-  raw SHA-256 (`sha256_bytes` over the exact downloaded bytes).
-- `model.safetensors` was cross-checked against the Hub's LFS blob hash
+- Cada archivo adquirido se registra en el manifest con su tamaño byte-exacto y
+  SHA-256 crudo (`sha256_bytes` sobre los bytes descargados exactos).
+- `model.safetensors` se contrastó con el hash de blob LFS del Hub
   `3c9f31665447c8911517620762200d2245a2518d6e7208acc78cd9db317e21ad`.
-- Verification (`scripts/verify_embedding_model.py`) re-checks schema/version,
-  model id/version, publisher, URLs, revision, license, dimension, max input,
-  device, architecture/tokenizer/pooling/normalization metadata, status,
-  redistribution, then file existence + exact size + exact SHA-256, and
-  rejects any extra file in the cache beyond the manifest's `expected_files`.
-  Any mismatch stops semantic enablement.
+- La verificación (`scripts/verify_embedding_model.py`) re-verifica
+  esquema/versión, id/versión del modelo, editor, URLs, revisión, licencia,
+  dimensión, entrada máxima, dispositivo, metadatos de
+  arquitectura/tokenizador/pooling/normalización, estado, redistribución, y luego
+  existencia de archivos + tamaño exacto + SHA-256 exacto, y rechaza cualquier
+  archivo extra en el caché más allá de los `expected_files` del manifest.
+  Cualquier desajuste detiene la habilitación semántica.
 
-## Inference behavior
+## Comportamiento de inferencia
 
-- **Local-only**: `SentenceTransformer(local_path, device="cpu",
-  local_files_only=True)`. No network, no Hub access, no fallback revision.
-- **Deterministic CPU settings**: single thread (`torch.set_num_threads(1)`),
-  fixed `batch_size=16`, stable input order, float32 inference, L2 via the
-  model's `2_Normalize` module plus `encode(normalize_embeddings=True)`.
-- **Dimension check**: the loaded model's embedding dimension is verified equal
-  to the committed 384 before any scoring; mismatch raises
-  `SemanticModelUnavailableError`.
-- **Empty input**: `embed([])` returns `[]`.
-- **Long input**: inputs are truncated by the tokenizer at 512 tokens, exactly
-  as the official model behaves; documented, not silent.
+- **Solo local**: `SentenceTransformer(local_path, device="cpu",
+  local_files_only=True)`. Sin red, sin acceso al Hub, sin revisión de fallback.
+- **Configuración CPU determinista**: un solo hilo (`torch.set_num_threads(1)`),
+  `batch_size=16` fijo, orden de entrada estable, inferencia float32, L2 vía el
+  módulo `2_Normalize` del modelo más `encode(normalize_embeddings=True)`.
+- **Verificación de dimensión**: la dimensión del embedding del modelo cargado se
+  verifica igual a la 384 comprometida antes de cualquier puntuación; un desajuste
+  lanza `SemanticModelUnavailableError`.
+- **Entrada vacía**: `embed([])` devuelve `[]`.
+- **Entrada larga**: las entradas se truncan por el tokenizador a 512 tokens,
+  exactamente como se comporta el modelo oficial; documentado, no silencioso.
 
-## Expected memory (approximate, qualitative)
+## Memoria esperada (aproximada, cualitativa)
 
-Qualitative only — no invented measurements. BGE-small is a 12-layer, 384-wide
-BERT (~130 MB of float32 weights). On CPU the model plus tokenizer plus a
-70-chunk index is expected to fit comfortably within a few hundred MB of RAM;
-the 70-chunk dense index itself is negligible compared to the loaded model. The
-evaluation records the process peak RSS it actually observed (see the report's
-`runtime_observations`); no per-mode memory figure is claimed.
+Solo cualitativa — sin mediciones inventadas. BGE-small es un BERT de 12 capas y
+384 de ancho (~130 MB de pesos float32). En CPU, el modelo más el tokenizador más
+un índice de 70 fragmentos se espera que quepa cómodamente en unos pocos cientos
+de MB de RAM; el índice dense de 70 fragmentos en sí es despreciable comparado
+con el modelo cargado. La evaluación registra el RSS pico del proceso que observó
+realmente (ver `runtime_observations` del reporte); no se afirma ninguna cifra de
+memoria por modo.
 
-## Dependency and install footprint
+## Footprint de dependencia e instalación
 
-- `sentence-transformers>=3.0` behind the optional extra
-  `[project.optional-dependencies].embeddings` (MIT/Apache-licensed ecosystem).
-- Installing it pulls the PyTorch/Transformers stack (torch, transformers,
-  tokenizers, safetensors, scikit-learn, numpy), which is a large disk/install
-  footprint. That is why it is optional and never required by the core
-  pipeline, the demo default, or the test suite.
-- Tests never download weights; real inference is exercised only when the
-  optional dependency and the verified local snapshot are present.
+- `sentence-transformers>=3.0` detrás del extra opcional
+  `[project.optional-dependencies].embeddings` (ecosistema con licencia
+  MIT/Apache).
+- Instalarlo arrastra el stack de PyTorch/Transformers (torch, transformers,
+  tokenizers, safetensors, scikit-learn, numpy), que es un gran footprint de
+  disco/instalación. Por eso es opcional y nunca requerido por el pipeline
+  central, la demo por defecto ni la suite de tests.
+- Los tests nunca descargan pesos; la inferencia real se ejercita solo cuando la
+  dependencia opcional y el snapshot local verificado están presentes.
 
-## Unavailable behavior (explicit, no fallback)
+## Comportamiento no disponible (explícito, sin fallback)
 
-- **The provider enforces the boundary itself.** `SemanticLocalEmbedding`
-  requires an audited manifest: construction audits the manifest against the
-  approval constants and byte-verifies the cache (existence, exact size, exact
-  SHA-256, and **no extra files beyond the manifest's `expected_files`**)
-  before anything is loaded. Caller-supplied metadata is never trusted and no
-  hardcoded critical-file list is used.
-- Model cache missing or incomplete / any file missing, tampered, or extra →
-  `SemanticModelUnavailableError` listing the exact blocker.
-- `sentence-transformers` not installed → `SemanticModelUnavailableError` with
-  the install command.
-- `local_files_only=False` or a non-approved device → refused
-  (`SemanticModelUnavailableError`); `local_files_only=True` and CPU are
-  invariants.
-- Loaded model dimension unknown or ≠ 384 → `SemanticModelUnavailableError`
-  (the dimension is never silently skipped).
-- Manifest schema/audit-policy failures (missing manifest, unapproved model,
-  revision/license/metadata mismatch, blocked status) → `EmbeddingModelManifestError`
-  with a stable code; these propagate unwrapped.
-- In every case the semantic mode is refused and **never** degrades to the
-  deterministic hash embedding under a semantic label.
+- **El proveedor aplica el límite él mismo.** `SemanticLocalEmbedding` requiere un
+  manifest auditado: la construcción audita el manifest contra las constantes de
+  aprobación y verifica por bytes el caché (existencia, tamaño exacto, SHA-256
+  exacto y **sin archivos extra más allá de los `expected_files` del manifest**)
+  antes de cargar cualquier cosa. Los metadatos provistos por el llamador nunca se
+  confían y no se usa una lista de archivos críticos hardcodeada.
+- Caché de modelo faltante o incompleto / cualquier archivo faltante, alterado o
+  extra → `SemanticModelUnavailableError` listando el bloqueador exacto.
+- `sentence-transformers` no instalado → `SemanticModelUnavailableError` con el
+  comando de instalación.
+- `local_files_only=False` o un dispositivo no aprobado → rechazado
+  (`SemanticModelUnavailableError`); `local_files_only=True` y CPU son
+  invariantes.
+- Dimensión del modelo cargado desconocida o ≠ 384 → `SemanticModelUnavailableError`
+  (la dimensión nunca se omite silenciosamente).
+- Fallos de esquema/política de auditoría del manifest (manifest faltante, modelo
+  no aprobado, desajuste de revisión/licencia/metadatos, estado bloqueado) →
+  `EmbeddingModelManifestError` con un código estable; estos se propagan sin
+  envolver.
+- En cada caso el modo semántico se rechaza y **nunca** degrada al embedding hash
+  determinista bajo una etiqueta semántica.
 
-## Limitations
+## Limitaciones
 
-- This is a bounded evaluation contract for a 3-file / 70-chunk corpus; it does
-  not validate Python documentation in general.
-- Retrieval quality does not imply answer faithfulness; the semantic
-  materializer reports retrieval metrics only (no generation, no LLM).
-- No model is claimed to be universally best; model-card benchmarks are not
-  project metrics.
+- Este es un contract de evaluación acotada para un corpus de 3 archivos / 70
+  fragmentos; no valida la documentación de Python en general.
+- La calidad de la recuperación no implica la fidelidad de la respuesta; el
+  materializer semántico reporta solo métricas de recuperación (sin generación,
+  sin LLM).
+- Ningún modelo se afirma como universalmente mejor; los benchmarks de la tarjeta
+  del modelo no son métricas de proyecto.

@@ -1,40 +1,3 @@
-"""Deterministic offline extractive/template generator.
-
-This provider is NOT an LLM. It extracts verbatim sentences from the retrieved
-evidence and assembles them into claims, each carrying a citation to the chunk
-the sentence came from. It is deterministic, offline, and makes no network
-calls; ``is_llm_generated`` is False and every report labels it accordingly.
-
-Decision procedure (committed, fully deterministic):
-
-1. Empty evidence (nothing exposed above the retrieval threshold) → abstain
-   ``insufficient_evidence``.
-2. Extract "matched claims": sentences from the top ``evidence_limit`` chunks
-   that contain at least one key (non-stopword) token of the query. If none →
-   abstain ``unsupported_query``.
-3. Conflict check: consider the matched claims that contain *every* key token
-   of the query (full matches; fall back to all matched claims when none are
-   full). If two such claims from *different chunks* share a normalized
-   predicate but carry different scalar values (or are explicit negations of
-   each other), the evidence is contradictory → abstain
-   ``conflicting_evidence``. Restricting conflict detection to full matches
-   prevents weakly-matching passages from poisoning a well-supported query.
-4. Multi-aspect check: if the query contains a coordination marker ("and",
-   "or", "also") or two or more wh-words, multiple matched claims are intended
-   → answered, joining the top claims with citations.
-5. Otherwise (single-aspect query):
-   - full matches (a sentence containing every key token) that come from
-     different chunks with different predicates but identical values → the
-     query is ambiguous → abstain ``insufficient_evidence``;
-   - else answered using the top-ranked full match, or — when no single
-     sentence fully matches and all matched claims share one predicate — the
-     top matched claim.
-
-The "conflict" rule is intentionally narrow and documented: it only fires on
-same-predicate scalar disagreement or explicit negation, never on tone or
-interpretation. This is a limitation, not a semantic understanding.
-"""
-
 from __future__ import annotations
 
 import itertools
@@ -69,8 +32,6 @@ _WH_WORDS = frozenset({"what", "when", "where", "which", "who", "how", "why"})
 
 
 class ExtractiveTemplateGenerator:
-    """Deterministic offline extractive/template provider (not an LLM)."""
-
     provider_id: str = PROVIDER_ID
     model_id: str = MODEL_ID
     is_llm_generated: bool = IS_LLM_GENERATED
@@ -145,10 +106,6 @@ class ExtractiveTemplateGenerator:
 
         return self._answered(query, evidence, matched)
 
-    # ------------------------------------------------------------------ #
-    # extraction
-    # ------------------------------------------------------------------ #
-
     def _extract_matched_claims(
         self,
         query: str,
@@ -178,10 +135,6 @@ class ExtractiveTemplateGenerator:
             predicate=predicate,
             value=value,
         )
-
-    # ------------------------------------------------------------------ #
-    # conflict and ambiguity
-    # ------------------------------------------------------------------ #
 
     def _find_conflict(self, claims: list[Claim]) -> str | None:
         for left, right in itertools.combinations(claims, 2):
@@ -248,10 +201,6 @@ class ExtractiveTemplateGenerator:
         wh_count = len(tokens & _WH_WORDS)
         return bool(markers) or wh_count >= 2
 
-    # ------------------------------------------------------------------ #
-    # answer assembly
-    # ------------------------------------------------------------------ #
-
     def _answered(
         self,
         query: str,
@@ -279,7 +228,9 @@ class ExtractiveTemplateGenerator:
                         location=chunk.location,
                     )
                 )
-        answer_text = " ".join(f"{claim.text} [{index + 1}]" for index, claim in enumerate(claims))
+        answer_text = " ".join(
+            f"{claim.text} [{index + 1}]" for index, claim in enumerate(claims)
+        )
         return GeneratedAnswer(
             state=AnswerState.ANSWERED,
             answer_text=answer_text,
@@ -311,13 +262,6 @@ class ExtractiveTemplateGenerator:
 
 
 def _evidence_to_chunks(evidence: EvidencePack | Sequence[Chunk] | Any) -> list[Chunk]:
-    """Normalize the generator input to chunk records.
-
-    Accepts either the bounded ``EvidencePack`` (the pipeline path) or a plain
-    sequence of ``Chunk`` records (direct/offline callers and tests). Anything
-    else is treated as empty so a generator never raises on a mis-shaped input;
-    the empty case yields the documented ``insufficient_evidence`` abstention.
-    """
     if isinstance(evidence, EvidencePack):
         return [item.to_chunk() for item in evidence.items]
     if isinstance(evidence, Sequence):
@@ -325,22 +269,12 @@ def _evidence_to_chunks(evidence: EvidencePack | Sequence[Chunk] | Any) -> list[
     return []
 
 
-# ---------------------------------------------------------------------- #
-# sentence / predicate helpers (pure, testable)
-# ---------------------------------------------------------------------- #
-
 def split_sentences(text: str) -> list[str]:
-    """Split text into sentences on ``.`` ``!`` ``?`` followed by whitespace."""
     parts = _SENTENCE_RE.split(text.strip())
     return [part.strip() for part in parts if part.strip()]
 
 
 def split_predicate_value(sentence: str) -> tuple[str | None, str | None]:
-    """Split a sentence into (predicate, value) around the first `` is ``.
-
-    Predicate/value are case-folded and whitespace-normalized. Returns
-    ``(None, None)`` when the sentence has no `` is `` separator.
-    """
     normalized = " ".join(sentence.casefold().split())
     marker = " is "
     if marker not in normalized:
@@ -351,11 +285,6 @@ def split_predicate_value(sentence: str) -> tuple[str | None, str | None]:
 
 
 def values_conflict(left: str | None, right: str | None) -> bool:
-    """Return whether two claim values are deterministic contradictions.
-
-    Fires when both values are scalars that differ, or when one value is an
-    explicit negation prefix of the other.
-    """
     if left is None or right is None:
         return False
     l_stripped = _LEADING_ARTICLE_RE.sub("", left).strip()

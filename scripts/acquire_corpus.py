@@ -1,24 +1,3 @@
-"""Acquire the approved Python 3.12.13 documentation corpus (local-only).
-
-Run:  uv run python scripts/acquire_corpus.py
-
-Downloads exactly three commit-pinned raw files from the approved CPython
-revision into ``data/raw/python-docs-3.12.13/`` (gitignored, never committed)
-and writes ``data/manifests/corpus-source-v1.0.0.json`` with the real file
-sizes and raw SHA-256 checksums plus the full source / license / revision
-evidence.
-
-Guarantees:
-
-- Revision is pinned to the approved commit ``3bb231a6...``; no mutable
-  branch, no mirror, no fallback.
-- Only the three approved files are downloaded; nothing else is touched.
-- The written manifest is re-validated through the real audit + verification
-  path before the script exits successfully.
-- Standard library only (``urllib``, ``hashlib``, ``json``). No secrets are
-  ever logged or written.
-"""
-
 from __future__ import annotations
 
 import json
@@ -58,24 +37,19 @@ ACQUISITION_METHOD = (
 )
 REDISTRIBUTION_STATUS = "not-redistributed"
 
-#: Official PSF License Version 2, sections 2 and 3, quoted for evidence. The
-#: grant covers reproduction, analysis, testing, display, derivatives,
-#: distribution and use; notices must be retained and distributed derivatives
-#: must summarize changes.
 LICENSE_EVIDENCE_EXCERPT = (
     'Section 2: "PSF hereby grants Licensee a nonexclusive, royalty-free, '
-    'world-wide license to reproduce, analyze, test, perform and/or display '
-    'publicly, prepare derivative works, distribute, and otherwise use Python '
-    'alone or in any derivative version, provided, however, that PSF\'s '
-    'License Agreement and PSF\'s notice of copyright ... are retained in '
+    "world-wide license to reproduce, analyze, test, perform and/or display "
+    "publicly, prepare derivative works, distribute, and otherwise use Python "
+    "alone or in any derivative version, provided, however, that PSF's "
+    "License Agreement and PSF's notice of copyright ... are retained in "
     'Python alone or in any derivative version prepared by Licensee." '
     'Section 3: "In the event Licensee prepares a derivative work that is '
-    'based on or incorporates Python or any part thereof, and wants to make '
-    'the derivative work available to others ... Licensee hereby agrees to '
+    "based on or incorporates Python or any part thereof, and wants to make "
+    "the derivative work available to others ... Licensee hereby agrees to "
     'include in any such work a brief summary of the changes made to Python."'
 )
 
-#: Approved files to capture, in the order they appear in the manifest.
 FILES: tuple[str, ...] = (
     "Doc/tutorial/introduction.rst",
     "Doc/library/functions.rst",
@@ -104,8 +78,9 @@ def _acquire_file(rel_path: str) -> dict[str, object]:
     }
 
 
-def build_manifest(entries: list[dict[str, object]], timestamp: str) -> dict[str, object]:
-    """Assemble the full source manifest from committed metadata + capture facts."""
+def build_manifest(
+    entries: list[dict[str, object]], timestamp: str
+) -> dict[str, object]:
     texts = {
         entry["path"]: (RAW_ROOT / entry["path"]).read_text(encoding="utf-8")
         for entry in entries

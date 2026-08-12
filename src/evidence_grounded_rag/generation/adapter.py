@@ -1,20 +1,3 @@
-"""Environment-configured generation provider adapter that fails closed.
-
-The only provider actually available is the deterministic offline
-extractive/template generator. The adapter reads ``EGRAG_GENERATION_PROVIDER``
-and:
-
-- uses the offline generator for the empty value or the explicit offline ids;
-- refuses ``live`` and every known remote provider with ``provider_unavailable``
-  — live generation requires an explicitly injected transport (see
-  ``generation/live.py``) and this adapter has none, so it NEVER attempts a
-  network call, never requires credentials, and never falls back to an
-  unconfigured remote provider.
-
-This is the **provider selection blocker**: no environment value or config can
-select a live/remote provider here, because none is configured.
-"""
-
 from __future__ import annotations
 
 import os
@@ -36,11 +19,8 @@ OFFLINE_PROVIDER_IDS = frozenset(
     {"", "deterministic-offline", "extractive-template", "deterministic-template"}
 )
 
-#: Provider names this offline system knows are remote but does NOT support.
 REMOTE_PROVIDER_IDS = frozenset({"claude", "anthropic", "openai", "remote"})
 
-#: The live label is recognized but NEVER selectable through configuration: it
-#: requires an injected transport that this adapter does not own.
 LIVE_PROVIDER_IDS = frozenset({"live", "live-provider", "injected-live-provider"})
 
 PROVIDER_ID = "env-configured-adapter"
@@ -49,8 +29,6 @@ MODE = "offline"
 
 
 class EnvConfiguredGenerator(Generator):
-    """Fail-closed generator adapter driven by an environment variable."""
-
     provider_id: str = PROVIDER_ID
     model_id: str = MODEL_ID
     is_llm_generated: bool = False

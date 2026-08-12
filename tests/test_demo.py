@@ -1,5 +1,3 @@
-"""Streamlit demo smoke test via AppTest (requires the demo extra)."""
-
 from __future__ import annotations
 
 from pathlib import Path
@@ -18,7 +16,9 @@ def test_demo_renders_offline_and_answers_default_query():
     app.run()
     assert not app.exception, app.exception
 
-    app.text_input(key="query_input").set_value("What must a permit application include?")
+    app.text_input(key="query_input").set_value(
+        "What must a permit application include?"
+    )
     app.selectbox(key="mode").set_value("hybrid")
     app.button(key="run_button").click()
     app.run()
@@ -33,7 +33,9 @@ def test_demo_renders_offline_and_answers_default_query():
 def test_demo_surfaces_abstention():
     app = AppTest.from_file(str(DEMO), default_timeout=30)
     app.run()
-    app.text_input(key="query_input").set_value("How much is the special event fee per day?")
+    app.text_input(key="query_input").set_value(
+        "How much is the special event fee per day?"
+    )
     app.button(key="run_button").click()
     app.run()
     assert not app.exception, app.exception
@@ -51,11 +53,6 @@ def test_demo_always_shows_corpus_license_panel():
     assert not app.exception, app.exception
 
 
-# --------------------------------------------------------------------------- #
-# corpus source selector
-# --------------------------------------------------------------------------- #
-
-
 def test_demo_defaults_to_synthetic_fixture():
     app = AppTest.from_file(str(DEMO), default_timeout=30)
     app.run()
@@ -65,15 +62,12 @@ def test_demo_defaults_to_synthetic_fixture():
     assert not app.exception, app.exception
 
 
-# --------------------------------------------------------------------------- #
-# generation state
-# --------------------------------------------------------------------------- #
-
-
 def test_demo_defaults_to_offline_generation():
     app = AppTest.from_file(str(DEMO), default_timeout=30)
     app.run()
-    assert app.selectbox(key="generation_mode").value == "Offline deterministic extractive"
+    assert (
+        app.selectbox(key="generation_mode").value == "Offline deterministic extractive"
+    )
     body = " ".join(str(item.value) for item in app.markdown)
     assert "Offline" in body
     assert not app.exception, app.exception
@@ -82,7 +76,9 @@ def test_demo_defaults_to_offline_generation():
 def test_demo_offline_generation_answers_and_shows_support():
     app = AppTest.from_file(str(DEMO), default_timeout=30)
     app.run()
-    app.text_input(key="query_input").set_value("What must a permit application include?")
+    app.text_input(key="query_input").set_value(
+        "What must a permit application include?"
+    )
     app.button(key="run_button").click()
     app.run()
     assert not app.exception, app.exception
@@ -100,7 +96,9 @@ def test_demo_live_generation_shows_actionable_unavailable_and_no_fallback():
     app = AppTest.from_file(str(DEMO), default_timeout=30)
     app.run()
     app.selectbox(key="generation_mode").set_value("Live provider (not configured)")
-    app.text_input(key="query_input").set_value("What must a permit application include?")
+    app.text_input(key="query_input").set_value(
+        "What must a permit application include?"
+    )
     app.button(key="run_button").click()
     app.run()
     assert not app.exception, app.exception

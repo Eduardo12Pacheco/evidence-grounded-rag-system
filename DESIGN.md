@@ -1,92 +1,102 @@
 # Design — evidence-grounded-rag-system
 
-Status: **implementation in progress — offline synthetic-fixture evaluation only.**
+Estado: **implementación en curso — solo evaluación offline con fixture
+sintético.**
 
-## Problem
+## Problema
 
-RAG systems are judged on perceived fluency, not on whether the answer is
-supported. This project builds a RAG pipeline where every answer is bound to
-evidence: hybrid retrieval surfaces passages, generation cites them, abstention
-refuses to fabricate, and faithfulness evaluation measures the gap between
-claim and evidence.
+Los sistemas RAG se juzgan por la fluidez percibida, no por si la respuesta está
+respaldada. Este proyecto construye un pipeline RAG donde cada respuesta está
+ligada a la evidencia: la recuperación híbrida expone pasajes, la generación los
+cita, la abstención se niega a fabricar y la evaluación de fidelidad mide la
+brecha entre afirmación y evidencia.
 
-## Architecture
+## Arquitectura
 
 ```text
 src/evidence_grounded_rag/
-├── corpus/        # license-gated corpus loading, IDs, checksums, normalization
-├── text/          # shared deterministic tokenizer (used by retrieval/embeddings)
-├── retrieval/     # BM25 + dense + RRF fusion + hybrid engine and traces
-├── embeddings/    # embedding interface + deterministic non-semantic embedding
-├── generation/    # claim/citation models, extractive provider, env adapter
-├── validation/    # strict citation validation (fail-closed)
-├── abstention/    # mandatory abstention reason codes
-├── evaluation/    # committed metrics, versioned query set, materialize command
-└── pipeline.py    # end-to-end EvidenceRagPipeline (retrieve → generate → validate)
+├── corpus/        # carga de corpus con gate de licencia, IDs, checksums, normalización
+├── text/          # tokenizador determinista compartido (usado por retrieval/embeddings)
+├── retrieval/     # BM25 + dense + fusión RRF + motor híbrido y traces
+├── embeddings/    # interfaz de embeddings + embedding determinista no semántico
+├── generation/    # modelos de afirmación/cita, proveedor extractivo, adaptador de entorno
+├── validation/    # validación estricta de citas (fail-closed)
+├── abstention/    # códigos de razón de abstención obligatoria
+├── evaluation/    # métricas comprometidas, conjunto de consultas versionado, comando materialize
+└── pipeline.py    # EvidenceRagPipeline de extremo a extremo (retrieve → generate → validate)
 ```
 
-Each layer is behind a documented interface and is replaceable.
+Cada capa está detrás de una interfaz documentada y es reemplazable.
 
-## Key decisions (implemented)
+## Decisiones clave (implementadas)
 
-| Topic | Decision |
+| Tema | Decisión |
 | --- | --- |
-| Language | Python >=3.11, `uv`, hatchling src layout; stdlib for the core |
-| Sparse retrieval | Okapi BM25, `k1 = 1.5`, `b = 0.75`, Robertson-Sparck Jones idf, deterministic tokenizer (`v1`, no stemming) |
-| Dense retrieval | `EmbeddingProvider` protocol; bundled `DeterministicEmbedding` is a hashed bag-of-words vector with `semantic = False` (offline, no weights, never labeled semantic) |
-| Fusion | Reciprocal rank fusion, `k = 60` (committed; changing it changes every number) |
-| Generation | Deterministic offline extractive/template provider (`is_llm_generated = False`); environment-configured adapter fails closed to `provider_unavailable` for any non-offline provider |
-| Abstention | Required behavior, tested; every refusal carries a stable reason code |
-| Evidence | Claims map to retrieved passages only; generator never sees the full corpus |
-| Citations | Strict validation: exists, exposed, current corpus version, exact excerpt, stable location, referenced by a claim; unverified answers are never surfaced |
-| Corpus gate | Fails closed: blocked real corpora, unapproved licenses, checksum/format/duplicate errors, and stale versions all refuse to serve |
-| Evaluation | Committed formulas + committed versioned query set; one command reproduces all numbers |
-| Demo | Local Streamlit app over committed fixtures only |
+| Lenguaje | Python >=3.11, `uv`, layout src de hatchling; stdlib para el núcleo |
+| Recuperación sparse | Okapi BM25, `k1 = 1.5`, `b = 0.75`, idf de Robertson-Sparck Jones, tokenizador determinista (`v1`, sin stemming) |
+| Recuperación dense | Protocolo `EmbeddingProvider`; el `DeterministicEmbedding` incluido es un vector de bolsa-de-palabras con hash con `semantic = False` (offline, sin pesos, nunca etiquetado como semántico) |
+| Fusión | Fusión de rango recíproco, `k = 60` (comprometido; cambiarlo cambia cada número) |
+| Generación | Proveedor extractivo/template offline determinista (`is_llm_generated = False`); el adaptador configurado por entorno falla cerrado a `provider_unavailable` para cualquier proveedor no offline |
+| Abstención | Comportamiento requerido, testeado; cada rechazo lleva un código de razón estable |
+| Evidencia | Las afirmaciones se mapean solo a pasajes recuperados; el generador nunca ve el corpus completo |
+| Citas | Validación estricta: existe, expuesta, versión actual del corpus, extracto exacto, ubicación estable, referenciada por una afirmación; las respuestas no verificadas nunca se exponen |
+| Gate de corpus | Falla cerrado: corpus reales bloqueados, licencias no aprobadas, errores de checksum/formato/duplicado y versiones obsoletas se niegan a servir |
+| Evaluación | Fórmulas comprometidas + conjunto de consultas versionado comprometido; un comando reproduce todos los números |
+| Demo | Aplicación Streamlit local sobre fixtures comprometidos únicamente |
 
-## Decision procedure of the extractive generator
+## Procedimiento de decisión del generador extractivo
 
-The generator receives only the retrieved evidence chunks and applies a
-committed, fully deterministic procedure:
+El generador recibe solo los fragmentos de evidencia recuperados y aplica un
+procedimiento comprometido y completamente determinista:
 
-1. Empty evidence → abstain `insufficient_evidence`.
-2. Extract matched claims (sentences containing a key token of the query). None
-   → abstain `unsupported_query`.
-3. Conflict: among claims that fully match the query's key tokens (falling back
-   to all matched claims when none are full), two claims from different chunks
-   with the same normalized predicate but different scalar values (or explicit
-   negation) → `conflicting_evidence`.
-4. Multi-aspect query (coordination marker or two wh-words) → answered with the
-   top matched claims.
-5. Otherwise (single-aspect): full matches from different chunks with different
-   subjects but identical values → ambiguous → `insufficient_evidence`; else
-   answered with the top full match (or the top claim when all matched claims
-   share one predicate).
+1. Evidencia vacía → abstenerse `insufficient_evidence`.
+2. Extraer afirmaciones coincidentes (oraciones que contienen un token clave de
+   la consulta). Ninguna → abstenerse `unsupported_query`.
+3. Conflicto: entre afirmaciones que coinciden completamente con los tokens
+   clave de la consulta (cayendo a todas las afirmaciones coincidentes cuando
+   ninguna lo hace), dos afirmaciones de fragmentos distintos con el mismo
+   predicado normalizado pero valores escalares diferentes (o negación
+   explícita) → `conflicting_evidence`.
+4. Consulta multi-aspecto (marcador de coordinación o dos palabras wh) →
+   respondida con las afirmaciones coincidentes principales.
+5. De lo contrario (un solo aspecto): coincidencias completas de fragmentos
+   distintos con sujetos diferentes pero valores idénticos → ambiguo →
+   `insufficient_evidence`; si no, respondida con la coincidencia completa
+   principal (o la afirmación principal cuando todas las afirmaciones
+   coincidentes comparten un predicado).
 
-The conflict/ambiguity rules are deliberately narrow and documented in
-`src/evidence_grounded_rag/generation/extractive.py`; they are not semantic
-understanding.
+Las reglas de conflicto/ambigüedad son deliberadamente estrechas y están
+documentadas en `src/evidence_grounded_rag/generation/extractive.py`; no son
+comprensión semántica.
 
-## No-goals
+## No-objetivos
 
-- No production search service or public deployment.
-- No unlicensed corpus use, ever (Gob.ec is not authorized).
-- No copying of the existing BM25 prototype code.
-- No claims of benchmark parity, real-world validation, perfect metrics,
-  hallucination-free behavior, trustworthiness, or production readiness.
+- Sin servicio de búsqueda de producción ni despliegue público.
+- Sin uso de corpus sin licencia, jamás (Gob.ec no está autorizado).
+- Sin copia del código del prototipo BM25 existente.
+- Sin afirmaciones de paridad de benchmark, validación del mundo real, métricas
+  perfectas, comportamiento libre de alucinaciones, confiabilidad ni aptitud de
+  producción.
 
-## Risks
+## Riesgos
 
-- Corpus license unresolved → real-corpus layer stays blocked by design.
-- Hallucination → mitigated by citation verification, mandatory abstention,
-  and fail-closed validation (unverified answers are never surfaced).
-- Metric gaming → fixed protocols, committed formulas, and committed query sets.
+- Licencia del corpus sin resolver → la capa de corpus real permanece bloqueada
+  por diseño.
+- Alucinación → mitigada por verificación de citas, abstención obligatoria y
+  validación fail-closed (las respuestas no verificadas nunca se exponen).
+- Juego de métricas → protocolos fijos, fórmulas comprometidas y conjuntos de
+  consultas comprometidos.
 
-## Definition of done (for the project, not just the current milestone)
+## Definición de terminado (para el proyecto, no solo el hito actual)
 
-- [x] License-gated corpus layer over synthetic fixtures (real corpus blocked).
-- [x] Hybrid retrieval (BM25 + deterministic dense + RRF) implemented and tested.
-- [x] Citation, abstention, and strict validation implemented and tested.
-- [x] Deterministic evaluation over the committed query set, reproduced by one command.
-- [x] Demo runs from fixtures with no network access.
-- [x] No unsupported claims in README or docs.
-- [ ] Real corpus license contract satisfied for any real corpus (blocked).
+- [x] Capa de corpus con gate de licencia sobre fixtures sintéticos (corpus real
+      bloqueado).
+- [x] Recuperación híbrida (BM25 + dense determinista + RRF) implementada y
+      testeada.
+- [x] Cita, abstención y validación estricta implementadas y testeadas.
+- [x] Evaluación determinista sobre el conjunto de consultas comprometido,
+      reproducida por un comando.
+- [x] Demo se ejecuta desde fixtures sin acceso a red.
+- [x] Sin afirmaciones sin respaldo en README ni docs.
+- [ ] Contract de licencia del corpus real satisfecho para cualquier corpus real
+      (bloqueado).

@@ -1,20 +1,3 @@
-"""Tests for the optional local semantic embedding provider.
-
-Fully offline — no model weights are ever downloaded. The provider's
-sentence-transformers import seam is monkeypatched with a fake module, and the
-"missing cache / tampered cache / missing dependency / dimension mismatch"
-failure modes are verified through the real error types. Coverage:
-
-- SemanticModelUnavailableError for missing cache, unverified/tampered cache,
-  missing dependency, unknown or mismatched dimension, and rejected
-  local_files_only=False;
-- EmbeddingModelManifestError for a missing manifest and manifest policy
-  failures (audit propagated, never wrapped as unavailable);
-- no network fallback (source-level check + local_files_only enforcement);
-- provider metadata, shape/order/dimension/empty/long-text behavior;
-- semantic dense/hybrid retrieval traces through a fake provider.
-"""
-
 from __future__ import annotations
 
 import types
@@ -78,7 +61,6 @@ _CACHE_FILES = (
 
 
 def _write_cache(tmp_path: Path, files: tuple[str, ...] = _CACHE_FILES) -> Path:
-    """Write fake cache files and return (cache_dir, matching expected_files)."""
     cache_dir = tmp_path / "cache"
     for rel in files:
         path = cache_dir / rel
@@ -134,7 +116,9 @@ def _make_manifest(
     expected_files: list[dict[str, object]] | None = None,
 ) -> object:
     return parse_embedding_model_manifest(
-        _manifest_doc(expected_files if expected_files is not None else _cache_entries())
+        _manifest_doc(
+            expected_files if expected_files is not None else _cache_entries()
+        )
     )
 
 
@@ -155,9 +139,14 @@ def _make_fake_st(dimension: int = 384, has_dimension_getter: bool = True):
 
         def encode(self, inputs, **kwargs):
             self.encode_calls.append((list(inputs), kwargs))
-            return [[0.1 * (index + 1) for _ in range(dimension)] for index in range(len(inputs))]
+            return [
+                [0.1 * (index + 1) for _ in range(dimension)]
+                for index in range(len(inputs))
+            ]
 
-    fake = types.SimpleNamespace(SentenceTransformer=FakeSentenceTransformer, instances=instances)
+    fake = types.SimpleNamespace(
+        SentenceTransformer=FakeSentenceTransformer, instances=instances
+    )
     return fake
 
 
@@ -173,11 +162,6 @@ def corpus():
     return load_corpus(FIXTURE_MANIFEST)
 
 
-# --------------------------------------------------------------------------- #
-# unavailable states
-# --------------------------------------------------------------------------- #
-
-
 def test_provider_requires_manifest(tmp_path):
     cache_dir = _write_cache(tmp_path)
     with pytest.raises(EmbeddingModelManifestError, match="manifest_required"):
@@ -185,7 +169,9 @@ def test_provider_requires_manifest(tmp_path):
 
 
 def test_missing_cache_directory_raises(tmp_path):
-    with pytest.raises(SemanticModelUnavailableError, match="cache directory not found"):
+    with pytest.raises(
+        SemanticModelUnavailableError, match="cache directory not found"
+    ):
         SemanticLocalEmbedding(tmp_path / "absent", manifest=_make_manifest())
 
 
@@ -241,11 +227,6 @@ def test_unknown_loaded_dimension_fails(monkeypatch, tmp_path):
         provider.embed(["hello"])
 
 
-# --------------------------------------------------------------------------- #
-# no network fallback / invariants
-# --------------------------------------------------------------------------- #
-
-
 def test_provider_never_uses_network_imports():
     source = SEMANTIC_SOURCE.read_text(encoding="utf-8")
     for forbidden in (
@@ -262,7 +243,9 @@ def test_provider_never_uses_network_imports():
 
 def test_provider_refuses_local_files_only_false(tmp_path):
     cache_dir = _write_cache(tmp_path)
-    with pytest.raises(SemanticModelUnavailableError, match="local_files_only must be True"):
+    with pytest.raises(
+        SemanticModelUnavailableError, match="local_files_only must be True"
+    ):
         SemanticLocalEmbedding(
             cache_dir, manifest=_make_manifest(), local_files_only=False
         )
@@ -293,11 +276,6 @@ def test_provider_embeds_with_normalization_and_no_download(fake_st, tmp_path):
     assert kwargs["normalize_embeddings"] is True
     assert "local_files_only" not in kwargs
     assert kwargs["show_progress_bar"] is False
-
-
-# --------------------------------------------------------------------------- #
-# provider behavior
-# --------------------------------------------------------------------------- #
 
 
 def test_provider_metadata(fake_st, tmp_path):
@@ -345,11 +323,6 @@ def test_provider_long_text_is_handled(fake_st, tmp_path):
     long_text = ("python function definition " * 400)[:5000]
     vector = provider.embed_one(long_text)
     assert len(vector) == 384
-
-
-# --------------------------------------------------------------------------- #
-# semantic retrieval traces through a fake provider
-# --------------------------------------------------------------------------- #
 
 
 def test_dense_index_uses_semantic_provider_metadata(corpus):

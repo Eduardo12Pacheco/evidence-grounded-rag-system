@@ -1,18 +1,3 @@
-"""End-to-end evidence-grounded RAG pipeline.
-
-The pipeline wires the license-gated corpus, hybrid retrieval, structured
-generation, and strict citation validation into one deterministic ``answer``
-call. It fails closed at every boundary:
-
-- a blocked/invalid/stale corpus produces abstentions with the corresponding
-  reason code instead of fabricated answers;
-- an answered generation that fails citation validation is converted into an
-  abstention with reason ``citation_validation_failed`` — an unverified answer
-  is never surfaced;
-- the generator only ever receives the retrieved evidence chunks, never the
-  full corpus.
-"""
-
 from __future__ import annotations
 
 from collections.abc import Sequence
@@ -42,7 +27,6 @@ from evidence_grounded_rag.retrieval import (
 from evidence_grounded_rag.validation import CitationValidationResult, CitationValidator
 from evidence_grounded_rag.versions import PACKAGE_VERSION
 
-#: Committed minimum fused score for evidence to be exposed to the generator.
 MIN_FUSED_SCORE = 0.01
 
 _GATE_ERROR_TO_REASON: dict[str, AbstentionReason] = {
@@ -57,8 +41,6 @@ _GATE_ERROR_TO_REASON: dict[str, AbstentionReason] = {
 
 @dataclass(frozen=True)
 class PipelineConfig:
-    """Committed pipeline parameters."""
-
     top_k: int = 5
     mode: str = MODE_HYBRID
     min_fused_score: float = MIN_FUSED_SCORE
@@ -67,8 +49,6 @@ class PipelineConfig:
 
 @dataclass(frozen=True)
 class AnswerRecord:
-    """Complete structured answer with its trace, validation, and provenance."""
-
     query: str
     state: AnswerState
     answer_text: str | None
@@ -132,7 +112,9 @@ class AnswerRecord:
         }
 
 
-def _validation_to_dict(validation: CitationValidationResult | None) -> dict[str, object] | None:
+def _validation_to_dict(
+    validation: CitationValidationResult | None,
+) -> dict[str, object] | None:
     if validation is None:
         return None
     return {
@@ -153,8 +135,6 @@ def _validation_to_dict(validation: CitationValidationResult | None) -> dict[str
 
 
 class EvidenceRagPipeline:
-    """Deterministic, fail-closed pipeline over one license-gated corpus."""
-
     def __init__(
         self,
         corpus_or_path: Corpus | str | Path,
@@ -200,10 +180,6 @@ class EvidenceRagPipeline:
                 self.validator = CitationValidator(self.corpus)
 
         self.generator = generator or EnvConfiguredGenerator()
-
-    # ------------------------------------------------------------------ #
-    # answering
-    # ------------------------------------------------------------------ #
 
     def answer(
         self,
@@ -275,7 +251,9 @@ class EvidenceRagPipeline:
         }
 
         if generated.state is not AnswerState.ANSWERED:
-            reason = generated.abstention_reason or AbstentionReason.INSUFFICIENT_EVIDENCE
+            reason = (
+                generated.abstention_reason or AbstentionReason.INSUFFICIENT_EVIDENCE
+            )
             return self._record(
                 query,
                 state=generated.state,
@@ -295,7 +273,9 @@ class EvidenceRagPipeline:
         if not validation.valid:
             detail = (
                 "Generated citations failed validation; answer refused. "
-                + "; ".join(f"{issue.code}: {issue.message}" for issue in validation.issues)
+                + "; ".join(
+                    f"{issue.code}: {issue.message}" for issue in validation.issues
+                )
             )
             return self._abstained_record(
                 query,
@@ -322,10 +302,6 @@ class EvidenceRagPipeline:
             versions=versions,
             config=config,
         )
-
-    # ------------------------------------------------------------------ #
-    # corpus status
-    # ------------------------------------------------------------------ #
 
     def corpus_status(self) -> dict[str, object]:
         if self.corpus is None or self._gate_failure is not None:
@@ -357,10 +333,6 @@ class EvidenceRagPipeline:
             "num_documents": len(self.corpus.documents),
             "num_chunks": len(self.corpus.chunks()),
         }
-
-    # ------------------------------------------------------------------ #
-    # helpers
-    # ------------------------------------------------------------------ #
 
     @staticmethod
     def _generation_info(generated: GeneratedAnswer) -> dict[str, object]:

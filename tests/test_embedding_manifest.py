@@ -1,15 +1,3 @@
-"""Tests for the embedding-model manifest schema, audit, and verification.
-
-Fully offline: manifests and cache files are created in temporary directories.
-Coverage:
-
-- schema/version validation and stable error codes;
-- audit of model id, revision, license, dimension, max-input, status, and
-  redistribution policy;
-- byte-exact file verification (existence, size, SHA-256) with no network;
-- path-escape refusal.
-"""
-
 from __future__ import annotations
 
 import json
@@ -96,11 +84,6 @@ def _write_cache(tmp_path: Path, files: dict[str, str]) -> Path:
     return cache_dir
 
 
-# --------------------------------------------------------------------------- #
-# schema / parsing
-# --------------------------------------------------------------------------- #
-
-
 def test_committed_model_manifest_parses_and_audits():
     manifest = load_embedding_model_manifest(COMMITTED_MANIFEST)
     audit_embedding_model_manifest(manifest)
@@ -126,7 +109,9 @@ def test_malformed_json_raises(tmp_path):
 
 def test_unsupported_manifest_version_rejected(tmp_path):
     path = _write_manifest(tmp_path, _manifest_data(manifest_version="9.9"))
-    with pytest.raises(EmbeddingModelManifestError, match="unsupported_manifest_version"):
+    with pytest.raises(
+        EmbeddingModelManifestError, match="unsupported_manifest_version"
+    ):
         load_embedding_model_manifest(path)
 
 
@@ -146,9 +131,7 @@ def test_invalid_revision_rejected(tmp_path):
 
 def test_file_path_escape_rejected(tmp_path):
     data = _manifest_data()
-    data["expected_files"] = [
-        {"path": "../escape.bin", "size": 1, "sha256": "a" * 64}
-    ]
+    data["expected_files"] = [{"path": "../escape.bin", "size": 1, "sha256": "a" * 64}]
     path = _write_manifest(tmp_path, data)
     with pytest.raises(EmbeddingModelManifestError, match="expected_files"):
         load_embedding_model_manifest(path)
@@ -190,11 +173,6 @@ def test_invalid_sha256_rejected(tmp_path):
     path = _write_manifest(tmp_path, data)
     with pytest.raises(EmbeddingModelManifestError, match="sha256"):
         load_embedding_model_manifest(path)
-
-
-# --------------------------------------------------------------------------- #
-# audit
-# --------------------------------------------------------------------------- #
 
 
 def test_audit_rejects_other_model(tmp_path):
@@ -319,14 +297,13 @@ def test_audit_rejects_redistribution(tmp_path):
         audit_embedding_model_manifest(manifest)
 
 
-# --------------------------------------------------------------------------- #
-# file verification
-# --------------------------------------------------------------------------- #
-
-
 def _verified_manifest_data(files: dict[str, str]) -> dict[str, object]:
     entries = [
-        {"path": rel, "size": len(text.encode("utf-8")), "sha256": sha256_bytes(text.encode("utf-8"))}
+        {
+            "path": rel,
+            "size": len(text.encode("utf-8")),
+            "sha256": sha256_bytes(text.encode("utf-8")),
+        }
         for rel, text in files.items()
     ]
     return _manifest_data(expected_files=entries)
@@ -389,6 +366,8 @@ def test_verify_extra_nested_cache_file_rejected(tmp_path):
     manifest = parse_embedding_model_manifest(_verified_manifest_data(files))
     nested = cache_dir / "1_Pooling"
     nested.mkdir()
-    (nested / "config.json").write_text('{"pooling_mode_cls_token": true}', encoding="utf-8")
+    (nested / "config.json").write_text(
+        '{"pooling_mode_cls_token": true}', encoding="utf-8"
+    )
     with pytest.raises(EmbeddingModelManifestError, match="extra_cache_file"):
         verify_embedding_model_files(manifest, cache_dir)

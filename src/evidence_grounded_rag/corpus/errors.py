@@ -1,15 +1,7 @@
-"""Errors raised by the corpus layer, each carrying a stable error code.
-
-The codes are the stable contract the rest of the system maps onto abstention
-reasons (``blocked_corpus``, ``invalid_corpus``, ``stale_corpus``).
-"""
-
 from __future__ import annotations
 
 
 class CorpusError(Exception):
-    """Base class for corpus-layer failures. ``code`` is the stable error code."""
-
     code: str = "invalid_corpus"
 
     def __init__(self, message: str, *, code: str | None = None) -> None:
@@ -43,13 +35,6 @@ class UnapprovedLicenseError(CorpusError):
 
 
 class SourceManifestError(CorpusError):
-    """Base class for source-manifest audit failures.
-
-    These errors describe the separate corpus source-manifest boundary used
-    for the bounded, explicitly approved real-local corpus. They do NOT loosen
-    the synthetic fixture gate and are never mapped onto the serving pipeline.
-    """
-
     code = "invalid_source_manifest"
 
 

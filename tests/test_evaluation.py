@@ -1,5 +1,3 @@
-"""Tests for the evaluation layer: metric math, query set, materialize."""
-
 from __future__ import annotations
 
 import json
@@ -37,9 +35,7 @@ def test_mrr_formula():
 
 
 def test_ndcg_formula():
-    # DCG = 2/log2(2) + 1/log2(3) = 2 + 0.6309 = 2.6309; IDCG = same → 1.0
     assert ndcg_at_k(["a", "b"], {"a": 2, "b": 1}, 2) == pytest.approx(1.0)
-    # Reversed order halves the first term contribution.
     score = ndcg_at_k(["b", "a"], {"a": 2, "b": 1}, 2)
     assert 0.0 < score < 1.0
     assert ndcg_at_k(["a"], {}, 5) == 0.0
@@ -133,10 +129,6 @@ def test_materialize_writes_labeled_report(tmp_path):
 
 
 def test_materialize_is_deterministic_in_metrics(tmp_path):
-    first, _ = materialize(
-        FIXTURE_MANIFEST, QUERY_SET, tmp_path / "r1.json", top_k=10
-    )
-    second, _ = materialize(
-        FIXTURE_MANIFEST, QUERY_SET, tmp_path / "r2.json", top_k=10
-    )
+    first, _ = materialize(FIXTURE_MANIFEST, QUERY_SET, tmp_path / "r1.json", top_k=10)
+    second, _ = materialize(FIXTURE_MANIFEST, QUERY_SET, tmp_path / "r2.json", top_k=10)
     assert first.metrics == second.metrics

@@ -20,7 +20,14 @@ exactly what is implemented, what is blocked, and what is not claimed.
   committed and versioned.
 - **Structured generation** — a deterministic offline extractive/template
   provider (`is_llm_generated = False`) that turns retrieved passages into
-  claims, each cited to the exact chunk.
+  claims, each cited to the exact chunk. The generator receives only a bounded
+  `EvidencePack` (retrieved chunks + rank/score/trace/corpus metadata), never
+  the full corpus. Live generation is optional, provider-neutral, and
+  deliberately NOT configured: it requires an injected transport, fails closed
+  with `provider_unavailable` otherwise, and never falls back to offline. The
+  full contract (frozen prompt `grounded-answer-prompt-v1.0.0`, JSON schema,
+  injection policy, size/timeout policy) is in
+  `docs/generation-contract.md`.
 - **Mandatory abstention** — every refusal carries a stable reason code
   (insufficient evidence, unsupported query, conflicting evidence, citation
   validation failure, provider unavailable, malformed output, blocked/invalid/
@@ -34,6 +41,11 @@ exactly what is implemented, what is blocked, and what is not claimed.
   rate, citation precision/completeness) over a committed, versioned query set
   covering answerable / unanswerable / ambiguous / conflicting /
   citation-boundary / numeric / multi-passage cases.
+- **Claim support evaluation** — a deterministic, versioned
+  (`normalized-exact-containment-v1`) rule that measures whether each claim's
+  text is exactly contained in the cited evidence. This is distinct from
+  structural citation validity and is reported per query in the generation
+  evaluation.
 
 ## What this is NOT
 
@@ -87,6 +99,10 @@ src/evidence_grounded_rag/
 | Model manifest | `1.0` | embedding-model manifest schema with checksums (no weights committed) |
 | Fusion | `rrf-v1` | RRF with `k = 60` |
 | Generator | `extractive-template-v1` | not an LLM |
+| Prompt | `grounded-answer-prompt-v1.0.0` | frozen; see `docs/generation-contract.md` |
+| Structured schema | `structured-answer-v1` | live-provider JSON schema + strict parser |
+| Live adapter | `injected-live-provider-v1` | optional; requires injected transport; never falls back |
+| Claim support rule | `normalized-exact-containment-v1` | deterministic verbatim grounding |
 | Query set | `synthetic-queries-v1` | 11 committed queries, 7 categories |
 
 ### Current synthetic-fixture numbers
@@ -157,6 +173,34 @@ carry excerpt checksums and short prefixes. Timestamp policy: only
 Synthetic evaluation (unchanged): `uv run python -m
 evidence_grounded_rag.evaluation.materialize` writes
 `data/manifests/evaluation-synthetic-v1.0.0.json`.
+
+## Generation evaluation (separate, offline, diagnostic)
+
+A SEPARATE offline evaluation of the deterministic extractive generator over
+the same approved real-local corpus and the UNCHANGED 18-query real query set,
+anchored by the committed answer-evaluation fixture
+(`data/fixtures/answer-evaluation-v1.0.0.json`, which references the query IDs
+and gold chunks without copying any passage). It reports answer coverage,
+correct abstentions, abstention precision/recall, citation
+precision/completeness, validation-failure rate, and claim-support rates.
+
+```bash
+uv run python -m evidence_grounded_rag.evaluation.generation_materialize \
+    --manifest data/manifests/corpus-source-v1.0.0.json \
+    --queries data/evaluation/queries/python-docs-real-v1.0.0.json \
+    --raw-dir data/raw/python-docs-3.12.13 \
+    --fixture data/fixtures/answer-evaluation-v1.0.0.json \
+    --output data/evaluations/python-docs-real-generation-evaluation-v1.0.0.json
+```
+
+The report (`data/evaluations/python-docs-real-generation-evaluation-v1.0.0.json`)
+is a SEPARATE artifact from the synthetic, hash-materializer, and semantic
+reports. It stores no claim or chunk text (citations carry excerpt checksums
+and short prefixes). Live generation is explicitly NOT measured: no
+provider/model/credentials are configured, so the report labels live results
+as unmeasured and never claims an LLM produced any number. Only the timestamp
+and runtime differ between runs; everything else is deterministic and covered
+by `deterministic_digest`.
 
 ## Semantic local embeddings (optional, separate, retrieval-only)
 

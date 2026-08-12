@@ -26,6 +26,7 @@ from evidence_grounded_rag.generation import (
     EnvConfiguredGenerator,
     Generator,
 )
+from evidence_grounded_rag.generation.evidence import EvidencePack
 from evidence_grounded_rag.generation.models import (
     AnswerState,
     Citation,
@@ -230,14 +231,12 @@ class EvidenceRagPipeline:
         )
 
         evidence: list[ScoredChunk] = list(hybrid.fused.chunks)
-        evidence_chunks = [
-            chunk
-            for item in evidence
-            if (chunk := self.corpus.chunk_by_id(item.chunk_id)) is not None
-        ]
+        evidence_pack = EvidencePack.from_scored_chunks(
+            self.corpus, evidence, trace=hybrid.trace
+        )
         exposed_ids = {item.chunk_id for item in evidence}
 
-        generated = self.generator.generate(query, evidence_chunks)
+        generated = self.generator.generate(query, evidence_pack)
 
         if generated.state is AnswerState.ANSWERED and (
             not generated.answer_text or not generated.claims
@@ -368,6 +367,7 @@ class EvidenceRagPipeline:
         return {
             "provider_id": generated.provider_id,
             "model_id": generated.model_id,
+            "mode": generated.mode,
             "is_llm_generated": generated.is_llm_generated,
         }
 

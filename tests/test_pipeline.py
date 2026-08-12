@@ -206,6 +206,45 @@ def test_missing_manifest_file_reports_invalid_corpus(tmp_path):
     assert record.abstention_reason is AbstentionReason.INVALID_CORPUS
 
 
+def test_answer_record_generation_metadata_includes_mode(pipeline):
+    record = pipeline.answer("What must a permit application include?", top_k=5)
+    assert record.generation["provider_id"] == "extractive-template"
+    assert record.generation["model_id"] == "extractive-template-v1"
+    assert record.generation["mode"] == "offline"
+    assert record.generation["is_llm_generated"] is False
+
+
+def test_env_adapter_live_label_fails_closed_in_pipeline():
+    from evidence_grounded_rag.generation import ENV_VAR, EnvConfiguredGenerator
+
+    pipe = EvidenceRagPipeline(
+        FIXTURE_MANIFEST,
+        config=PipelineConfig(top_k=5),
+        generator=EnvConfiguredGenerator(env={ENV_VAR: "live"}),
+    )
+    record = pipe.answer("What must a permit application include?", top_k=5)
+    assert record.state is AnswerState.ABSTAINED
+    assert record.abstention_reason is AbstentionReason.PROVIDER_UNAVAILABLE
+    assert record.generation["mode"] == "offline"
+    assert record.answer_text is None
+
+
+def test_live_generator_without_transport_abstains_through_pipeline():
+    from evidence_grounded_rag.generation import LiveGenerator
+
+    pipe = EvidenceRagPipeline(
+        FIXTURE_MANIFEST,
+        config=PipelineConfig(top_k=5),
+        generator=LiveGenerator(),
+    )
+    record = pipe.answer("What must a permit application include?", top_k=5)
+    assert record.state is AnswerState.ABSTAINED
+    assert record.abstention_reason is AbstentionReason.PROVIDER_UNAVAILABLE
+    assert record.generation["mode"] == "live"
+    assert record.generation["is_llm_generated"] is True
+    assert "not fall back" in (record.abstention_detail or "").lower()
+
+
 def _single_chunk_evidence(query: str) -> GeneratedAnswer:
     from evidence_grounded_rag.corpus import load_corpus
 

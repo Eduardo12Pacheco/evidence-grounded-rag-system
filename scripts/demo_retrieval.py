@@ -5,13 +5,18 @@ Two explicit corpus sources:
 - **Synthetic fixture** (default): runs entirely from committed synthetic
   fixtures. No credentials, no network, no model downloads. Every panel is
   failure-visible: gate failures, validation failures, and abstentions are
-  shown explicitly.
+  shown explicitly. Generation is offline by default with an explicit
+  offline/live state: live generation shows an actionable
+  ``provider_unavailable`` message and never falls back to offline.
 - **Real local corpus**: the approved Python 3.12.13 documentation corpus,
   retrieval only. Retrieval modes are explicitly labeled and never silently
   swap: ``BM25 sparse baseline``, ``Hash embedding diagnostic``, ``Local
   semantic embeddings``, and ``Semantic hybrid``. The semantic modes load the
   local model with ``local_files_only=True`` and show an actionable warning
   instead of falling back to hash embeddings when it is unavailable.
+
+A permanent honesty warning is shown wherever retrieval feeds generation:
+``Retrieval quality does not prove answer faithfulness.``
 
 Run:  uv run --extra demo streamlit run scripts/demo_retrieval.py
 """
@@ -29,7 +34,12 @@ from evidence_grounded_rag.embeddings import (
     load_embedding_model_manifest,
 )
 from evidence_grounded_rag.evaluation.real_materialize import build_real_local
-from evidence_grounded_rag.generation import AnswerState
+from evidence_grounded_rag.generation import (
+    AnswerState,
+    ClaimSupportEvaluator,
+    EvidencePack,
+    LiveGenerator,
+)
 from evidence_grounded_rag.retrieval import (
     MODE_DENSE,
     MODE_HYBRID,
@@ -48,6 +58,12 @@ MODEL_CACHE_DIR = ROOT / "data" / "raw" / "models" / "bge-small-en-v1.5"
 CORPUS_SOURCE_SYNTHETIC = "Synthetic fixture"
 CORPUS_SOURCE_REAL = "Real local corpus"
 CORPUS_SOURCES = (CORPUS_SOURCE_SYNTHETIC, CORPUS_SOURCE_REAL)
+
+GENERATION_OFFLINE = "Offline deterministic extractive"
+GENERATION_LIVE = "Live provider (not configured)"
+GENERATION_MODES = (GENERATION_OFFLINE, GENERATION_LIVE)
+
+FAITHFULNESS_WARNING = "Retrieval quality does not prove answer faithfulness."
 
 REAL_MODE_SPARSE = "BM25 sparse baseline"
 REAL_MODE_HASH = "Hash embedding diagnostic"
@@ -193,12 +209,68 @@ def _show_versions_config(record) -> None:
     )
 
 
+def _show_evidence_pack(corpus, record) -> None:
+    st.markdown("### Evidence pack (exposed to the generator)")
+    if not record.evidence:
+        st.caption("no evidence was exposed")
+        return
+    pack = EvidencePack.from_scored_chunks(corpus, record.evidence)
+    st.markdown(
+        f"- **corpus:** `{pack.corpus_id}` v{pack.corpus_version} — "
+        f"{len(pack.items)} exposed item(s)"
+    )
+    st.table(
+        [
+            {
+                "rank": item.rank,
+                "chunk_id": item.chunk_id,
+                "document_id": item.document_id,
+                "score": round(item.score, 4),
+                "location": item.location,
+            }
+            for item in pack.items
+        ]
+    )
+
+
+def _show_claim_support(corpus, record) -> None:
+    st.markdown("### Claim support (exact containment)")
+    if record.state is not AnswerState.ANSWERED:
+        st.caption("claim support is only evaluated on answered answers")
+        return
+    pack = EvidencePack.from_scored_chunks(corpus, record.evidence)
+    evaluation = ClaimSupportEvaluator().evaluate(record, pack)
+    st.markdown(
+        f"- **rule:** `{evaluation.rule}` — supported {evaluation.supported} / "
+        f"{evaluation.total} (rate {evaluation.support_rate:.3f})"
+    )
+    st.table(
+        [
+            {
+                "claim_id": result.claim_id,
+                "support": result.support.value,
+                "cited_chunk_ids": ", ".join(result.cited_chunk_ids),
+                "matched_chunk_id": result.matched_chunk_id or "",
+            }
+            for result in evaluation.results
+        ]
+    )
+
+
 def _show_trace(record) -> None:
     st.markdown("### Trace")
     if record.trace is None:
         st.caption("no retrieval trace (corpus gate failed)")
         return
     st.json(record.trace.to_dict())
+
+
+def _show_generation_mode_header(generation_mode: str) -> None:
+    st.markdown(
+        f"**Generation state:** `{generation_mode}` — offline is deterministic "
+        "extraction (not an LLM); live is not configured."
+    )
+    st.warning(FAITHFULNESS_WARNING)
 
 
 def _show_synthetic() -> None:
@@ -235,16 +307,43 @@ def _show_synthetic() -> None:
     with col_k:
         top_k = st.slider("top_k", 1, 10, 5, key="top_k")
 
+    col_gen, _ = st.columns([2, 4])
+    with col_gen:
+        generation_mode = st.selectbox(
+            "Generation mode",
+            GENERATION_MODES,
+            index=0,
+            key="generation_mode",
+            help=(
+                "Offline (default) uses the deterministic extractive generator. "
+                "Live requires an explicitly injected provider; none is "
+                "configured, so live runs fail closed with provider_unavailable "
+                "and never fall back to offline."
+            ),
+        )
+
     query = st.text_input("Query", value=DEFAULT_QUERY, key="query_input")
     run = st.button("Run retrieval", key="run_button", type="primary")
+
+    _show_generation_mode_header(generation_mode)
 
     if run:
         if not query.strip():
             st.error("query is empty")
             return
 
-        if pipeline.retriever is None:
-            record = pipeline.answer(query, top_k=top_k, mode=mode)
+        live_selected = generation_mode == GENERATION_LIVE
+        if live_selected:
+            pipe = EvidenceRagPipeline(
+                MANIFEST,
+                config=PipelineConfig(top_k=top_k),
+                generator=LiveGenerator(),
+            )
+        else:
+            pipe = load_pipeline()
+
+        if pipe.retriever is None:
+            record = pipe.answer(query, top_k=top_k, mode=mode)
             _show_answer(record)
             _show_validation(record)
             _show_versions_config(record)
@@ -252,28 +351,35 @@ def _show_synthetic() -> None:
             return
 
         try:
-            record = pipeline.answer(query, top_k=top_k, mode=mode)
-            sparse = pipeline.retriever.search(query, top_k=top_k, mode=MODE_SPARSE)
-            dense = pipeline.retriever.search(query, top_k=top_k, mode=MODE_DENSE)
-            fused = pipeline.retriever.search(query, top_k=top_k, mode=MODE_HYBRID)
+            record = pipe.answer(query, top_k=top_k, mode=mode)
+            sparse = pipe.retriever.search(query, top_k=top_k, mode=MODE_SPARSE)
+            dense = pipe.retriever.search(query, top_k=top_k, mode=MODE_DENSE)
+            fused = pipe.retriever.search(query, top_k=top_k, mode=MODE_HYBRID)
         except Exception as exc:  # noqa: BLE001 - demo must surface failures
             st.error(f"pipeline failed: {exc}")
             return
 
         st.markdown("## Retrieval results")
-        _result_table(pipeline.corpus, "Sparse (BM25)", sparse.fused)
-        _result_table(pipeline.corpus, "Dense (deterministic, non-semantic)", dense.fused)
-        _result_table(pipeline.corpus, f"Hybrid (RRF, mode={mode})", fused.fused)
+        _result_table(pipe.corpus, "Sparse (BM25)", sparse.fused)
+        _result_table(pipe.corpus, "Dense (deterministic, non-semantic)", dense.fused)
+        _result_table(pipe.corpus, f"Hybrid (RRF, mode={mode})", fused.fused)
 
         if mode != MODE_HYBRID:
             st.caption(f"Answer is grounded on the **{mode}** ranking above.")
 
+        if live_selected:
+            st.error(
+                "**Live generation is not available** — no provider/model/"
+                "credentials are configured and no transport was injected. "
+                "Live generation does NOT fall back to the offline provider."
+            )
+
         if record.evidence:
             top_chunk_id = record.evidence[0].chunk_id
-            document = pipeline.corpus.document_by_id(record.evidence[0].document_id)
+            document = pipe.corpus.document_by_id(record.evidence[0].document_id)
             if document is not None:
                 st.markdown("### Passage / source metadata (top evidence)")
-                chunk = pipeline.corpus.chunk_by_id(top_chunk_id)
+                chunk = pipe.corpus.chunk_by_id(top_chunk_id)
                 st.table(
                     {
                         "document_id": document.doc_id,
@@ -289,7 +395,9 @@ def _show_synthetic() -> None:
                     }
                 )
 
+        _show_evidence_pack(pipe.corpus, record)
         _show_answer(record)
+        _show_claim_support(pipe.corpus, record)
         _show_validation(record)
         _show_versions_config(record)
         _show_trace(record)
@@ -307,6 +415,7 @@ def _show_real_local() -> None:
         "run `uv run python -m "
         "evidence_grounded_rag.evaluation.semantic_materialize`."
     )
+    st.warning(FAITHFULNESS_WARNING)
 
     try:
         corpus = load_real_corpus()

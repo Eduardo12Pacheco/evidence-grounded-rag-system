@@ -375,6 +375,77 @@ Run the command twice and compare `deterministic_digest` and per-query
 `retrieved_chunk_ids` for cross-run stability; both runs in the same process
 are additionally reported under `ranking_stability`.
 
+## Generation evaluation (separate, offline, diagnostic)
+
+A SEPARATE offline evaluation of the deterministic extractive generator over
+the same approved real-local corpus and the UNCHANGED real query set
+(`python-docs-real-v1`, 18 queries). It is never combined with the synthetic,
+hash-materializer, or semantic-materializer reports and never falls back to the
+synthetic corpus. Generation policy is committed in
+`docs/generation-contract.md` (prompt `grounded-answer-prompt-v1.0.0`,
+structured schema `structured-answer-v1`, provider selection blocker, live
+adapter that fails closed).
+
+### Command
+
+```bash
+uv run python -m evidence_grounded_rag.evaluation.generation_materialize \
+    --manifest data/manifests/corpus-source-v1.0.0.json \
+    --queries data/evaluation/queries/python-docs-real-v1.0.0.json \
+    --raw-dir data/raw/python-docs-3.12.13 \
+    --fixture data/fixtures/answer-evaluation-v1.0.0.json \
+    --output data/evaluations/python-docs-real-generation-evaluation-v1.0.0.json
+```
+
+The command verifies the real corpus first, then loads the unchanged real query
+set and cross-validates it against the committed answer-evaluation fixture
+(`data/fixtures/answer-evaluation-v1.0.0.json`), which references the 18 query
+IDs and their gold chunks WITHOUT copying any passage. It then runs the offline
+deterministic generator with strict citation validation and the claim-support
+evaluator, mirroring the serving pipeline's fail-closed rules. No network, no
+LLM, no synthetic fallback.
+
+### Report (`data/evaluations/python-docs-real-generation-evaluation-v1.0.0.json`)
+
+Records corpus/query-set/fixture facts, configs (BM25/RRF/thresholds unchanged,
+`prompt_version`, `schema_version`, claim-support rule), metrics, per-query
+records, failures, timestamp, runtime, implementation commit, and limitations.
+
+Metrics (all over the 18 queries in the evaluated mode, hybrid by default):
+
+- **Answer coverage**: answered / answerable queries.
+- **Abstention precision**: correct abstentions / abstentions.
+- **Abstention recall**: correct abstentions / non-answerable queries.
+- **Abstention rate** (descriptive) and **correct abstention count**.
+- **Citation precision**: valid citations / citations checked.
+- **Citation completeness**: claims with ≥1 valid citation / total claims.
+- **Citation-validation failure rate**: answered generations refused by
+  validation / total queries.
+- **Claim support**: supported / unsupported / unknown claim counts and
+  `support_rate` (supported / total claims) under the committed
+  `normalized-exact-containment-v1` rule.
+- **Invalid-output and provider-error counts** (zero for the offline run).
+- Per-query fields: query id/case/expected status, state, abstention reason and
+  truncated detail, answerable/answered/abstained flags, correct abstention,
+  wrong answer, retrieved chunk ids and quantized ranks/scores, claim ids with
+  support verdicts, citation checksums/prefixes, validation summary, and
+  generation provenance (`provider_id`, `model_id`, `mode=offline`,
+  `is_llm_generated=False`).
+
+Required labels: generation is labeled exactly
+**`Offline deterministic extractive evaluation — not an LLM result`**, and live
+generation is labeled **`Live generation NOT measured`** because no
+provider/model/credentials are configured. The report stores no claim or chunk
+text; citations carry excerpt checksums and short prefixes.
+
+### Timestamp and determinism policy
+
+`timestamp_utc` and `runtime_seconds` are runtime provenance — the ONLY fields
+allowed to differ between runs. Every other field is deterministic and covered
+by `deterministic_digest` (SHA-256 of the canonical serialization without those
+keys); two runs produce byte-identical deterministic portions. Raw retrieval
+scores are quantized to 12 decimal places (same policy as the hash materializer).
+
 ## Definition of done for evaluation
 
 - [x] Query sets and metric formulas are committed.

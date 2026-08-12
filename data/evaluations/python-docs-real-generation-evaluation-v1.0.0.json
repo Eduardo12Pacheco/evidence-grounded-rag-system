@@ -1,0 +1,2513 @@
+{
+  "configs": {
+    "bm25": {
+      "b": 0.75,
+      "k1": 1.5,
+      "tokenizer_version": "v1",
+      "version": "okapi-bm25-v1"
+    },
+    "claim_support_rule": "normalized-exact-containment-v1",
+    "embedding": {
+      "mode": "offline",
+      "model_id": "deterministic-hashed-bow-v1",
+      "semantic": false
+    },
+    "fusion": {
+      "k": 60,
+      "version": "rrf-v1"
+    },
+    "generation": {
+      "is_llm_generated": false,
+      "mode": "offline",
+      "model_id": "extractive-template-v1",
+      "prompt_version": "grounded-answer-prompt-v1.0.0",
+      "provider_id": "extractive-template",
+      "schema_version": "structured-answer-v1"
+    },
+    "min_fused_score": 0.01,
+    "mode": "hybrid",
+    "top_k": 10,
+    "versions": {
+      "answer_evaluation_fixture": "1.0.0",
+      "corpus_format": "1.0",
+      "normalization": "v1",
+      "package": "0.1.0",
+      "source_manifest": "1.0"
+    }
+  },
+  "corpus": {
+    "access_date": "2026-08-11",
+    "acquisition_method": "commit-pinned raw GitHub URLs (https://raw.githubusercontent.com/python/cpython/<commit>/<path>); no mirror, no mutable branch",
+    "canonical_checksum": "34fb94d40908a3f6f3f946b40333ad0cff9d619f1f1b4691d53e345ef4f7063e",
+    "chunk_count": 70,
+    "chunks_per_document": {
+      "doc-library-functions.rst": 42,
+      "doc-reference-lexical_analysis.rst": 19,
+      "doc-tutorial-introduction.rst": 9
+    },
+    "corpus_id": "python-docs-3.12.13",
+    "corpus_version": "1.0.0",
+    "document_count": 3,
+    "documents": [
+      {
+        "chunk_count": 42,
+        "doc_id": "doc-library-functions.rst",
+        "normalized_sha256": "8a0b886dcae024a36cd9d3a617658cce2c920c2a1045552f7f0f27c2ae43cad7",
+        "raw_sha256": "963d7143ba762daba0675a6cb3b2b470fd374f2110e92a678f4f28ee85bd7048",
+        "raw_size": 91745,
+        "source_path": "Doc/library/functions.rst"
+      },
+      {
+        "chunk_count": 19,
+        "doc_id": "doc-reference-lexical_analysis.rst",
+        "normalized_sha256": "831fc96e7b9087c11a9c068a5b0775aa2e78a29318622c7e0d669158f8cab5d6",
+        "raw_sha256": "001f1f19e0038d09dd99ed6a1bf2248220707730360abccdf11f65a89981c2e6",
+        "raw_size": 39844,
+        "source_path": "Doc/reference/lexical_analysis.rst"
+      },
+      {
+        "chunk_count": 9,
+        "doc_id": "doc-tutorial-introduction.rst",
+        "normalized_sha256": "ff687eeb82c54211d344f2991dd5aad4443c49e4948f21d8d98cf9e2b90242b4",
+        "raw_sha256": "db919b049a48e7acd17869e2cabeec71060f552fa041a99fc3bf527b7da36a25",
+        "raw_size": 18959,
+        "source_path": "Doc/tutorial/introduction.rst"
+      }
+    ],
+    "license": {
+      "name": "Python Software Foundation License Version 2",
+      "url": "https://docs.python.org/3.12/license.html",
+      "version": "2"
+    },
+    "manifest_id": "corpus-source-v1.0.0",
+    "manifest_version": "1.0",
+    "official_docs_url": "https://docs.python.org/3.12/",
+    "privacy_status": "no-private-content-detected",
+    "publisher": "Python Software Foundation",
+    "raw_files": [
+      {
+        "path": "Doc/tutorial/introduction.rst",
+        "sha256": "db919b049a48e7acd17869e2cabeec71060f552fa041a99fc3bf527b7da36a25",
+        "size": 18959
+      },
+      {
+        "path": "Doc/library/functions.rst",
+        "sha256": "963d7143ba762daba0675a6cb3b2b470fd374f2110e92a678f4f28ee85bd7048",
+        "size": 91745
+      },
+      {
+        "path": "Doc/reference/lexical_analysis.rst",
+        "sha256": "001f1f19e0038d09dd99ed6a1bf2248220707730360abccdf11f65a89981c2e6",
+        "size": 39844
+      }
+    ],
+    "redistribution_status": "not-redistributed",
+    "revision": "3bb231a6a5dc02b95658877318bf61501a7209e9",
+    "revision_tag": "v3.12.13",
+    "source_url": "https://github.com/python/cpython/tree/v3.12.13/Doc",
+    "status": "approved-for-local-development"
+  },
+  "deterministic_digest": "f1f65a173b0c1b457e9107b3d93262559377f65a8a42466a51adc1297ffb91ad",
+  "failures": [
+    {
+      "kind": "answerable_abstention",
+      "mode": "hybrid",
+      "query_id": "real-q-010",
+      "reason": "insufficient_evidence"
+    },
+    {
+      "kind": "answerable_abstention",
+      "mode": "hybrid",
+      "query_id": "real-q-011",
+      "reason": "insufficient_evidence"
+    },
+    {
+      "kind": "answerable_abstention",
+      "mode": "hybrid",
+      "query_id": "real-q-012",
+      "reason": "insufficient_evidence"
+    },
+    {
+      "expected_status": "ambiguous",
+      "kind": "wrong_answer",
+      "mode": "hybrid",
+      "query_id": "real-q-015"
+    },
+    {
+      "expected_status": "abstain",
+      "kind": "wrong_answer",
+      "mode": "hybrid",
+      "query_id": "real-q-018"
+    }
+  ],
+  "fixture": {
+    "fixture_id": "answer-evaluation-v1",
+    "fixture_version": "1.0.0",
+    "num_queries": 18,
+    "query_set_id": "python-docs-real-v1",
+    "query_set_version": "1.0.0"
+  },
+  "implementation_commit": "2a1460ef91ea0103f0695b345cc3112fe865857e",
+  "labels": {
+    "bounded_scope": "Bounded evaluation over three Python 3.12.13 documentation files and 70 chunks; it does not represent all Python documentation.",
+    "diagnostic_only": "Generation is deterministic extraction, not an LLM; results are diagnostic, not production readiness.",
+    "generation": "Offline deterministic extractive evaluation \u2014 not an LLM result",
+    "live_generation": "Live generation NOT measured \u2014 no provider/model/credentials are configured and no provider is selected; the offline report covers deterministic extractive generation only.",
+    "no_live_claim": "Live generation is not measured here: no provider/model/credentials are configured, so no live result exists to report.",
+    "non_semantic": "Dense mode uses deterministic non-semantic hash embeddings; scores encode token overlap only, not meaning.",
+    "separate_from_other_reports": "This report is a separate real-local generation evaluation and is never combined with the synthetic, hash-materializer, or semantic materializer reports."
+  },
+  "limitations": [
+    "Bounded evaluation over three Python 3.12.13 documentation files and 70 chunks; it does not represent all Python documentation.",
+    "Generation is deterministic extractive/template output, not an LLM result; live generation is NOT measured because no provider/model/credentials are configured.",
+    "The claim-support rule is exact normalized containment only: a claim is supported iff its normalized text is a substring of a cited chunk's normalized text. This measures verbatim grounding, not semantic entailment.",
+    "Results are diagnostic, not production readiness; no quality claim is made.",
+    "No chunk-level or claim-level text is stored in this report; claims carry ids and support verdicts, citations carry excerpt checksums and short prefixes, and abstention details are truncated.",
+    "Denominators are small (12 answerable and 6 non-answerable queries); one query moves percentages by up to 8.3 percentage points."
+  ],
+  "metrics": {
+    "abstention_precision": 0.5714285714285714,
+    "abstention_rate": 0.3888888888888889,
+    "abstention_recall": 0.6666666666666666,
+    "answer_coverage": 0.9166666666666666,
+    "citation_completeness": 1.0,
+    "citation_precision": 1.0,
+    "citation_validation_failure_rate": 0.0,
+    "claim_support": {
+      "evaluated_rate": 1.0,
+      "rule": "normalized-exact-containment-v1",
+      "support_rate": 1.0,
+      "supported": 19,
+      "total": 19,
+      "unknown": 0,
+      "unsupported": 0
+    },
+    "correct_abstention_count": 4,
+    "denominators": {
+      "abstentions": 7,
+      "answerable": 12,
+      "checked_citations": 11,
+      "non_answerable": 6,
+      "queries": 18,
+      "total_claims": 19
+    },
+    "invalid_output_count": 0,
+    "provider_error_count": 0,
+    "wrong_answer_count": 2
+  },
+  "per_query": {
+    "real-q-001": {
+      "abstained": false,
+      "abstention_detail": null,
+      "abstention_reason": null,
+      "answerable": true,
+      "answered": true,
+      "case": "single_passage",
+      "citation_completeness": 1.0,
+      "citations": [
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::2",
+          "citation_id": "cit-1-doc-reference-lexical_analysis.rst::2",
+          "corpus_version": "1.0.0",
+          "document_id": "doc-reference-lexical_analysis.rst",
+          "excerpt_matches": true,
+          "excerpt_prefix": "year < 2100 and 1 <= month <= 12 \\ and 1 <= day <= 31 and 0 <= hour < 24 \\ and 0 <= minute < 60 and 0 <= second < 60: # ",
+          "excerpt_sha256": "94aa5b21f4af252d461f0dc0fedca0956990b12db3ba72bccd074cf2cdd6b0f1",
+          "location": "local://python-docs-3.12.13/doc-reference-lexical_analysis.rst/chunk/2"
+        }
+      ],
+      "cited_claim_count": 1,
+      "claim_count": 1,
+      "claim_support": [
+        {
+          "cited_chunk_ids": [
+            "doc-reference-lexical_analysis.rst::2"
+          ],
+          "claim_id": "doc-reference-lexical_analysis.rst::2::claim-0",
+          "matched_chunk_id": "doc-reference-lexical_analysis.rst::2",
+          "support": "supported"
+        }
+      ],
+      "claim_support_rule": "normalized-exact-containment-v1",
+      "claims": [
+        {
+          "citation_chunk_ids": [
+            "doc-reference-lexical_analysis.rst::2"
+          ],
+          "claim_id": "doc-reference-lexical_analysis.rst::2::claim-0"
+        }
+      ],
+      "corpus_manifest_id": "corpus-source-v1.0.0",
+      "correct_abstention": false,
+      "evidence_ranks": [
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::2",
+          "rank": 1,
+          "score": 0.032266458496
+        },
+        {
+          "chunk_id": "doc-tutorial-introduction.rst::0",
+          "rank": 2,
+          "score": 0.032258064516
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::1",
+          "rank": 3,
+          "score": 0.031544957774
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::13",
+          "rank": 4,
+          "score": 0.030536130536
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::14",
+          "rank": 5,
+          "score": 0.02967032967
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::12",
+          "rank": 6,
+          "score": 0.015873015873
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::0",
+          "rank": 7,
+          "score": 0.015625
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::15",
+          "rank": 8,
+          "score": 0.015625
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::12",
+          "rank": 9,
+          "score": 0.014925373134
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::8",
+          "rank": 10,
+          "score": 0.014925373134
+        }
+      ],
+      "expected_status": "answerable",
+      "generation": {
+        "is_llm_generated": false,
+        "mode": "offline",
+        "model_id": "extractive-template-v1",
+        "prompt_version": "grounded-answer-prompt-v1.0.0",
+        "provider_id": "extractive-template",
+        "schema_version": "structured-answer-v1"
+      },
+      "invalid_output": false,
+      "provider_error": false,
+      "query_id": "real-q-001",
+      "reason_match": false,
+      "retrieval_empty": false,
+      "retrieved_chunk_ids": [
+        "doc-reference-lexical_analysis.rst::2",
+        "doc-tutorial-introduction.rst::0",
+        "doc-reference-lexical_analysis.rst::1",
+        "doc-reference-lexical_analysis.rst::13",
+        "doc-reference-lexical_analysis.rst::14",
+        "doc-reference-lexical_analysis.rst::12",
+        "doc-reference-lexical_analysis.rst::0",
+        "doc-reference-lexical_analysis.rst::15",
+        "doc-library-functions.rst::12",
+        "doc-reference-lexical_analysis.rst::8"
+      ],
+      "state": "answered",
+      "validation": {
+        "checked_citations": 1,
+        "checked_claims": 1,
+        "issue_codes": [],
+        "skipped": false,
+        "valid": true
+      },
+      "wrong_answer": false
+    },
+    "real-q-002": {
+      "abstained": false,
+      "abstention_detail": null,
+      "abstention_reason": null,
+      "answerable": true,
+      "answered": true,
+      "case": "numeric_parameter",
+      "citation_completeness": 1.0,
+      "citations": [
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::3",
+          "citation_id": "cit-1-doc-reference-lexical_analysis.rst::3",
+          "corpus_version": "1.0.0",
+          "document_id": "doc-reference-lexical_analysis.rst",
+          "excerpt_matches": true,
+          "excerpt_prefix": "d to determine the grouping of statements. Tabs are replaced (from left to right) by one to eight spaces such that the t",
+          "excerpt_sha256": "8cc4b9ee326e5c3c55682d75bb2fe612878a2aa839d9bc7287f259a486dcad1b",
+          "location": "local://python-docs-3.12.13/doc-reference-lexical_analysis.rst/chunk/3"
+        }
+      ],
+      "cited_claim_count": 1,
+      "claim_count": 1,
+      "claim_support": [
+        {
+          "cited_chunk_ids": [
+            "doc-reference-lexical_analysis.rst::3"
+          ],
+          "claim_id": "doc-reference-lexical_analysis.rst::3::claim-2",
+          "matched_chunk_id": "doc-reference-lexical_analysis.rst::3",
+          "support": "supported"
+        }
+      ],
+      "claim_support_rule": "normalized-exact-containment-v1",
+      "claims": [
+        {
+          "citation_chunk_ids": [
+            "doc-reference-lexical_analysis.rst::3"
+          ],
+          "claim_id": "doc-reference-lexical_analysis.rst::3::claim-2"
+        }
+      ],
+      "corpus_manifest_id": "corpus-source-v1.0.0",
+      "correct_abstention": false,
+      "evidence_ranks": [
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::3",
+          "rank": 1,
+          "score": 0.032786885246
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::40",
+          "rank": 2,
+          "score": 0.030365769496
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::4",
+          "rank": 3,
+          "score": 0.030158730159
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::16",
+          "rank": 4,
+          "score": 0.016129032258
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::2",
+          "rank": 5,
+          "score": 0.016129032258
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::12",
+          "rank": 6,
+          "score": 0.015625
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::14",
+          "rank": 7,
+          "score": 0.015625
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::5",
+          "rank": 8,
+          "score": 0.015384615385
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::0",
+          "rank": 9,
+          "score": 0.015384615385
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::35",
+          "rank": 10,
+          "score": 0.015151515152
+        }
+      ],
+      "expected_status": "answerable",
+      "generation": {
+        "is_llm_generated": false,
+        "mode": "offline",
+        "model_id": "extractive-template-v1",
+        "prompt_version": "grounded-answer-prompt-v1.0.0",
+        "provider_id": "extractive-template",
+        "schema_version": "structured-answer-v1"
+      },
+      "invalid_output": false,
+      "provider_error": false,
+      "query_id": "real-q-002",
+      "reason_match": false,
+      "retrieval_empty": false,
+      "retrieved_chunk_ids": [
+        "doc-reference-lexical_analysis.rst::3",
+        "doc-library-functions.rst::40",
+        "doc-reference-lexical_analysis.rst::4",
+        "doc-library-functions.rst::16",
+        "doc-reference-lexical_analysis.rst::2",
+        "doc-library-functions.rst::12",
+        "doc-reference-lexical_analysis.rst::14",
+        "doc-library-functions.rst::5",
+        "doc-reference-lexical_analysis.rst::0",
+        "doc-library-functions.rst::35"
+      ],
+      "state": "answered",
+      "validation": {
+        "checked_citations": 1,
+        "checked_claims": 1,
+        "issue_codes": [],
+        "skipped": false,
+        "valid": true
+      },
+      "wrong_answer": false
+    },
+    "real-q-003": {
+      "abstained": false,
+      "abstention_detail": null,
+      "abstention_reason": null,
+      "answerable": true,
+      "answered": true,
+      "case": "terminology",
+      "citation_completeness": 1.0,
+      "citations": [
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::6",
+          "citation_id": "cit-1-doc-reference-lexical_analysis.rst::6",
+          "corpus_version": "1.0.0",
+          "document_id": "doc-reference-lexical_analysis.rst",
+          "excerpt_matches": true,
+          "excerpt_prefix": "eywords -------- .. index:: single: keyword single: reserved word The following identifiers are used as reserved words, ",
+          "excerpt_sha256": "13e65887ad8e0e9a765d18ed043857b8cef6c6303df7a719dc7d821a22c9feea",
+          "location": "local://python-docs-3.12.13/doc-reference-lexical_analysis.rst/chunk/6"
+        }
+      ],
+      "cited_claim_count": 1,
+      "claim_count": 1,
+      "claim_support": [
+        {
+          "cited_chunk_ids": [
+            "doc-reference-lexical_analysis.rst::6"
+          ],
+          "claim_id": "doc-reference-lexical_analysis.rst::6::claim-4",
+          "matched_chunk_id": "doc-reference-lexical_analysis.rst::6",
+          "support": "supported"
+        }
+      ],
+      "claim_support_rule": "normalized-exact-containment-v1",
+      "claims": [
+        {
+          "citation_chunk_ids": [
+            "doc-reference-lexical_analysis.rst::6"
+          ],
+          "claim_id": "doc-reference-lexical_analysis.rst::6::claim-4"
+        }
+      ],
+      "corpus_manifest_id": "corpus-source-v1.0.0",
+      "correct_abstention": false,
+      "evidence_ranks": [
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::6",
+          "rank": 1,
+          "score": 0.032786885246
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::17",
+          "rank": 2,
+          "score": 0.030621785881
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::9",
+          "rank": 3,
+          "score": 0.028778467909
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::4",
+          "rank": 4,
+          "score": 0.016129032258
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::37",
+          "rank": 5,
+          "score": 0.015873015873
+        },
+        {
+          "chunk_id": "doc-tutorial-introduction.rst::5",
+          "rank": 6,
+          "score": 0.015873015873
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::1",
+          "rank": 7,
+          "score": 0.015625
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::16",
+          "rank": 8,
+          "score": 0.015625
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::11",
+          "rank": 9,
+          "score": 0.015384615385
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::21",
+          "rank": 10,
+          "score": 0.015384615385
+        }
+      ],
+      "expected_status": "answerable",
+      "generation": {
+        "is_llm_generated": false,
+        "mode": "offline",
+        "model_id": "extractive-template-v1",
+        "prompt_version": "grounded-answer-prompt-v1.0.0",
+        "provider_id": "extractive-template",
+        "schema_version": "structured-answer-v1"
+      },
+      "invalid_output": false,
+      "provider_error": false,
+      "query_id": "real-q-003",
+      "reason_match": false,
+      "retrieval_empty": false,
+      "retrieved_chunk_ids": [
+        "doc-reference-lexical_analysis.rst::6",
+        "doc-reference-lexical_analysis.rst::17",
+        "doc-reference-lexical_analysis.rst::9",
+        "doc-reference-lexical_analysis.rst::4",
+        "doc-library-functions.rst::37",
+        "doc-tutorial-introduction.rst::5",
+        "doc-library-functions.rst::1",
+        "doc-reference-lexical_analysis.rst::16",
+        "doc-library-functions.rst::11",
+        "doc-library-functions.rst::21"
+      ],
+      "state": "answered",
+      "validation": {
+        "checked_citations": 1,
+        "checked_claims": 1,
+        "issue_codes": [],
+        "skipped": false,
+        "valid": true
+      },
+      "wrong_answer": false
+    },
+    "real-q-004": {
+      "abstained": false,
+      "abstention_detail": null,
+      "abstention_reason": null,
+      "answerable": true,
+      "answered": true,
+      "case": "exact_api",
+      "citation_completeness": 1.0,
+      "citations": [
+        {
+          "chunk_id": "doc-library-functions.rst::31",
+          "citation_id": "cit-1-doc-library-functions.rst::31",
+          "corpus_version": "1.0.0",
+          "document_id": "doc-library-functions.rst",
+          "excerpt_matches": true,
+          "excerpt_prefix": "`typesseq`. .. function:: repr(object) Return a string containing a printable representation of an object. For many type",
+          "excerpt_sha256": "21dd240439384f67882e31ea6efe726dcbb3ea0d5057a2d958ffc7b5f63adbed",
+          "location": "local://python-docs-3.12.13/doc-library-functions.rst/chunk/31"
+        }
+      ],
+      "cited_claim_count": 1,
+      "claim_count": 1,
+      "claim_support": [
+        {
+          "cited_chunk_ids": [
+            "doc-library-functions.rst::31"
+          ],
+          "claim_id": "doc-library-functions.rst::31::claim-10",
+          "matched_chunk_id": "doc-library-functions.rst::31",
+          "support": "supported"
+        }
+      ],
+      "claim_support_rule": "normalized-exact-containment-v1",
+      "claims": [
+        {
+          "citation_chunk_ids": [
+            "doc-library-functions.rst::31"
+          ],
+          "claim_id": "doc-library-functions.rst::31::claim-10"
+        }
+      ],
+      "corpus_manifest_id": "corpus-source-v1.0.0",
+      "correct_abstention": false,
+      "evidence_ranks": [
+        {
+          "chunk_id": "doc-library-functions.rst::31",
+          "rank": 1,
+          "score": 0.031513647643
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::16",
+          "rank": 2,
+          "score": 0.016393442623
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::32",
+          "rank": 3,
+          "score": 0.016393442623
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::3",
+          "rank": 4,
+          "score": 0.016129032258
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::40",
+          "rank": 5,
+          "score": 0.015873015873
+        },
+        {
+          "chunk_id": "doc-tutorial-introduction.rst::1",
+          "rank": 6,
+          "score": 0.015873015873
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::28",
+          "rank": 7,
+          "score": 0.015625
+        },
+        {
+          "chunk_id": "doc-tutorial-introduction.rst::4",
+          "rank": 8,
+          "score": 0.015625
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::10",
+          "rank": 9,
+          "score": 0.015384615385
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::22",
+          "rank": 10,
+          "score": 0.015151515152
+        }
+      ],
+      "expected_status": "answerable",
+      "generation": {
+        "is_llm_generated": false,
+        "mode": "offline",
+        "model_id": "extractive-template-v1",
+        "prompt_version": "grounded-answer-prompt-v1.0.0",
+        "provider_id": "extractive-template",
+        "schema_version": "structured-answer-v1"
+      },
+      "invalid_output": false,
+      "provider_error": false,
+      "query_id": "real-q-004",
+      "reason_match": false,
+      "retrieval_empty": false,
+      "retrieved_chunk_ids": [
+        "doc-library-functions.rst::31",
+        "doc-library-functions.rst::16",
+        "doc-library-functions.rst::32",
+        "doc-reference-lexical_analysis.rst::3",
+        "doc-library-functions.rst::40",
+        "doc-tutorial-introduction.rst::1",
+        "doc-library-functions.rst::28",
+        "doc-tutorial-introduction.rst::4",
+        "doc-library-functions.rst::10",
+        "doc-library-functions.rst::22"
+      ],
+      "state": "answered",
+      "validation": {
+        "checked_citations": 1,
+        "checked_claims": 1,
+        "issue_codes": [],
+        "skipped": false,
+        "valid": true
+      },
+      "wrong_answer": false
+    },
+    "real-q-005": {
+      "abstained": false,
+      "abstention_detail": null,
+      "abstention_reason": null,
+      "answerable": true,
+      "answered": true,
+      "case": "section_distinction",
+      "citation_completeness": 1.0,
+      "citations": [
+        {
+          "chunk_id": "doc-library-functions.rst::25",
+          "citation_id": "cit-1-doc-library-functions.rst::25",
+          "corpus_version": "1.0.0",
+          "document_id": "doc-library-functions.rst",
+          "excerpt_matches": true,
+          "excerpt_prefix": " follows: * Binary files are buffered in fixed-size chunks; the size of the buffer is chosen using a heuristic trying to",
+          "excerpt_sha256": "83e2c9f249167033fc3550271cd0b47149934f71d25e8e3b38ff6a13fde024d0",
+          "location": "local://python-docs-3.12.13/doc-library-functions.rst/chunk/25"
+        }
+      ],
+      "cited_claim_count": 1,
+      "claim_count": 1,
+      "claim_support": [
+        {
+          "cited_chunk_ids": [
+            "doc-library-functions.rst::25"
+          ],
+          "claim_id": "doc-library-functions.rst::25::claim-6",
+          "matched_chunk_id": "doc-library-functions.rst::25",
+          "support": "supported"
+        }
+      ],
+      "claim_support_rule": "normalized-exact-containment-v1",
+      "claims": [
+        {
+          "citation_chunk_ids": [
+            "doc-library-functions.rst::25"
+          ],
+          "claim_id": "doc-library-functions.rst::25::claim-6"
+        }
+      ],
+      "corpus_manifest_id": "corpus-source-v1.0.0",
+      "correct_abstention": false,
+      "evidence_ranks": [
+        {
+          "chunk_id": "doc-library-functions.rst::25",
+          "rank": 1,
+          "score": 0.032786885246
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::1",
+          "rank": 2,
+          "score": 0.032002048131
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::24",
+          "rank": 3,
+          "score": 0.030365769496
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::22",
+          "rank": 4,
+          "score": 0.016129032258
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::3",
+          "rank": 5,
+          "score": 0.015625
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::38",
+          "rank": 6,
+          "score": 0.015625
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::21",
+          "rank": 7,
+          "score": 0.015384615385
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::23",
+          "rank": 8,
+          "score": 0.015384615385
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::16",
+          "rank": 9,
+          "score": 0.015151515152
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::8",
+          "rank": 10,
+          "score": 0.015151515152
+        }
+      ],
+      "expected_status": "answerable",
+      "generation": {
+        "is_llm_generated": false,
+        "mode": "offline",
+        "model_id": "extractive-template-v1",
+        "prompt_version": "grounded-answer-prompt-v1.0.0",
+        "provider_id": "extractive-template",
+        "schema_version": "structured-answer-v1"
+      },
+      "invalid_output": false,
+      "provider_error": false,
+      "query_id": "real-q-005",
+      "reason_match": false,
+      "retrieval_empty": false,
+      "retrieved_chunk_ids": [
+        "doc-library-functions.rst::25",
+        "doc-reference-lexical_analysis.rst::1",
+        "doc-library-functions.rst::24",
+        "doc-library-functions.rst::22",
+        "doc-library-functions.rst::3",
+        "doc-library-functions.rst::38",
+        "doc-library-functions.rst::21",
+        "doc-library-functions.rst::23",
+        "doc-library-functions.rst::16",
+        "doc-reference-lexical_analysis.rst::8"
+      ],
+      "state": "answered",
+      "validation": {
+        "checked_citations": 1,
+        "checked_claims": 1,
+        "issue_codes": [],
+        "skipped": false,
+        "valid": true
+      },
+      "wrong_answer": false
+    },
+    "real-q-006": {
+      "abstained": false,
+      "abstention_detail": null,
+      "abstention_reason": null,
+      "answerable": true,
+      "answered": true,
+      "case": "multi_passage",
+      "citation_completeness": 1.0,
+      "citations": [
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::6",
+          "citation_id": "cit-1-doc-reference-lexical_analysis.rst::6",
+          "corpus_version": "1.0.0",
+          "document_id": "doc-reference-lexical_analysis.rst",
+          "excerpt_matches": true,
+          "excerpt_prefix": "eywords -------- .. index:: single: keyword single: reserved word The following identifiers are used as reserved words, ",
+          "excerpt_sha256": "13e65887ad8e0e9a765d18ed043857b8cef6c6303df7a719dc7d821a22c9feea",
+          "location": "local://python-docs-3.12.13/doc-reference-lexical_analysis.rst/chunk/6"
+        }
+      ],
+      "cited_claim_count": 3,
+      "claim_count": 3,
+      "claim_support": [
+        {
+          "cited_chunk_ids": [
+            "doc-reference-lexical_analysis.rst::6"
+          ],
+          "claim_id": "doc-reference-lexical_analysis.rst::6::claim-1",
+          "matched_chunk_id": "doc-reference-lexical_analysis.rst::6",
+          "support": "supported"
+        },
+        {
+          "cited_chunk_ids": [
+            "doc-reference-lexical_analysis.rst::6"
+          ],
+          "claim_id": "doc-reference-lexical_analysis.rst::6::claim-2",
+          "matched_chunk_id": "doc-reference-lexical_analysis.rst::6",
+          "support": "supported"
+        },
+        {
+          "cited_chunk_ids": [
+            "doc-reference-lexical_analysis.rst::6"
+          ],
+          "claim_id": "doc-reference-lexical_analysis.rst::6::claim-4",
+          "matched_chunk_id": "doc-reference-lexical_analysis.rst::6",
+          "support": "supported"
+        }
+      ],
+      "claim_support_rule": "normalized-exact-containment-v1",
+      "claims": [
+        {
+          "citation_chunk_ids": [
+            "doc-reference-lexical_analysis.rst::6"
+          ],
+          "claim_id": "doc-reference-lexical_analysis.rst::6::claim-1"
+        },
+        {
+          "citation_chunk_ids": [
+            "doc-reference-lexical_analysis.rst::6"
+          ],
+          "claim_id": "doc-reference-lexical_analysis.rst::6::claim-2"
+        },
+        {
+          "citation_chunk_ids": [
+            "doc-reference-lexical_analysis.rst::6"
+          ],
+          "claim_id": "doc-reference-lexical_analysis.rst::6::claim-4"
+        }
+      ],
+      "corpus_manifest_id": "corpus-source-v1.0.0",
+      "correct_abstention": false,
+      "evidence_ranks": [
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::6",
+          "rank": 1,
+          "score": 0.032786885246
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::10",
+          "rank": 2,
+          "score": 0.016129032258
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::16",
+          "rank": 3,
+          "score": 0.016129032258
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::12",
+          "rank": 4,
+          "score": 0.015873015873
+        },
+        {
+          "chunk_id": "doc-tutorial-introduction.rst::0",
+          "rank": 5,
+          "score": 0.015873015873
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::13",
+          "rank": 6,
+          "score": 0.015625
+        },
+        {
+          "chunk_id": "doc-tutorial-introduction.rst::7",
+          "rank": 7,
+          "score": 0.015625
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::14",
+          "rank": 8,
+          "score": 0.015384615385
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::8",
+          "rank": 9,
+          "score": 0.015384615385
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::33",
+          "rank": 10,
+          "score": 0.015151515152
+        }
+      ],
+      "expected_status": "answerable",
+      "generation": {
+        "is_llm_generated": false,
+        "mode": "offline",
+        "model_id": "extractive-template-v1",
+        "prompt_version": "grounded-answer-prompt-v1.0.0",
+        "provider_id": "extractive-template",
+        "schema_version": "structured-answer-v1"
+      },
+      "invalid_output": false,
+      "provider_error": false,
+      "query_id": "real-q-006",
+      "reason_match": false,
+      "retrieval_empty": false,
+      "retrieved_chunk_ids": [
+        "doc-reference-lexical_analysis.rst::6",
+        "doc-library-functions.rst::10",
+        "doc-reference-lexical_analysis.rst::16",
+        "doc-library-functions.rst::12",
+        "doc-tutorial-introduction.rst::0",
+        "doc-reference-lexical_analysis.rst::13",
+        "doc-tutorial-introduction.rst::7",
+        "doc-reference-lexical_analysis.rst::14",
+        "doc-reference-lexical_analysis.rst::8",
+        "doc-library-functions.rst::33"
+      ],
+      "state": "answered",
+      "validation": {
+        "checked_citations": 1,
+        "checked_claims": 3,
+        "issue_codes": [],
+        "skipped": false,
+        "valid": true
+      },
+      "wrong_answer": false
+    },
+    "real-q-007": {
+      "abstained": false,
+      "abstention_detail": null,
+      "abstention_reason": null,
+      "answerable": true,
+      "answered": true,
+      "case": "multi_passage",
+      "citation_completeness": 1.0,
+      "citations": [
+        {
+          "chunk_id": "doc-library-functions.rst::20",
+          "citation_id": "cit-1-doc-library-functions.rst::20",
+          "corpus_version": "1.0.0",
+          "document_id": "doc-library-functions.rst",
+          "excerpt_matches": true,
+          "excerpt_prefix": " in *classinfo*. In any other case, a :exc:`TypeError` exception is raised. .. versionchanged:: 3.10 *classinfo* can be ",
+          "excerpt_sha256": "3852a1f83e6834c8256f1bb7ce134c9887cd2c9fa07cce071a813c01c8892d30",
+          "location": "local://python-docs-3.12.13/doc-library-functions.rst/chunk/20"
+        }
+      ],
+      "cited_claim_count": 3,
+      "claim_count": 3,
+      "claim_support": [
+        {
+          "cited_chunk_ids": [
+            "doc-library-functions.rst::20"
+          ],
+          "claim_id": "doc-library-functions.rst::20::claim-14",
+          "matched_chunk_id": "doc-library-functions.rst::20",
+          "support": "supported"
+        },
+        {
+          "cited_chunk_ids": [
+            "doc-library-functions.rst::20"
+          ],
+          "claim_id": "doc-library-functions.rst::20::claim-15",
+          "matched_chunk_id": "doc-library-functions.rst::20",
+          "support": "supported"
+        },
+        {
+          "cited_chunk_ids": [
+            "doc-library-functions.rst::20"
+          ],
+          "claim_id": "doc-library-functions.rst::20::claim-19",
+          "matched_chunk_id": "doc-library-functions.rst::20",
+          "support": "supported"
+        }
+      ],
+      "claim_support_rule": "normalized-exact-containment-v1",
+      "claims": [
+        {
+          "citation_chunk_ids": [
+            "doc-library-functions.rst::20"
+          ],
+          "claim_id": "doc-library-functions.rst::20::claim-14"
+        },
+        {
+          "citation_chunk_ids": [
+            "doc-library-functions.rst::20"
+          ],
+          "claim_id": "doc-library-functions.rst::20::claim-15"
+        },
+        {
+          "citation_chunk_ids": [
+            "doc-library-functions.rst::20"
+          ],
+          "claim_id": "doc-library-functions.rst::20::claim-19"
+        }
+      ],
+      "corpus_manifest_id": "corpus-source-v1.0.0",
+      "correct_abstention": false,
+      "evidence_ranks": [
+        {
+          "chunk_id": "doc-library-functions.rst::20",
+          "rank": 1,
+          "score": 0.031009615385
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::10",
+          "rank": 2,
+          "score": 0.016393442623
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::39",
+          "rank": 3,
+          "score": 0.016393442623
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::6",
+          "rank": 4,
+          "score": 0.016129032258
+        },
+        {
+          "chunk_id": "doc-tutorial-introduction.rst::4",
+          "rank": 5,
+          "score": 0.016129032258
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::2",
+          "rank": 6,
+          "score": 0.015873015873
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::38",
+          "rank": 7,
+          "score": 0.015873015873
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::14",
+          "rank": 8,
+          "score": 0.015625
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::40",
+          "rank": 9,
+          "score": 0.015384615385
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::19",
+          "rank": 10,
+          "score": 0.015151515152
+        }
+      ],
+      "expected_status": "answerable",
+      "generation": {
+        "is_llm_generated": false,
+        "mode": "offline",
+        "model_id": "extractive-template-v1",
+        "prompt_version": "grounded-answer-prompt-v1.0.0",
+        "provider_id": "extractive-template",
+        "schema_version": "structured-answer-v1"
+      },
+      "invalid_output": false,
+      "provider_error": false,
+      "query_id": "real-q-007",
+      "reason_match": false,
+      "retrieval_empty": false,
+      "retrieved_chunk_ids": [
+        "doc-library-functions.rst::20",
+        "doc-library-functions.rst::10",
+        "doc-library-functions.rst::39",
+        "doc-reference-lexical_analysis.rst::6",
+        "doc-tutorial-introduction.rst::4",
+        "doc-library-functions.rst::2",
+        "doc-library-functions.rst::38",
+        "doc-reference-lexical_analysis.rst::14",
+        "doc-library-functions.rst::40",
+        "doc-library-functions.rst::19"
+      ],
+      "state": "answered",
+      "validation": {
+        "checked_citations": 1,
+        "checked_claims": 3,
+        "issue_codes": [],
+        "skipped": false,
+        "valid": true
+      },
+      "wrong_answer": false
+    },
+    "real-q-008": {
+      "abstained": false,
+      "abstention_detail": null,
+      "abstention_reason": null,
+      "answerable": true,
+      "answered": true,
+      "case": "multi_passage",
+      "citation_completeness": 1.0,
+      "citations": [
+        {
+          "chunk_id": "doc-tutorial-introduction.rst::5",
+          "citation_id": "cit-1-doc-tutorial-introduction.rst::5",
+          "corpus_version": "1.0.0",
+          "document_id": "doc-tutorial-introduction.rst",
+          "excerpt_matches": true,
+          "excerpt_prefix": "]`` is 2. Attempting to use an index that is too large will result in an error:: >>> word[42] # the word only has 6 char",
+          "excerpt_sha256": "48f9d49eabd85d06e198be0549142c5bcab0d85a0a6bf2514709ad42465e258b",
+          "location": "local://python-docs-3.12.13/doc-tutorial-introduction.rst/chunk/5"
+        }
+      ],
+      "cited_claim_count": 3,
+      "claim_count": 3,
+      "claim_support": [
+        {
+          "cited_chunk_ids": [
+            "doc-tutorial-introduction.rst::5"
+          ],
+          "claim_id": "doc-tutorial-introduction.rst::5::claim-1",
+          "matched_chunk_id": "doc-tutorial-introduction.rst::5",
+          "support": "supported"
+        },
+        {
+          "cited_chunk_ids": [
+            "doc-tutorial-introduction.rst::5"
+          ],
+          "claim_id": "doc-tutorial-introduction.rst::5::claim-2",
+          "matched_chunk_id": "doc-tutorial-introduction.rst::5",
+          "support": "supported"
+        },
+        {
+          "cited_chunk_ids": [
+            "doc-tutorial-introduction.rst::5"
+          ],
+          "claim_id": "doc-tutorial-introduction.rst::5::claim-3",
+          "matched_chunk_id": "doc-tutorial-introduction.rst::5",
+          "support": "supported"
+        }
+      ],
+      "claim_support_rule": "normalized-exact-containment-v1",
+      "claims": [
+        {
+          "citation_chunk_ids": [
+            "doc-tutorial-introduction.rst::5"
+          ],
+          "claim_id": "doc-tutorial-introduction.rst::5::claim-1"
+        },
+        {
+          "citation_chunk_ids": [
+            "doc-tutorial-introduction.rst::5"
+          ],
+          "claim_id": "doc-tutorial-introduction.rst::5::claim-2"
+        },
+        {
+          "citation_chunk_ids": [
+            "doc-tutorial-introduction.rst::5"
+          ],
+          "claim_id": "doc-tutorial-introduction.rst::5::claim-3"
+        }
+      ],
+      "corpus_manifest_id": "corpus-source-v1.0.0",
+      "correct_abstention": false,
+      "evidence_ranks": [
+        {
+          "chunk_id": "doc-tutorial-introduction.rst::5",
+          "rank": 1,
+          "score": 0.032018442623
+        },
+        {
+          "chunk_id": "doc-tutorial-introduction.rst::3",
+          "rank": 2,
+          "score": 0.031054405392
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::13",
+          "rank": 3,
+          "score": 0.030886196246
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::14",
+          "rank": 4,
+          "score": 0.016129032258
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::5",
+          "rank": 5,
+          "score": 0.015873015873
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::12",
+          "rank": 6,
+          "score": 0.015873015873
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::11",
+          "rank": 7,
+          "score": 0.015625
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::12",
+          "rank": 8,
+          "score": 0.015384615385
+        },
+        {
+          "chunk_id": "doc-tutorial-introduction.rst::6",
+          "rank": 9,
+          "score": 0.015384615385
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::0",
+          "rank": 10,
+          "score": 0.015151515152
+        }
+      ],
+      "expected_status": "answerable",
+      "generation": {
+        "is_llm_generated": false,
+        "mode": "offline",
+        "model_id": "extractive-template-v1",
+        "prompt_version": "grounded-answer-prompt-v1.0.0",
+        "provider_id": "extractive-template",
+        "schema_version": "structured-answer-v1"
+      },
+      "invalid_output": false,
+      "provider_error": false,
+      "query_id": "real-q-008",
+      "reason_match": false,
+      "retrieval_empty": false,
+      "retrieved_chunk_ids": [
+        "doc-tutorial-introduction.rst::5",
+        "doc-tutorial-introduction.rst::3",
+        "doc-reference-lexical_analysis.rst::13",
+        "doc-reference-lexical_analysis.rst::14",
+        "doc-library-functions.rst::5",
+        "doc-reference-lexical_analysis.rst::12",
+        "doc-library-functions.rst::11",
+        "doc-library-functions.rst::12",
+        "doc-tutorial-introduction.rst::6",
+        "doc-reference-lexical_analysis.rst::0"
+      ],
+      "state": "answered",
+      "validation": {
+        "checked_citations": 1,
+        "checked_claims": 3,
+        "issue_codes": [],
+        "skipped": false,
+        "valid": true
+      },
+      "wrong_answer": false
+    },
+    "real-q-009": {
+      "abstained": false,
+      "abstention_detail": null,
+      "abstention_reason": null,
+      "answerable": true,
+      "answered": true,
+      "case": "citation_boundary",
+      "citation_completeness": 1.0,
+      "citations": [
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::6",
+          "citation_id": "cit-1-doc-reference-lexical_analysis.rst::6",
+          "corpus_version": "1.0.0",
+          "document_id": "doc-reference-lexical_analysis.rst",
+          "excerpt_matches": true,
+          "excerpt_prefix": "eywords -------- .. index:: single: keyword single: reserved word The following identifiers are used as reserved words, ",
+          "excerpt_sha256": "13e65887ad8e0e9a765d18ed043857b8cef6c6303df7a719dc7d821a22c9feea",
+          "location": "local://python-docs-3.12.13/doc-reference-lexical_analysis.rst/chunk/6"
+        }
+      ],
+      "cited_claim_count": 3,
+      "claim_count": 3,
+      "claim_support": [
+        {
+          "cited_chunk_ids": [
+            "doc-reference-lexical_analysis.rst::6"
+          ],
+          "claim_id": "doc-reference-lexical_analysis.rst::6::claim-1",
+          "matched_chunk_id": "doc-reference-lexical_analysis.rst::6",
+          "support": "supported"
+        },
+        {
+          "cited_chunk_ids": [
+            "doc-reference-lexical_analysis.rst::6"
+          ],
+          "claim_id": "doc-reference-lexical_analysis.rst::6::claim-4",
+          "matched_chunk_id": "doc-reference-lexical_analysis.rst::6",
+          "support": "supported"
+        },
+        {
+          "cited_chunk_ids": [
+            "doc-reference-lexical_analysis.rst::6"
+          ],
+          "claim_id": "doc-reference-lexical_analysis.rst::6::claim-5",
+          "matched_chunk_id": "doc-reference-lexical_analysis.rst::6",
+          "support": "supported"
+        }
+      ],
+      "claim_support_rule": "normalized-exact-containment-v1",
+      "claims": [
+        {
+          "citation_chunk_ids": [
+            "doc-reference-lexical_analysis.rst::6"
+          ],
+          "claim_id": "doc-reference-lexical_analysis.rst::6::claim-1"
+        },
+        {
+          "citation_chunk_ids": [
+            "doc-reference-lexical_analysis.rst::6"
+          ],
+          "claim_id": "doc-reference-lexical_analysis.rst::6::claim-4"
+        },
+        {
+          "citation_chunk_ids": [
+            "doc-reference-lexical_analysis.rst::6"
+          ],
+          "claim_id": "doc-reference-lexical_analysis.rst::6::claim-5"
+        }
+      ],
+      "corpus_manifest_id": "corpus-source-v1.0.0",
+      "correct_abstention": false,
+      "evidence_ranks": [
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::6",
+          "rank": 1,
+          "score": 0.032266458496
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::12",
+          "rank": 2,
+          "score": 0.032018442623
+        },
+        {
+          "chunk_id": "doc-tutorial-introduction.rst::8",
+          "rank": 3,
+          "score": 0.031754032258
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::11",
+          "rank": 4,
+          "score": 0.028778467909
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::14",
+          "rank": 5,
+          "score": 0.016129032258
+        },
+        {
+          "chunk_id": "doc-tutorial-introduction.rst::4",
+          "rank": 6,
+          "score": 0.015873015873
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::16",
+          "rank": 7,
+          "score": 0.015384615385
+        },
+        {
+          "chunk_id": "doc-tutorial-introduction.rst::0",
+          "rank": 8,
+          "score": 0.015384615385
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::33",
+          "rank": 9,
+          "score": 0.015151515152
+        },
+        {
+          "chunk_id": "doc-tutorial-introduction.rst::7",
+          "rank": 10,
+          "score": 0.015151515152
+        }
+      ],
+      "expected_status": "answerable",
+      "generation": {
+        "is_llm_generated": false,
+        "mode": "offline",
+        "model_id": "extractive-template-v1",
+        "prompt_version": "grounded-answer-prompt-v1.0.0",
+        "provider_id": "extractive-template",
+        "schema_version": "structured-answer-v1"
+      },
+      "invalid_output": false,
+      "provider_error": false,
+      "query_id": "real-q-009",
+      "reason_match": false,
+      "retrieval_empty": false,
+      "retrieved_chunk_ids": [
+        "doc-reference-lexical_analysis.rst::6",
+        "doc-library-functions.rst::12",
+        "doc-tutorial-introduction.rst::8",
+        "doc-library-functions.rst::11",
+        "doc-reference-lexical_analysis.rst::14",
+        "doc-tutorial-introduction.rst::4",
+        "doc-reference-lexical_analysis.rst::16",
+        "doc-tutorial-introduction.rst::0",
+        "doc-library-functions.rst::33",
+        "doc-tutorial-introduction.rst::7"
+      ],
+      "state": "answered",
+      "validation": {
+        "checked_citations": 1,
+        "checked_claims": 3,
+        "issue_codes": [],
+        "skipped": false,
+        "valid": true
+      },
+      "wrong_answer": false
+    },
+    "real-q-010": {
+      "abstained": true,
+      "abstention_detail": "No single retrieved passage fully supports the query and the matched passages address different predicates.",
+      "abstention_reason": "insufficient_evidence",
+      "answerable": true,
+      "answered": false,
+      "case": "exact_api",
+      "citation_completeness": 0.0,
+      "citations": [],
+      "cited_claim_count": 0,
+      "claim_count": 0,
+      "claim_support": [],
+      "claim_support_rule": "normalized-exact-containment-v1",
+      "claims": [],
+      "corpus_manifest_id": "corpus-source-v1.0.0",
+      "correct_abstention": false,
+      "evidence_ranks": [
+        {
+          "chunk_id": "doc-library-functions.rst::12",
+          "rank": 1,
+          "score": 0.032522474881
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::11",
+          "rank": 2,
+          "score": 0.032266458496
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::13",
+          "rank": 3,
+          "score": 0.031754032258
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::31",
+          "rank": 4,
+          "score": 0.031009615385
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::22",
+          "rank": 5,
+          "score": 0.029631255487
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::5",
+          "rank": 6,
+          "score": 0.015873015873
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::21",
+          "rank": 7,
+          "score": 0.015384615385
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::16",
+          "rank": 8,
+          "score": 0.015151515152
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::7",
+          "rank": 9,
+          "score": 0.015151515152
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::40",
+          "rank": 10,
+          "score": 0.014925373134
+        }
+      ],
+      "expected_status": "answerable",
+      "generation": {
+        "is_llm_generated": false,
+        "mode": "offline",
+        "model_id": "extractive-template-v1",
+        "prompt_version": "grounded-answer-prompt-v1.0.0",
+        "provider_id": "extractive-template",
+        "schema_version": "structured-answer-v1"
+      },
+      "invalid_output": false,
+      "provider_error": false,
+      "query_id": "real-q-010",
+      "reason_match": false,
+      "retrieval_empty": false,
+      "retrieved_chunk_ids": [
+        "doc-library-functions.rst::12",
+        "doc-library-functions.rst::11",
+        "doc-library-functions.rst::13",
+        "doc-library-functions.rst::31",
+        "doc-library-functions.rst::22",
+        "doc-library-functions.rst::5",
+        "doc-library-functions.rst::21",
+        "doc-library-functions.rst::16",
+        "doc-library-functions.rst::7",
+        "doc-library-functions.rst::40"
+      ],
+      "state": "abstained",
+      "validation": {
+        "checked_citations": 0,
+        "checked_claims": 0,
+        "issue_codes": [],
+        "skipped": true,
+        "valid": true
+      },
+      "wrong_answer": false
+    },
+    "real-q-011": {
+      "abstained": true,
+      "abstention_detail": "No single retrieved passage contains every key term of the query, and the matched passages address different predicates; the query is ambiguous as posed.",
+      "abstention_reason": "insufficient_evidence",
+      "answerable": true,
+      "answered": false,
+      "case": "numeric_parameter",
+      "citation_completeness": 0.0,
+      "citations": [],
+      "cited_claim_count": 0,
+      "claim_count": 0,
+      "claim_support": [],
+      "claim_support_rule": "normalized-exact-containment-v1",
+      "claims": [],
+      "corpus_manifest_id": "corpus-source-v1.0.0",
+      "correct_abstention": false,
+      "evidence_ranks": [
+        {
+          "chunk_id": "doc-library-functions.rst::22",
+          "rank": 1,
+          "score": 0.032266458496
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::18",
+          "rank": 2,
+          "score": 0.030886196246
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::38",
+          "rank": 3,
+          "score": 0.016129032258
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::16",
+          "rank": 4,
+          "score": 0.016129032258
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::16",
+          "rank": 5,
+          "score": 0.015873015873
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::21",
+          "rank": 6,
+          "score": 0.015625
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::28",
+          "rank": 7,
+          "score": 0.015625
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::29",
+          "rank": 8,
+          "score": 0.015384615385
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::40",
+          "rank": 9,
+          "score": 0.015384615385
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::19",
+          "rank": 10,
+          "score": 0.015151515152
+        }
+      ],
+      "expected_status": "answerable",
+      "generation": {
+        "is_llm_generated": false,
+        "mode": "offline",
+        "model_id": "extractive-template-v1",
+        "prompt_version": "grounded-answer-prompt-v1.0.0",
+        "provider_id": "extractive-template",
+        "schema_version": "structured-answer-v1"
+      },
+      "invalid_output": false,
+      "provider_error": false,
+      "query_id": "real-q-011",
+      "reason_match": false,
+      "retrieval_empty": false,
+      "retrieved_chunk_ids": [
+        "doc-library-functions.rst::22",
+        "doc-library-functions.rst::18",
+        "doc-library-functions.rst::38",
+        "doc-reference-lexical_analysis.rst::16",
+        "doc-library-functions.rst::16",
+        "doc-library-functions.rst::21",
+        "doc-library-functions.rst::28",
+        "doc-library-functions.rst::29",
+        "doc-library-functions.rst::40",
+        "doc-library-functions.rst::19"
+      ],
+      "state": "abstained",
+      "validation": {
+        "checked_citations": 0,
+        "checked_claims": 0,
+        "issue_codes": [],
+        "skipped": true,
+        "valid": true
+      },
+      "wrong_answer": false
+    },
+    "real-q-012": {
+      "abstained": true,
+      "abstention_detail": "No single retrieved passage contains every key term of the query, and the matched passages address different predicates; the query is ambiguous as posed.",
+      "abstention_reason": "insufficient_evidence",
+      "answerable": true,
+      "answered": false,
+      "case": "single_passage",
+      "citation_completeness": 0.0,
+      "citations": [],
+      "cited_claim_count": 0,
+      "claim_count": 0,
+      "claim_support": [],
+      "claim_support_rule": "normalized-exact-containment-v1",
+      "claims": [],
+      "corpus_manifest_id": "corpus-source-v1.0.0",
+      "correct_abstention": false,
+      "evidence_ranks": [
+        {
+          "chunk_id": "doc-library-functions.rst::21",
+          "rank": 1,
+          "score": 0.032258064516
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::31",
+          "rank": 2,
+          "score": 0.031257631258
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::1",
+          "rank": 3,
+          "score": 0.030886196246
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::11",
+          "rank": 4,
+          "score": 0.030578898226
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::22",
+          "rank": 5,
+          "score": 0.030076888286
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::16",
+          "rank": 6,
+          "score": 0.016393442623
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::12",
+          "rank": 7,
+          "score": 0.015625
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::40",
+          "rank": 8,
+          "score": 0.015625
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::13",
+          "rank": 9,
+          "score": 0.015384615385
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::5",
+          "rank": 10,
+          "score": 0.015151515152
+        }
+      ],
+      "expected_status": "answerable",
+      "generation": {
+        "is_llm_generated": false,
+        "mode": "offline",
+        "model_id": "extractive-template-v1",
+        "prompt_version": "grounded-answer-prompt-v1.0.0",
+        "provider_id": "extractive-template",
+        "schema_version": "structured-answer-v1"
+      },
+      "invalid_output": false,
+      "provider_error": false,
+      "query_id": "real-q-012",
+      "reason_match": false,
+      "retrieval_empty": false,
+      "retrieved_chunk_ids": [
+        "doc-library-functions.rst::21",
+        "doc-library-functions.rst::31",
+        "doc-library-functions.rst::1",
+        "doc-library-functions.rst::11",
+        "doc-library-functions.rst::22",
+        "doc-library-functions.rst::16",
+        "doc-library-functions.rst::12",
+        "doc-library-functions.rst::40",
+        "doc-library-functions.rst::13",
+        "doc-library-functions.rst::5"
+      ],
+      "state": "abstained",
+      "validation": {
+        "checked_citations": 0,
+        "checked_claims": 0,
+        "issue_codes": [],
+        "skipped": true,
+        "valid": true
+      },
+      "wrong_answer": false
+    },
+    "real-q-013": {
+      "abstained": true,
+      "abstention_detail": "No single retrieved passage contains every key term of the query, and the matched passages address different predicates; the query is ambiguous as posed.",
+      "abstention_reason": "insufficient_evidence",
+      "answerable": false,
+      "answered": false,
+      "case": "unanswerable",
+      "citation_completeness": 0.0,
+      "citations": [],
+      "cited_claim_count": 0,
+      "claim_count": 0,
+      "claim_support": [],
+      "claim_support_rule": "normalized-exact-containment-v1",
+      "claims": [],
+      "corpus_manifest_id": "corpus-source-v1.0.0",
+      "correct_abstention": true,
+      "evidence_ranks": [
+        {
+          "chunk_id": "doc-tutorial-introduction.rst::4",
+          "rank": 1,
+          "score": 0.031778058008
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::40",
+          "rank": 2,
+          "score": 0.031746031746
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::41",
+          "rank": 3,
+          "score": 0.02921108742
+        },
+        {
+          "chunk_id": "doc-tutorial-introduction.rst::8",
+          "rank": 4,
+          "score": 0.028985507246
+        },
+        {
+          "chunk_id": "doc-tutorial-introduction.rst::7",
+          "rank": 5,
+          "score": 0.016393442623
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::23",
+          "rank": 6,
+          "score": 0.016129032258
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::3",
+          "rank": 7,
+          "score": 0.016129032258
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::35",
+          "rank": 8,
+          "score": 0.015625
+        },
+        {
+          "chunk_id": "doc-tutorial-introduction.rst::1",
+          "rank": 9,
+          "score": 0.015625
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::16",
+          "rank": 10,
+          "score": 0.015384615385
+        }
+      ],
+      "expected_status": "unanswerable",
+      "generation": {
+        "is_llm_generated": false,
+        "mode": "offline",
+        "model_id": "extractive-template-v1",
+        "prompt_version": "grounded-answer-prompt-v1.0.0",
+        "provider_id": "extractive-template",
+        "schema_version": "structured-answer-v1"
+      },
+      "invalid_output": false,
+      "provider_error": false,
+      "query_id": "real-q-013",
+      "reason_match": true,
+      "retrieval_empty": false,
+      "retrieved_chunk_ids": [
+        "doc-tutorial-introduction.rst::4",
+        "doc-library-functions.rst::40",
+        "doc-library-functions.rst::41",
+        "doc-tutorial-introduction.rst::8",
+        "doc-tutorial-introduction.rst::7",
+        "doc-library-functions.rst::23",
+        "doc-reference-lexical_analysis.rst::3",
+        "doc-library-functions.rst::35",
+        "doc-tutorial-introduction.rst::1",
+        "doc-reference-lexical_analysis.rst::16"
+      ],
+      "state": "abstained",
+      "validation": {
+        "checked_citations": 0,
+        "checked_claims": 0,
+        "issue_codes": [],
+        "skipped": true,
+        "valid": true
+      },
+      "wrong_answer": false
+    },
+    "real-q-014": {
+      "abstained": true,
+      "abstention_detail": "No single retrieved passage contains every key term of the query, and the matched passages address different predicates; the query is ambiguous as posed.",
+      "abstention_reason": "insufficient_evidence",
+      "answerable": false,
+      "answered": false,
+      "case": "unanswerable",
+      "citation_completeness": 0.0,
+      "citations": [],
+      "cited_claim_count": 0,
+      "claim_count": 0,
+      "claim_support": [],
+      "claim_support_rule": "normalized-exact-containment-v1",
+      "claims": [],
+      "corpus_manifest_id": "corpus-source-v1.0.0",
+      "correct_abstention": true,
+      "evidence_ranks": [
+        {
+          "chunk_id": "doc-library-functions.rst::38",
+          "rank": 1,
+          "score": 0.031099324976
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::23",
+          "rank": 2,
+          "score": 0.028571428571
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::40",
+          "rank": 3,
+          "score": 0.016393442623
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::21",
+          "rank": 4,
+          "score": 0.016129032258
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::39",
+          "rank": 5,
+          "score": 0.016129032258
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::16",
+          "rank": 6,
+          "score": 0.015873015873
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::7",
+          "rank": 7,
+          "score": 0.015873015873
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::22",
+          "rank": 8,
+          "score": 0.015625
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::16",
+          "rank": 9,
+          "score": 0.015625
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::31",
+          "rank": 10,
+          "score": 0.015384615385
+        }
+      ],
+      "expected_status": "unanswerable",
+      "generation": {
+        "is_llm_generated": false,
+        "mode": "offline",
+        "model_id": "extractive-template-v1",
+        "prompt_version": "grounded-answer-prompt-v1.0.0",
+        "provider_id": "extractive-template",
+        "schema_version": "structured-answer-v1"
+      },
+      "invalid_output": false,
+      "provider_error": false,
+      "query_id": "real-q-014",
+      "reason_match": true,
+      "retrieval_empty": false,
+      "retrieved_chunk_ids": [
+        "doc-library-functions.rst::38",
+        "doc-library-functions.rst::23",
+        "doc-library-functions.rst::40",
+        "doc-library-functions.rst::21",
+        "doc-library-functions.rst::39",
+        "doc-library-functions.rst::16",
+        "doc-reference-lexical_analysis.rst::7",
+        "doc-library-functions.rst::22",
+        "doc-reference-lexical_analysis.rst::16",
+        "doc-library-functions.rst::31"
+      ],
+      "state": "abstained",
+      "validation": {
+        "checked_citations": 0,
+        "checked_claims": 0,
+        "issue_codes": [],
+        "skipped": true,
+        "valid": true
+      },
+      "wrong_answer": false
+    },
+    "real-q-015": {
+      "abstained": false,
+      "abstention_detail": null,
+      "abstention_reason": null,
+      "answerable": false,
+      "answered": true,
+      "case": "ambiguous",
+      "citation_completeness": 1.0,
+      "citations": [
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::5",
+          "citation_id": "cit-1-doc-reference-lexical_analysis.rst::5",
+          "corpus_version": "1.0.0",
+          "document_id": "doc-reference-lexical_analysis.rst",
+          "excerpt_matches": true,
+          "excerpt_prefix": "icode standard annex UAX-31, with elaboration and changes as defined below; see also :pep:`3131` for further details. Wi",
+          "excerpt_sha256": "084e0d3a7c6e52193d804ef58c36e853e1f540b05838c39e8df11ee2508ea94d",
+          "location": "local://python-docs-3.12.13/doc-reference-lexical_analysis.rst/chunk/5"
+        }
+      ],
+      "cited_claim_count": 1,
+      "claim_count": 1,
+      "claim_support": [
+        {
+          "cited_chunk_ids": [
+            "doc-reference-lexical_analysis.rst::5"
+          ],
+          "claim_id": "doc-reference-lexical_analysis.rst::5::claim-1",
+          "matched_chunk_id": "doc-reference-lexical_analysis.rst::5",
+          "support": "supported"
+        }
+      ],
+      "claim_support_rule": "normalized-exact-containment-v1",
+      "claims": [
+        {
+          "citation_chunk_ids": [
+            "doc-reference-lexical_analysis.rst::5"
+          ],
+          "claim_id": "doc-reference-lexical_analysis.rst::5::claim-1"
+        }
+      ],
+      "corpus_manifest_id": "corpus-source-v1.0.0",
+      "correct_abstention": false,
+      "evidence_ranks": [
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::5",
+          "rank": 1,
+          "score": 0.031754032258
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::11",
+          "rank": 2,
+          "score": 0.030621785881
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::16",
+          "rank": 3,
+          "score": 0.029437229437
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::16",
+          "rank": 4,
+          "score": 0.016393442623
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::7",
+          "rank": 5,
+          "score": 0.016393442623
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::12",
+          "rank": 6,
+          "score": 0.015873015873
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::40",
+          "rank": 7,
+          "score": 0.015873015873
+        },
+        {
+          "chunk_id": "doc-tutorial-introduction.rst::0",
+          "rank": 8,
+          "score": 0.015625
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::6",
+          "rank": 9,
+          "score": 0.015384615385
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::12",
+          "rank": 10,
+          "score": 0.015384615385
+        }
+      ],
+      "expected_status": "ambiguous",
+      "generation": {
+        "is_llm_generated": false,
+        "mode": "offline",
+        "model_id": "extractive-template-v1",
+        "prompt_version": "grounded-answer-prompt-v1.0.0",
+        "provider_id": "extractive-template",
+        "schema_version": "structured-answer-v1"
+      },
+      "invalid_output": false,
+      "provider_error": false,
+      "query_id": "real-q-015",
+      "reason_match": false,
+      "retrieval_empty": false,
+      "retrieved_chunk_ids": [
+        "doc-reference-lexical_analysis.rst::5",
+        "doc-library-functions.rst::11",
+        "doc-library-functions.rst::16",
+        "doc-reference-lexical_analysis.rst::16",
+        "doc-reference-lexical_analysis.rst::7",
+        "doc-library-functions.rst::12",
+        "doc-library-functions.rst::40",
+        "doc-tutorial-introduction.rst::0",
+        "doc-library-functions.rst::6",
+        "doc-reference-lexical_analysis.rst::12"
+      ],
+      "state": "answered",
+      "validation": {
+        "checked_citations": 1,
+        "checked_claims": 1,
+        "issue_codes": [],
+        "skipped": false,
+        "valid": true
+      },
+      "wrong_answer": true
+    },
+    "real-q-016": {
+      "abstained": true,
+      "abstention_detail": "No single retrieved passage fully supports the query and the matched passages address different predicates.",
+      "abstention_reason": "insufficient_evidence",
+      "answerable": false,
+      "answered": false,
+      "case": "ambiguous",
+      "citation_completeness": 0.0,
+      "citations": [],
+      "cited_claim_count": 0,
+      "claim_count": 0,
+      "claim_support": [],
+      "claim_support_rule": "normalized-exact-containment-v1",
+      "claims": [],
+      "corpus_manifest_id": "corpus-source-v1.0.0",
+      "correct_abstention": true,
+      "evidence_ranks": [
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::11",
+          "rank": 1,
+          "score": 0.031024531025
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::14",
+          "rank": 2,
+          "score": 0.030834914611
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::12",
+          "rank": 3,
+          "score": 0.030330882353
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::2",
+          "rank": 4,
+          "score": 0.029910714286
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::16",
+          "rank": 5,
+          "score": 0.016393442623
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::3",
+          "rank": 6,
+          "score": 0.016393442623
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::11",
+          "rank": 7,
+          "score": 0.016129032258
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::31",
+          "rank": 8,
+          "score": 0.015873015873
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::15",
+          "rank": 9,
+          "score": 0.015384615385
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::5",
+          "rank": 10,
+          "score": 0.015384615385
+        }
+      ],
+      "expected_status": "ambiguous",
+      "generation": {
+        "is_llm_generated": false,
+        "mode": "offline",
+        "model_id": "extractive-template-v1",
+        "prompt_version": "grounded-answer-prompt-v1.0.0",
+        "provider_id": "extractive-template",
+        "schema_version": "structured-answer-v1"
+      },
+      "invalid_output": false,
+      "provider_error": false,
+      "query_id": "real-q-016",
+      "reason_match": true,
+      "retrieval_empty": false,
+      "retrieved_chunk_ids": [
+        "doc-reference-lexical_analysis.rst::11",
+        "doc-library-functions.rst::14",
+        "doc-library-functions.rst::12",
+        "doc-library-functions.rst::2",
+        "doc-reference-lexical_analysis.rst::16",
+        "doc-reference-lexical_analysis.rst::3",
+        "doc-library-functions.rst::11",
+        "doc-library-functions.rst::31",
+        "doc-library-functions.rst::15",
+        "doc-library-functions.rst::5"
+      ],
+      "state": "abstained",
+      "validation": {
+        "checked_citations": 0,
+        "checked_claims": 0,
+        "issue_codes": [],
+        "skipped": true,
+        "valid": true
+      },
+      "wrong_answer": false
+    },
+    "real-q-017": {
+      "abstained": true,
+      "abstention_detail": "No single retrieved passage contains every key term of the query, and the matched passages address different predicates; the query is ambiguous as posed.",
+      "abstention_reason": "insufficient_evidence",
+      "answerable": false,
+      "answered": false,
+      "case": "abstain",
+      "citation_completeness": 0.0,
+      "citations": [],
+      "cited_claim_count": 0,
+      "claim_count": 0,
+      "claim_support": [],
+      "claim_support_rule": "normalized-exact-containment-v1",
+      "claims": [],
+      "corpus_manifest_id": "corpus-source-v1.0.0",
+      "correct_abstention": true,
+      "evidence_ranks": [
+        {
+          "chunk_id": "doc-library-functions.rst::40",
+          "rank": 1,
+          "score": 0.032002048131
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::6",
+          "rank": 2,
+          "score": 0.031778058008
+        },
+        {
+          "chunk_id": "doc-tutorial-introduction.rst::8",
+          "rank": 3,
+          "score": 0.029910714286
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::26",
+          "rank": 4,
+          "score": 0.028778467909
+        },
+        {
+          "chunk_id": "doc-tutorial-introduction.rst::7",
+          "rank": 5,
+          "score": 0.016393442623
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::13",
+          "rank": 6,
+          "score": 0.016129032258
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::24",
+          "rank": 7,
+          "score": 0.015873015873
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::41",
+          "rank": 8,
+          "score": 0.015625
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::5",
+          "rank": 9,
+          "score": 0.015384615385
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::14",
+          "rank": 10,
+          "score": 0.015151515152
+        }
+      ],
+      "expected_status": "abstain",
+      "generation": {
+        "is_llm_generated": false,
+        "mode": "offline",
+        "model_id": "extractive-template-v1",
+        "prompt_version": "grounded-answer-prompt-v1.0.0",
+        "provider_id": "extractive-template",
+        "schema_version": "structured-answer-v1"
+      },
+      "invalid_output": false,
+      "provider_error": false,
+      "query_id": "real-q-017",
+      "reason_match": true,
+      "retrieval_empty": false,
+      "retrieved_chunk_ids": [
+        "doc-library-functions.rst::40",
+        "doc-reference-lexical_analysis.rst::6",
+        "doc-tutorial-introduction.rst::8",
+        "doc-library-functions.rst::26",
+        "doc-tutorial-introduction.rst::7",
+        "doc-reference-lexical_analysis.rst::13",
+        "doc-library-functions.rst::24",
+        "doc-library-functions.rst::41",
+        "doc-library-functions.rst::5",
+        "doc-reference-lexical_analysis.rst::14"
+      ],
+      "state": "abstained",
+      "validation": {
+        "checked_citations": 0,
+        "checked_claims": 0,
+        "issue_codes": [],
+        "skipped": true,
+        "valid": true
+      },
+      "wrong_answer": false
+    },
+    "real-q-018": {
+      "abstained": false,
+      "abstention_detail": null,
+      "abstention_reason": null,
+      "answerable": false,
+      "answered": true,
+      "case": "abstain",
+      "citation_completeness": 1.0,
+      "citations": [
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::3",
+          "citation_id": "cit-1-doc-reference-lexical_analysis.rst::3",
+          "corpus_version": "1.0.0",
+          "document_id": "doc-reference-lexical_analysis.rst",
+          "excerpt_matches": true,
+          "excerpt_prefix": "d to determine the grouping of statements. Tabs are replaced (from left to right) by one to eight spaces such that the t",
+          "excerpt_sha256": "8cc4b9ee326e5c3c55682d75bb2fe612878a2aa839d9bc7287f259a486dcad1b",
+          "location": "local://python-docs-3.12.13/doc-reference-lexical_analysis.rst/chunk/3"
+        }
+      ],
+      "cited_claim_count": 1,
+      "claim_count": 1,
+      "claim_support": [
+        {
+          "cited_chunk_ids": [
+            "doc-reference-lexical_analysis.rst::3"
+          ],
+          "claim_id": "doc-reference-lexical_analysis.rst::3::claim-1",
+          "matched_chunk_id": "doc-reference-lexical_analysis.rst::3",
+          "support": "supported"
+        }
+      ],
+      "claim_support_rule": "normalized-exact-containment-v1",
+      "claims": [
+        {
+          "citation_chunk_ids": [
+            "doc-reference-lexical_analysis.rst::3"
+          ],
+          "claim_id": "doc-reference-lexical_analysis.rst::3::claim-1"
+        }
+      ],
+      "corpus_manifest_id": "corpus-source-v1.0.0",
+      "correct_abstention": false,
+      "evidence_ranks": [
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::3",
+          "rank": 1,
+          "score": 0.032018442623
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::5",
+          "rank": 2,
+          "score": 0.032018442623
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::0",
+          "rank": 3,
+          "score": 0.031024531025
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::40",
+          "rank": 4,
+          "score": 0.016129032258
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::11",
+          "rank": 5,
+          "score": 0.016129032258
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::16",
+          "rank": 6,
+          "score": 0.015873015873
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::14",
+          "rank": 7,
+          "score": 0.015384615385
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::26",
+          "rank": 8,
+          "score": 0.015384615385
+        },
+        {
+          "chunk_id": "doc-reference-lexical_analysis.rst::9",
+          "rank": 9,
+          "score": 0.015151515152
+        },
+        {
+          "chunk_id": "doc-library-functions.rst::3",
+          "rank": 10,
+          "score": 0.014925373134
+        }
+      ],
+      "expected_status": "abstain",
+      "generation": {
+        "is_llm_generated": false,
+        "mode": "offline",
+        "model_id": "extractive-template-v1",
+        "prompt_version": "grounded-answer-prompt-v1.0.0",
+        "provider_id": "extractive-template",
+        "schema_version": "structured-answer-v1"
+      },
+      "invalid_output": false,
+      "provider_error": false,
+      "query_id": "real-q-018",
+      "reason_match": false,
+      "retrieval_empty": false,
+      "retrieved_chunk_ids": [
+        "doc-reference-lexical_analysis.rst::3",
+        "doc-reference-lexical_analysis.rst::5",
+        "doc-reference-lexical_analysis.rst::0",
+        "doc-library-functions.rst::40",
+        "doc-reference-lexical_analysis.rst::11",
+        "doc-library-functions.rst::16",
+        "doc-library-functions.rst::14",
+        "doc-library-functions.rst::26",
+        "doc-reference-lexical_analysis.rst::9",
+        "doc-library-functions.rst::3"
+      ],
+      "state": "answered",
+      "validation": {
+        "checked_citations": 1,
+        "checked_claims": 1,
+        "issue_codes": [],
+        "skipped": false,
+        "valid": true
+      },
+      "wrong_answer": true
+    }
+  },
+  "query_set": {
+    "cases": {
+      "abstain": 2,
+      "ambiguous": 2,
+      "citation_boundary": 1,
+      "exact_api": 2,
+      "multi_passage": 3,
+      "numeric_parameter": 2,
+      "section_distinction": 1,
+      "single_passage": 2,
+      "terminology": 1,
+      "unanswerable": 2
+    },
+    "corpus_id": "python-docs-3.12.13",
+    "corpus_manifest_id": "corpus-source-v1.0.0",
+    "corpus_version": "1.0.0",
+    "expected_statuses": {
+      "abstain": 2,
+      "ambiguous": 2,
+      "answerable": 12,
+      "unanswerable": 2
+    },
+    "num_queries": 18,
+    "query_set_id": "python-docs-real-v1",
+    "query_set_version": "1.0.0",
+    "real_local": true,
+    "synthetic": false
+  },
+  "report_type": "real-local-generation-evaluation",
+  "report_version": "1.0.0",
+  "runtime_seconds": 0.1766778989986051,
+  "timestamp_utc": "2026-08-12T13:43:13+00:00"
+}

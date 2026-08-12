@@ -1,0 +1,29 @@
+{
+  "fixture_id": "answer-evaluation-v1",
+  "fixture_version": "1.0.0",
+  "corpus_id": "python-docs-3.12.13",
+  "corpus_version": "1.0.0",
+  "query_set_id": "python-docs-real-v1",
+  "query_set_version": "1.0.0",
+  "purpose": "Versioned pointer for the separate real-local generation evaluation. It references the UNCHANGED real query set (18 query IDs) and its gold chunks WITHOUT copying any passage text. The generation materializer cross-validates the loaded real query set against this fixture; any change to the query set's IDs or gold chunks breaks the check.",
+  "queries": [
+    { "query_id": "real-q-001", "expected_status": "answerable", "gold_chunk_ids": ["doc-reference-lexical_analysis.rst::1"] },
+    { "query_id": "real-q-002", "expected_status": "answerable", "gold_chunk_ids": ["doc-reference-lexical_analysis.rst::3"] },
+    { "query_id": "real-q-003", "expected_status": "answerable", "gold_chunk_ids": ["doc-reference-lexical_analysis.rst::6"] },
+    { "query_id": "real-q-004", "expected_status": "answerable", "gold_chunk_ids": ["doc-library-functions.rst::32", "doc-library-functions.rst::31"] },
+    { "query_id": "real-q-005", "expected_status": "answerable", "gold_chunk_ids": ["doc-reference-lexical_analysis.rst::1"] },
+    { "query_id": "real-q-006", "expected_status": "answerable", "gold_chunk_ids": ["doc-reference-lexical_analysis.rst::6"] },
+    { "query_id": "real-q-007", "expected_status": "answerable", "gold_chunk_ids": ["doc-tutorial-introduction.rst::6", "doc-tutorial-introduction.rst::7"] },
+    { "query_id": "real-q-008", "expected_status": "answerable", "gold_chunk_ids": ["doc-tutorial-introduction.rst::2", "doc-tutorial-introduction.rst::3"] },
+    { "query_id": "real-q-009", "expected_status": "answerable", "gold_chunk_ids": ["doc-reference-lexical_analysis.rst::6"] },
+    { "query_id": "real-q-010", "expected_status": "answerable", "gold_chunk_ids": ["doc-library-functions.rst::12"] },
+    { "query_id": "real-q-011", "expected_status": "answerable", "gold_chunk_ids": ["doc-library-functions.rst::18"] },
+    { "query_id": "real-q-012", "expected_status": "answerable", "gold_chunk_ids": ["doc-library-functions.rst::22"] },
+    { "query_id": "real-q-013", "expected_status": "unanswerable", "gold_chunk_ids": [] },
+    { "query_id": "real-q-014", "expected_status": "unanswerable", "gold_chunk_ids": [] },
+    { "query_id": "real-q-015", "expected_status": "ambiguous", "gold_chunk_ids": [] },
+    { "query_id": "real-q-016", "expected_status": "ambiguous", "gold_chunk_ids": [] },
+    { "query_id": "real-q-017", "expected_status": "abstain", "gold_chunk_ids": [] },
+    { "query_id": "real-q-018", "expected_status": "abstain", "gold_chunk_ids": [] }
+  ]
+}

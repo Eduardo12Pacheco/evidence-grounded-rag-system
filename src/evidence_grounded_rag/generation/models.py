@@ -59,3 +59,4 @@ class GeneratedAnswer:
     provider_id: str = ""
     model_id: str = ""
     is_llm_generated: bool = False
+    mode: str = ""

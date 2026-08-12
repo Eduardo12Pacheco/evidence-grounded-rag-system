@@ -49,5 +49,29 @@ FUSION_VERSION = "rrf-v1"
 #: Version of the deterministic offline extractive/template generator.
 GENERATOR_VERSION = "extractive-template-v1"
 
+#: Version of the provider-neutral live adapter. No provider/model/credentials
+#: are configured; live generation requires an explicitly injected transport.
+LIVE_GENERATOR_VERSION = "injected-live-provider-v1"
+
+#: Version of the committed grounded-answer prompt. The prompt text is frozen
+#: under ``docs/generation-contract.md`` (version ``grounded-answer-prompt-v1.0.0``).
+GENERATION_PROMPT_VERSION = "grounded-answer-prompt-v1.0.0"
+
+#: Version of the structured answer JSON schema produced by live providers and
+#: parsed by the strict parser (see ``generation/structured.py`` and
+#: ``docs/generation-contract.md``).
+STRUCTURED_ANSWER_SCHEMA_VERSION = "structured-answer-v1"
+
+#: Version of the deterministic claim-support containment rule
+#: (see ``generation/support.py`` and ``docs/generation-contract.md``).
+CLAIM_SUPPORT_VERSION = "normalized-exact-containment-v1"
+
+#: Version of the committed answer-evaluation fixture that references the
+#: unchanged real query IDs and gold chunks without copying any passage.
+ANSWER_EVALUATION_FIXTURE_VERSION = "1.0.0"
+
+#: Version of the separate real-local generation evaluation report.
+GENERATION_EVALUATION_VERSION = "1.0.0"
+
 #: Version of the committed synthetic query set.
 QUERY_SET_VERSION = "synthetic-queries-v1"

@@ -40,9 +40,11 @@ from __future__ import annotations
 import itertools
 import re
 from collections.abc import Sequence
+from typing import Any
 
 from evidence_grounded_rag.abstention import AbstentionReason, reason_detail
 from evidence_grounded_rag.corpus.models import Chunk
+from evidence_grounded_rag.generation.evidence import EvidencePack
 from evidence_grounded_rag.generation.models import (
     AnswerState,
     Citation,
@@ -72,6 +74,7 @@ class ExtractiveTemplateGenerator:
     provider_id: str = PROVIDER_ID
     model_id: str = MODEL_ID
     is_llm_generated: bool = IS_LLM_GENERATED
+    mode: str = MODE
 
     def __init__(
         self,
@@ -82,7 +85,15 @@ class ExtractiveTemplateGenerator:
         self.evidence_limit = evidence_limit
         self.max_cited_claims = max_cited_claims
 
-    def generate(self, query: str, evidence: Sequence[Chunk]) -> GeneratedAnswer:
+    def generate(
+        self, query: str, evidence: EvidencePack | Sequence[Chunk] | Any
+    ) -> GeneratedAnswer:
+        chunks = _evidence_to_chunks(evidence)
+        return self._generate_chunks(query, chunks)
+
+    def _generate_chunks(
+        self, query: str, evidence: Sequence[Chunk]
+    ) -> GeneratedAnswer:
         if not isinstance(query, str) or not query.strip():
             return self._abstain(
                 AbstentionReason.UNSUPPORTED_QUERY,
@@ -277,6 +288,7 @@ class ExtractiveTemplateGenerator:
             provider_id=self.provider_id,
             model_id=self.model_id,
             is_llm_generated=self.is_llm_generated,
+            mode=self.mode,
         )
 
     def _abstain(
@@ -294,7 +306,23 @@ class ExtractiveTemplateGenerator:
             provider_id=self.provider_id,
             model_id=self.model_id,
             is_llm_generated=self.is_llm_generated,
+            mode=self.mode,
         )
+
+
+def _evidence_to_chunks(evidence: EvidencePack | Sequence[Chunk] | Any) -> list[Chunk]:
+    """Normalize the generator input to chunk records.
+
+    Accepts either the bounded ``EvidencePack`` (the pipeline path) or a plain
+    sequence of ``Chunk`` records (direct/offline callers and tests). Anything
+    else is treated as empty so a generator never raises on a mis-shaped input;
+    the empty case yields the documented ``insufficient_evidence`` abstention.
+    """
+    if isinstance(evidence, EvidencePack):
+        return [item.to_chunk() for item in evidence.items]
+    if isinstance(evidence, Sequence):
+        return [chunk for chunk in evidence if isinstance(chunk, Chunk)]
+    return []
 
 
 # ---------------------------------------------------------------------- #

@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from typing import Protocol, runtime_checkable
 
-from evidence_grounded_rag.corpus.models import Chunk
+from evidence_grounded_rag.generation.evidence import EvidencePack
 from evidence_grounded_rag.generation.models import GeneratedAnswer
 
 
@@ -13,7 +12,8 @@ from evidence_grounded_rag.generation.models import GeneratedAnswer
 class Generator(Protocol):
     """Contract every generation provider must satisfy.
 
-    A generator receives ONLY the retrieved evidence chunks — never the full
+    A generator receives ONLY the bounded evidence pack — the retrieved,
+    selected chunks plus rank/score/trace/corpus metadata, never the full
     corpus — and returns a structured, validated-in-shape answer. Providers
     must fail closed: any malformed or unavailable provider returns an
     abstained ``GeneratedAnswer`` with a reason code rather than raising into
@@ -23,5 +23,6 @@ class Generator(Protocol):
     provider_id: str
     model_id: str
     is_llm_generated: bool
+    mode: str
 
-    def generate(self, query: str, evidence: Sequence[Chunk]) -> GeneratedAnswer: ...
+    def generate(self, query: str, evidence: EvidencePack) -> GeneratedAnswer: ...

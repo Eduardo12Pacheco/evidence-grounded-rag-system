@@ -6,7 +6,7 @@ and reproducible retrieval and claim-support evaluation. Answers are only as goo
 support them, and the system abstains with a stable reason code when the
 evidence is missing.
 
-**Status — implementation in progress.** Synthetic-fixture evaluation is the
+**Status — implementation complete for the declared scope.** Synthetic-fixture evaluation is the
 default and is fully committed and reproducible. One real-local corpus
 (Python 3.12.13 documentation, **3 files / 70 chunks**) is approved for local
 development only, and one local semantic embedding model (BAAI/bge-small-en-v1.5)

@@ -117,6 +117,40 @@ uv run --extra demo streamlit run scripts/demo_retrieval.py     # offline demo
 The demo runs only on committed synthetic fixtures, makes no network calls,
 and uses no credentials. See `docs/demo-script.md` for the walkthrough.
 
+## Real-local evaluation (separate, diagnostic)
+
+There is a SEPARATE bounded evaluation over the approved real-local corpus
+(Python 3.12.13 documentation, 3 files / 70 chunks). It uses its own committed
+query set (`data/evaluation/queries/python-docs-real-v1.0.0.json`, 18 queries),
+its own command, and its own report
+(`data/evaluations/python-docs-real-evaluation-v1.0.0.json`). It is NEVER
+combined with the synthetic report and never falls back to the synthetic corpus.
+
+```bash
+# 1. Verify the approved local corpus against its source manifest (offline)
+uv run python scripts/verify_corpus.py --manifest data/manifests/corpus-source-v1.0.0.json
+
+# 2. Run the real-local evaluation (offline, no synthetic fallback)
+uv run python -m evidence_grounded_rag.evaluation.real_materialize \
+    --manifest data/manifests/corpus-source-v1.0.0.json \
+    --queries data/evaluation/queries/python-docs-real-v1.0.0.json \
+    --raw-dir data/raw/python-docs-3.12.13 \
+    --output data/evaluations/python-docs-real-evaluation-v1.0.0.json
+```
+
+Every number in the real report is a **diagnostic** result: the dense mode is a
+deterministic non-semantic hash embedding (never labeled semantic), generation
+is deterministic extraction (not an LLM), and the report covers three files and
+70 chunks — it is NOT validation of Python documentation in general and is NOT
+production readiness. The real report stores no chunk or claim text; citations
+carry excerpt checksums and short prefixes. Timestamp policy: only
+`timestamp_utc` differs between runs; the deterministic portions are covered by
+`deterministic_digest`.
+
+Synthetic evaluation (unchanged): `uv run python -m
+evidence_grounded_rag.evaluation.materialize` writes
+`data/manifests/evaluation-synthetic-v1.0.0.json`.
+
 ## Real-local corpus (approved, local-only, not the default)
 
 The **only** approved real source is the Python 3.12.13 official documentation

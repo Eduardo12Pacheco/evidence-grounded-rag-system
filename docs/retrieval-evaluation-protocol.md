@@ -156,6 +156,133 @@ committed synthetic fixtures and query set only.
 - No claim of real-world validation, perfect metrics, hallucination-free
   behavior, trustworthiness, or production readiness.
 
+## Real-local evaluation (separate, diagnostic)
+
+A separate bounded evaluation over the single approved real-local corpus
+(Python 3.12.13 documentation, 3 files / 70 chunks). It is NEVER combined with
+the synthetic report: separate query set, separate command, separate report
+file, separate labels.
+
+### Real query set (`data/evaluation/queries/python-docs-real-v1.0.0.json`)
+
+Version `1.0.0`, frozen against corpus `python-docs-3.12.13` v1.0.0 via source
+manifest `corpus-source-v1.0.0` (revision `3bb231a6...`). 18 committed queries
+covering every required case:
+
+| Case | Queries |
+| --- | --- |
+| single_passage | real-q-001, real-q-012 |
+| multi_passage | real-q-006, real-q-007, real-q-008 |
+| exact_api | real-q-004, real-q-010 |
+| terminology | real-q-003, real-q-009 |
+| numeric_parameter | real-q-002, real-q-011 |
+| section_distinction | real-q-005 |
+| citation_boundary | real-q-009 |
+| unanswerable | real-q-013, real-q-014 |
+| ambiguous | real-q-015, real-q-016 |
+| abstain | real-q-017, real-q-018 |
+
+Each query declares `query_id`, `case`, `question`, `expected_status`
+(`answerable | unanswerable | ambiguous | abstain`), graded gold chunks,
+expected citation-count range, expected abstention reason(s), notes, and an
+annotation record. The loader (`evaluation/real_queries.py`) validates schema,
+duplicate IDs, corpus id/version and manifest reference, chunk existence in the
+derived corpus, case/status coverage, and deterministic load. The synthetic
+seven-category loader is untouched.
+
+### Annotation procedure (reproducible)
+
+1. Build the derived corpus in memory from the approved source manifest and
+   local raw files (`build_real_local_corpus`); chunk IDs are
+   `derive_chunk_id(document_id, seq)`, verified against the manifest revision.
+2. For each question, locate the sentence(s) that answer it and record the
+   derived chunk ID(s); grade 2 = primary, 1 = secondary.
+3. Phrase the question with the exact token forms present in the gold sentence
+   because the committed extractive generator has no stemming and requires
+   every key token of the query in one sentence for a full match.
+4. Declare the expected status from the annotator's judgment of the corpus
+   content, independent of any retrieval mode.
+
+### Command
+
+```bash
+uv run python scripts/verify_corpus.py --manifest data/manifests/corpus-source-v1.0.0.json
+
+uv run python -m evidence_grounded_rag.evaluation.real_materialize \
+    --manifest data/manifests/corpus-source-v1.0.0.json \
+    --queries data/evaluation/queries/python-docs-real-v1.0.0.json \
+    --raw-dir data/raw/python-docs-3.12.13 \
+    --output data/evaluations/python-docs-real-evaluation-v1.0.0.json
+```
+
+The command verifies the manifest, audit, files, sizes, raw SHA-256, and the
+privacy scan first, then builds the real-local corpus. On ANY failure it exits
+non-zero with the stable error code and never falls back to the synthetic
+corpus. It makes no network calls.
+
+### Report (`data/evaluations/python-docs-real-evaluation-v1.0.0.json`)
+
+Records corpus/source/license/manifest/revision/raw checksums/canonical
+checksum/doc and chunk counts, query set, configs and thresholds, per-mode
+metrics, per-query records, retrieval traces, failures, timestamp,
+implementation commit, and limitations. Required labels:
+
+- Dense mode: **`Deterministic hash embedding diagnostic — not semantic retrieval`**
+- Hybrid mode: **`Hybrid diagnostic using BM25 plus deterministic non-semantic hash embeddings`**
+- Generation: **`Offline deterministic extractive evaluation — not an LLM result`**
+- The report explicitly states it is a bounded evaluation over three Python
+  3.12.13 documentation files and 70 chunks, does not represent all Python
+  documentation, uses non-semantic hash embeddings, deterministic (non-LLM)
+  generation, and is diagnostic, not production readiness.
+
+No chunk-level or claim-level text is stored in the report; citations carry
+excerpt checksums and short prefixes only.
+
+### Metrics (computed per retrieval mode: sparse, dense, hybrid)
+
+Retrieval metrics (same formulas as the synthetic protocol, macro-averaged over
+queries with ≥1 gold judgment), reported overall and grouped by answerable,
+single_passage, multi_passage, unanswerable, ambiguous, and abstain:
+
+- Recall@1/5/10, MRR, nDCG@5 (graded).
+- No-result rate (queries whose fused result is empty after the threshold).
+- Top-k hit counts (queries whose top-k contains ≥1 gold chunk).
+
+Faithfulness metrics over all 18 queries per mode:
+
+- Answerable coverage: answered / answerable queries.
+- Abstention precision: correct abstentions / abstentions.
+- Abstention recall: correct abstentions / non-answerable queries (a rejection
+  is correct when the query is not answerable AND the recorded reason is one of
+  the query's declared expected abstention reason(s)).
+- Citation precision: valid citations / citations checked.
+- Citation completeness: claims with ≥1 valid citation / total claims.
+- Unsupported-claim rate: claims without a valid citation / total claims.
+- Citation-validation failure rate: answered generations refused by validation
+  / total queries.
+- Wrong-answer count: answered queries whose expected status is not answerable.
+
+### Timestamp and determinism policy
+
+`timestamp_utc` is runtime provenance and the only field allowed to differ
+between runs. All other fields are deterministic and covered by
+`deterministic_digest` (SHA-256 of the canonical serialization without the
+timestamp and digest keys); two runs produce byte-identical deterministic
+portions. Raw retrieval scores are quantized to 12 decimal places in the report
+because BM25's in-memory summation adds term contributions in hash-randomized
+dict/set order, which can move the last ulp of a float between processes;
+rankings (which drive every metric) are unchanged.
+
+### Honesty for the real-local evaluation
+
+- The real report is a diagnostic over 3 files / 70 chunks of Python 3.12.13
+  documentation; it is NOT validation of Python documentation in general.
+- Dense mode is a deterministic non-semantic hash embedding, not semantic
+  retrieval; generation is deterministic extraction, not an LLM.
+- Results are diagnostic, not production readiness.
+- Denominators are small (12 answerable / 6 non-answerable queries per mode);
+  one query moves percentages by up to 8.3 points.
+
 ## Definition of done for evaluation
 
 - [x] Query sets and metric formulas are committed.

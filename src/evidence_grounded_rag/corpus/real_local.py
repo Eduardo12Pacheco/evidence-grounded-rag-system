@@ -83,6 +83,18 @@ class RealLocalCorpus:
     def chunks(self) -> list[Chunk]:
         return [chunk for doc in self.documents for chunk in doc.chunks]
 
+    def chunk_by_id(self, chunk_id: str) -> Chunk | None:
+        for chunk in self.chunks():
+            if chunk.chunk_id == chunk_id:
+                return chunk
+        return None
+
+    def document_by_id(self, document_id: str) -> RealLocalDocument | None:
+        for doc in self.documents:
+            if doc.doc_id == document_id:
+                return doc
+        return None
+
 
 def derive_source_doc_id(source_path: str) -> str:
     """Derive a stable document ID from a relative source path.

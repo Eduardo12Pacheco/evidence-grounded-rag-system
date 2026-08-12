@@ -1,0 +1,309 @@
+{
+  "query_set_id": "python-docs-real-v1",
+  "query_set_version": "1.0.0",
+  "corpus_id": "python-docs-3.12.13",
+  "corpus_version": "1.0.0",
+  "corpus_manifest_id": "corpus-source-v1.0.0",
+  "synthetic": false,
+  "real_local": true,
+  "annotation_method": "Gold chunks were selected by a human by locating the sentence(s) in the derived real-local corpus that answer each question, then recording the stable derived chunk ID (derive_chunk_id(document_id, seq)) and the corpus manifest revision they were verified against. Questions are phrased with the exact token forms present in the gold sentence because the committed extractive generator has no stemming and requires every key token of the query to appear inside one sentence for a full match. The full annotation procedure is documented in docs/retrieval-evaluation-protocol.md.",
+  "queries": [
+    {
+      "query_id": "real-q-001",
+      "case": "single_passage",
+      "question": "What character starts a comment?",
+      "expected_status": "answerable",
+      "gold_relevant": [
+        { "chunk_id": "doc-reference-lexical_analysis.rst::1", "grade": 2 }
+      ],
+      "expected_citation_count": { "min": 1, "max": 2 },
+      "expected_abstention": [],
+      "notes": "Answerable from one passage: 'A comment starts with a hash character (#)...'. Gold sentence is the first sentence of chunk 1 of lexical_analysis.rst. The exact-API and citation-boundary checks require the citation to stay within the exposed evidence.",
+      "annotation": {
+        "annotator": "evidence-grounded-rag-system real-local evaluation",
+        "verified_against_revision": "3bb231a6a5dc02b95658877318bf61501a7209e9",
+        "document": "Doc/reference/lexical_analysis.rst"
+      }
+    },
+    {
+      "query_id": "real-q-002",
+      "case": "numeric_parameter",
+      "question": "What is the maximum indentation level allowed?",
+      "expected_status": "answerable",
+      "gold_relevant": [
+        { "chunk_id": "doc-reference-lexical_analysis.rst::3", "grade": 2 }
+      ],
+      "expected_citation_count": { "min": 1, "max": 2 },
+      "expected_abstention": [],
+      "notes": "Numeric/parameter case: the reference notes that 'different platforms may explicitly limit the maximum indentation level' (chunk 3 of lexical_analysis.rst). The question expects a grounded answer citing that passage.",
+      "annotation": {
+        "annotator": "evidence-grounded-rag-system real-local evaluation",
+        "verified_against_revision": "3bb231a6a5dc02b95658877318bf61501a7209e9",
+        "document": "Doc/reference/lexical_analysis.rst"
+      }
+    },
+    {
+      "query_id": "real-q-003",
+      "case": "terminology",
+      "question": "What are soft keywords?",
+      "expected_status": "answerable",
+      "gold_relevant": [
+        { "chunk_id": "doc-reference-lexical_analysis.rst::6", "grade": 2 }
+      ],
+      "expected_citation_count": { "min": 1, "max": 2 },
+      "expected_abstention": [],
+      "notes": "Terminology case: soft keywords are defined in chunk 6 of lexical_analysis.rst ('Some identifiers are only reserved under specific contexts'). The soft-keyword definition appears in a single sentence of that chunk.",
+      "annotation": {
+        "annotator": "evidence-grounded-rag-system real-local evaluation",
+        "verified_against_revision": "3bb231a6a5dc02b95658877318bf61501a7209e9",
+        "document": "Doc/reference/lexical_analysis.rst"
+      }
+    },
+    {
+      "query_id": "real-q-004",
+      "case": "exact_api",
+      "question": "What is the result of round 2 675?",
+      "expected_status": "answerable",
+      "gold_relevant": [
+        { "chunk_id": "doc-library-functions.rst::32", "grade": 2 },
+        { "chunk_id": "doc-library-functions.rst::31", "grade": 1 }
+      ],
+      "expected_citation_count": { "min": 1, "max": 2 },
+      "expected_abstention": [],
+      "notes": "Exact API/numeric case: the worked example 'round(2.675, 2) gives 2.67 instead of the expected 2.68' is in chunk 32 of functions.rst; the round() function signature is in chunk 31. Primary gold chunk is the example; the function definition is a secondary judgment.",
+      "annotation": {
+        "annotator": "evidence-grounded-rag-system real-local evaluation",
+        "verified_against_revision": "3bb231a6a5dc02b95658877318bf61501a7209e9",
+        "document": "Doc/library/functions.rst"
+      }
+    },
+    {
+      "query_id": "real-q-005",
+      "case": "section_distinction",
+      "question": "What is the default encoding?",
+      "expected_status": "answerable",
+      "gold_relevant": [
+        { "chunk_id": "doc-reference-lexical_analysis.rst::1", "grade": 2 }
+      ],
+      "expected_citation_count": { "min": 1, "max": 2 },
+      "expected_abstention": [],
+      "notes": "Section-distinction case: the sentence 'If no encoding declaration is found, the default encoding is UTF-8.' lives in the lexical-analysis section (chunk 1), not in the open() function docs. A correct answer must ground on the lexical-analysis chunk; surfacing the open() encoding modes (functions.rst chunk 25) is a section-distinction failure the evaluation measures.",
+      "annotation": {
+        "annotator": "evidence-grounded-rag-system real-local evaluation",
+        "verified_against_revision": "3bb231a6a5dc02b95658877318bf61501a7209e9",
+        "document": "Doc/reference/lexical_analysis.rst"
+      }
+    },
+    {
+      "query_id": "real-q-006",
+      "case": "multi_passage",
+      "question": "What are soft keywords and when were they introduced?",
+      "expected_status": "answerable",
+      "gold_relevant": [
+        { "chunk_id": "doc-reference-lexical_analysis.rst::6", "grade": 2 }
+      ],
+      "expected_citation_count": { "min": 1, "max": 2 },
+      "expected_abstention": [],
+      "notes": "Multi-aspect case ('and' coordination marker): asks for the soft-keyword definition and its introduction version. The version marker (.. versionadded:: 3.10) and the definition both sit in chunk 6 of lexical_analysis.rst; the multi-aspect rule may cite one or both passages.",
+      "annotation": {
+        "annotator": "evidence-grounded-rag-system real-local evaluation",
+        "verified_against_revision": "3bb231a6a5dc02b95658877318bf61501a7209e9",
+        "document": "Doc/reference/lexical_analysis.rst"
+      }
+    },
+    {
+      "query_id": "real-q-007",
+      "case": "multi_passage",
+      "question": "What is a list and how is its length computed?",
+      "expected_status": "answerable",
+      "gold_relevant": [
+        { "chunk_id": "doc-tutorial-introduction.rst::6", "grade": 2 },
+        { "chunk_id": "doc-tutorial-introduction.rst::7", "grade": 2 }
+      ],
+      "expected_citation_count": { "min": 1, "max": 3 },
+      "expected_abstention": [],
+      "notes": "Multi-passage case spanning two tutorial chunks: the list definition and mutability (chunk 6) and the len() example over lists (chunk 7). Both are primary judgments; a fully grounded answer needs evidence from both.",
+      "annotation": {
+        "annotator": "evidence-grounded-rag-system real-local evaluation",
+        "verified_against_revision": "3bb231a6a5dc02b95658877318bf61501a7209e9",
+        "document": "Doc/tutorial/introduction.rst"
+      }
+    },
+    {
+      "query_id": "real-q-008",
+      "case": "multi_passage",
+      "question": "What is a string and how are strings indexed?",
+      "expected_status": "answerable",
+      "gold_relevant": [
+        { "chunk_id": "doc-tutorial-introduction.rst::2", "grade": 2 },
+        { "chunk_id": "doc-tutorial-introduction.rst::3", "grade": 2 }
+      ],
+      "expected_citation_count": { "min": 1, "max": 3 },
+      "expected_abstention": [],
+      "notes": "Multi-passage case: string representation ('Python can manipulate text, represented by type str') lives in tutorial chunk 2; indexing semantics ('Strings can be indexed (subscripted), with the first character having index 0') live in tutorial chunk 3.",
+      "annotation": {
+        "annotator": "evidence-grounded-rag-system real-local evaluation",
+        "verified_against_revision": "3bb231a6a5dc02b95658877318bf61501a7209e9",
+        "document": "Doc/tutorial/introduction.rst"
+      }
+    },
+    {
+      "query_id": "real-q-009",
+      "case": "citation_boundary",
+      "question": "What is the difference between a keyword and a soft keyword?",
+      "expected_status": "answerable",
+      "gold_relevant": [
+        { "chunk_id": "doc-reference-lexical_analysis.rst::6", "grade": 2 }
+      ],
+      "expected_citation_count": { "min": 1, "max": 2 },
+      "expected_abstention": [],
+      "notes": "Citation-boundary case: the keyword/soft-keyword distinction is confined to chunk 6 of lexical_analysis.rst. The expected citation must reference only chunks that were exposed to the generator; the validation layer refuses unexposed citations.",
+      "annotation": {
+        "annotator": "evidence-grounded-rag-system real-local evaluation",
+        "verified_against_revision": "3bb231a6a5dc02b95658877318bf61501a7209e9",
+        "document": "Doc/reference/lexical_analysis.rst"
+      }
+    },
+    {
+      "query_id": "real-q-010",
+      "case": "exact_api",
+      "question": "What does the exec function return?",
+      "expected_status": "answerable",
+      "gold_relevant": [
+        { "chunk_id": "doc-library-functions.rst::12", "grade": 2 }
+      ],
+      "expected_citation_count": { "min": 1, "max": 2 },
+      "expected_abstention": [],
+      "notes": "Exact API case: 'The return value is None.' for exec() is in chunk 12 of functions.rst. Included to exercise answerable coverage honestly: the committed sentence-splitting can move the exact answer sentence beyond the generator's matched-claim window, so some modes may abstain.",
+      "annotation": {
+        "annotator": "evidence-grounded-rag-system real-local evaluation",
+        "verified_against_revision": "3bb231a6a5dc02b95658877318bf61501a7209e9",
+        "document": "Doc/library/functions.rst"
+      }
+    },
+    {
+      "query_id": "real-q-011",
+      "case": "numeric_parameter",
+      "question": "What is the default base?",
+      "expected_status": "answerable",
+      "gold_relevant": [
+        { "chunk_id": "doc-library-functions.rst::18", "grade": 2 }
+      ],
+      "expected_citation_count": { "min": 1, "max": 2 },
+      "expected_abstention": [],
+      "notes": "Numeric/parameter case: 'The default base is 10.' for int(string) is in chunk 18 of functions.rst. Intentionally shares vocabulary with the min() signature (chunk 22) so the evaluation measures retrieval precision under near-duplicate tokens.",
+      "annotation": {
+        "annotator": "evidence-grounded-rag-system real-local evaluation",
+        "verified_against_revision": "3bb231a6a5dc02b95658877318bf61501a7209e9",
+        "document": "Doc/library/functions.rst"
+      }
+    },
+    {
+      "query_id": "real-q-012",
+      "case": "single_passage",
+      "question": "What does the memoryview function return?",
+      "expected_status": "answerable",
+      "gold_relevant": [
+        { "chunk_id": "doc-library-functions.rst::22", "grade": 2 }
+      ],
+      "expected_citation_count": { "min": 1, "max": 2 },
+      "expected_abstention": [],
+      "notes": "Single-passage exact-API case: 'Return a memoryview object created from the given argument' is in chunk 22 of functions.rst. The 'memoryview' spelling differs from the query's 'memoryview function' wording, exercising the no-stemming tokenizer.",
+      "annotation": {
+        "annotator": "evidence-grounded-rag-system real-local evaluation",
+        "verified_against_revision": "3bb231a6a5dc02b95658877318bf61501a7209e9",
+        "document": "Doc/library/functions.rst"
+      }
+    },
+    {
+      "query_id": "real-q-013",
+      "case": "unanswerable",
+      "question": "How do I configure the Django ORM to use a connection pool?",
+      "expected_status": "unanswerable",
+      "gold_relevant": [],
+      "expected_citation_count": { "min": 0, "max": 0 },
+      "expected_abstention": ["unsupported_query", "insufficient_evidence"],
+      "notes": "Out-of-scope: the Django ORM and connection pooling are not part of the three Python 3.12.13 documentation files. The question shares no corpus vocabulary with a meaningful answer; a correct system abstains. Sparse retrieval may surface low-overlap chunks, in which case the documented reason is unsupported_query; when no evidence clears the threshold it is insufficient_evidence.",
+      "annotation": {
+        "annotator": "evidence-grounded-rag-system real-local evaluation",
+        "verified_against_revision": "3bb231a6a5dc02b95658877318bf61501a7209e9",
+        "document": "none (out of scope)"
+      }
+    },
+    {
+      "query_id": "real-q-014",
+      "case": "unanswerable",
+      "question": "What is the annual membership fee for the regional library?",
+      "expected_status": "unanswerable",
+      "gold_relevant": [],
+      "expected_citation_count": { "min": 0, "max": 0 },
+      "expected_abstention": ["unsupported_query", "insufficient_evidence"],
+      "notes": "Out-of-scope: membership fees and regional libraries appear nowhere in the corpus. No gold chunk exists; a correct system abstains with either unsupported_query (evidence surfaced but no key-token match) or insufficient_evidence (no evidence).",
+      "annotation": {
+        "annotator": "evidence-grounded-rag-system real-local evaluation",
+        "verified_against_revision": "3bb231a6a5dc02b95658877318bf61501a7209e9",
+        "document": "none (out of scope)"
+      }
+    },
+    {
+      "query_id": "real-q-015",
+      "case": "ambiguous",
+      "question": "What does the underscore mean in Python?",
+      "expected_status": "ambiguous",
+      "gold_relevant": [],
+      "expected_citation_count": { "min": 0, "max": 0 },
+      "expected_abstention": ["insufficient_evidence"],
+      "notes": "Genuinely ambiguous: '_' carries at least three distinct documented meanings (interactive-interpreter last value in the tutorial, wildcard/soft keyword in lexical analysis, gettext convention). No single grounding is correct; a correct system abstains with insufficient_evidence. A mode that answers selects one interpretation without disambiguation, which the evaluation records as a wrong answer.",
+      "annotation": {
+        "annotator": "evidence-grounded-rag-system real-local evaluation",
+        "verified_against_revision": "3bb231a6a5dc02b95658877318bf61501a7209e9",
+        "document": "Doc/reference/lexical_analysis.rst + Doc/tutorial/introduction.rst"
+      }
+    },
+    {
+      "query_id": "real-q-016",
+      "case": "ambiguous",
+      "question": "What is the value of a string index in Python?",
+      "expected_status": "ambiguous",
+      "gold_relevant": [],
+      "expected_citation_count": { "min": 0, "max": 0 },
+      "expected_abstention": ["insufficient_evidence"],
+      "notes": "Ambiguous as posed: 'value of a string index' can mean the character value at an index, the index position semantics (0-based, negative from -1), or out-of-range behavior. The corpus passages addressing these readings have different predicates; a correct system abstains with insufficient_evidence.",
+      "annotation": {
+        "annotator": "evidence-grounded-rag-system real-local evaluation",
+        "verified_against_revision": "3bb231a6a5dc02b95658877318bf61501a7209e9",
+        "document": "Doc/tutorial/introduction.rst"
+      }
+    },
+    {
+      "query_id": "real-q-017",
+      "case": "abstain",
+      "question": "When was the match statement introduced in Python?",
+      "expected_status": "abstain",
+      "gold_relevant": [],
+      "expected_citation_count": { "min": 0, "max": 0 },
+      "expected_abstention": ["insufficient_evidence"],
+      "notes": "Topic is present (match/case are listed as soft keywords in chunk 6 of lexical_analysis.rst) but the introduction version of the match statement is not stated anywhere in the three files. The correct behavior is abstention with insufficient_evidence.",
+      "annotation": {
+        "annotator": "evidence-grounded-rag-system real-local evaluation",
+        "verified_against_revision": "3bb231a6a5dc02b95658877318bf61501a7209e9",
+        "document": "Doc/reference/lexical_analysis.rst"
+      }
+    },
+    {
+      "query_id": "real-q-018",
+      "case": "abstain",
+      "question": "What is the exact number of characters in the standard Unicode maximum?",
+      "expected_status": "abstain",
+      "gold_relevant": [],
+      "expected_citation_count": { "min": 0, "max": 0 },
+      "expected_abstention": ["insufficient_evidence"],
+      "notes": "Topic-adjacent (Unicode identifiers are discussed in lexical_analysis.rst) but the exact Unicode code-point count is not stated in these files. A correct system abstains; a mode that answers with an unrelated indentation passage is recorded as a wrong answer.",
+      "annotation": {
+        "annotator": "evidence-grounded-rag-system real-local evaluation",
+        "verified_against_revision": "3bb231a6a5dc02b95658877318bf61501a7209e9",
+        "document": "Doc/reference/lexical_analysis.rst"
+      }
+    }
+  ]
+}

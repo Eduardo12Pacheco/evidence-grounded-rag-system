@@ -1,8 +1,7 @@
 # Borrador LinkedIn — sistema RAG basado en evidencia
 
 > Publicación profesional en español (español neutro). Largo objetivo: lectura
-> de ~60-90 segundos. Los placeholders de GitHub/demo se reemplazan antes de
-> publicar.
+> de ~60-90 segundos.
 
 ---
 
@@ -47,5 +46,5 @@ Alcance real, sin exagerar:
 Proyecto en progreso, documentado como tal: contratos de licencia, protocolos y
 reportes de evaluación comprometidos en el repositorio.
 
-GitHub: [placeholder-repo]
-Demo local: [placeholder-demo]
+GitHub: https://github.com/Eduardo12Pacheco/evidence-grounded-rag-system
+Demo local: https://github.com/Eduardo12Pacheco/evidence-grounded-rag-system#readme

@@ -1,5 +1,12 @@
 # Sistema RAG basado en evidencia
 
+> **TL;DR (English)** — Evidence-grounded RAG with hybrid retrieval, strict citations, mandatory abstention and reproducible evaluation; declared scope complete, live LLM generation not evaluated.
+> Quickstart: `uv sync --dev --extra demo` · `uv run pytest` · `uv run --extra demo streamlit run scripts/demo_retrieval.py` (offline, no API keys).
+>
+> | real local Python docs — recall@5 (12 answerable queries) | BM25 sparse | Local semantic embeddings | Semantic hybrid |
+> | --- | --- | --- | --- |
+> | Retrieval quality | 0.7917 | 0.8750 | 0.9167 |
+
 Un sistema RAG greenfield donde **las respuestas están ligadas a la evidencia**:
 recuperación híbrida (sparse + dense), generación con citas, abstención
 obligatoria y evaluación reproducible de recuperación y soporte de afirmaciones.
@@ -251,16 +258,17 @@ docs/                        # contracts, protocolos, demo script, activos de pu
 data/fixtures/               # fixtures sintéticos comprometidos
 data/manifests/              # manifests versionados comprometidos + checksums
 data/evaluations/            # reportes de evaluación comprometidos (JSON)
-data/queries/     # conjunto de consultas local real comprometido
+data/queries/                # conjunto de consultas local real comprometido
 data/raw/ data/processed/    # salida de ejecución gitignored (corpus, pesos de modelo)
 scripts/                     # adquisición, verificación, materialización, demo
-deploy/                      # notas de despliegue (más adelante)
 ```
 
 ## Límites de datos y licencia
 
-- El repo es MIT; cubre solo el código original y los fixtures sintéticos. Los
-  documentos de terceros conservan sus propios términos.
+- El repo es MIT estándar (`LICENSE`, `Copyright (c) 2026 Eduardo Pacheco`);
+  cubre solo el código original y los fixtures sintéticos. El texto MIT no cubre
+  datos de terceros, capturas crudas, manifests, datasets, fixtures, citas de
+  fuentes ni otro contenido externo, que conservan sus propios términos.
 - El corpus local real aprobado (docs de Python 3.12.13, PSF License v2) se usa
   solo para desarrollo local; su texto crudo nunca se compromete, empaqueta ni
   publica (`docs/corpus-license-contract.md`).

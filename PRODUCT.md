@@ -1,7 +1,8 @@
 # Product — evidence-grounded-rag-system
 
-Estado: **implementación en curso — solo evaluación offline con fixture
-sintético.**
+Estado: **implementación completa para el alcance declarado** — evaluación
+sintética por defecto y corpus real local aprobado solo para desarrollo; la
+generación en vivo con LLM no fue evaluada y Gob.ec permanece bloqueado.
 
 ## Plataforma
 

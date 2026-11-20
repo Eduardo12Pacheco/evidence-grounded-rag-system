@@ -1,7 +1,7 @@
 [project]
 name = "evidence-grounded-rag-system"
 version = "0.1.0"
-description = "Hybrid retrieval, evidence-grounded generation with citations, abstention, and faithfulness evaluation over license-gated synthetic fixtures. Offline evaluation only; real corpus blocked."
+description = "Hybrid retrieval, evidence-grounded generation with citations, abstention, and faithfulness evaluation over license-gated synthetic fixtures plus an optional approved local Python-docs corpus. Live LLM generation is not evaluated and the Gob.ec corpus remains blocked."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = []

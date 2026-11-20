@@ -157,6 +157,14 @@ def fake_st(monkeypatch):
     return fake
 
 
+@pytest.fixture()
+def torch():
+    """Load the optional torch dependency or skip tests that need it."""
+    return pytest.importorskip(
+        "torch", reason="the optional 'embeddings' extra (torch) is not installed"
+    )
+
+
 @pytest.fixture(scope="module")
 def corpus():
     return load_corpus(FIXTURE_MANIFEST)
@@ -209,7 +217,7 @@ def test_missing_dependency_raises(monkeypatch, tmp_path):
         provider.embed(["hello"])
 
 
-def test_dimension_mismatch_raises(monkeypatch, tmp_path):
+def test_dimension_mismatch_raises(monkeypatch, tmp_path, torch):
     fake = _make_fake_st(dimension=768)
     monkeypatch.setattr(semantic_module, "_import_sentence_transformers", lambda: fake)
     cache_dir = _write_cache(tmp_path)
@@ -218,7 +226,7 @@ def test_dimension_mismatch_raises(monkeypatch, tmp_path):
         provider.embed(["hello"])
 
 
-def test_unknown_loaded_dimension_fails(monkeypatch, tmp_path):
+def test_unknown_loaded_dimension_fails(monkeypatch, tmp_path, torch):
     fake = _make_fake_st(dimension=384, has_dimension_getter=False)
     monkeypatch.setattr(semantic_module, "_import_sentence_transformers", lambda: fake)
     cache_dir = _write_cache(tmp_path)
@@ -257,7 +265,7 @@ def test_provider_refuses_off_approved_device(tmp_path):
         SemanticLocalEmbedding(cache_dir, manifest=_make_manifest(), device="cuda")
 
 
-def test_provider_loads_with_local_files_only(fake_st, tmp_path):
+def test_provider_loads_with_local_files_only(fake_st, tmp_path, torch):
     cache_dir = _write_cache(tmp_path)
     provider = SemanticLocalEmbedding(cache_dir, manifest=_make_manifest())
     provider.embed(["hello"])
@@ -267,7 +275,7 @@ def test_provider_loads_with_local_files_only(fake_st, tmp_path):
     assert transformer.init_args[0] == str(cache_dir)
 
 
-def test_provider_embeds_with_normalization_and_no_download(fake_st, tmp_path):
+def test_provider_embeds_with_normalization_and_no_download(fake_st, tmp_path, torch):
     cache_dir = _write_cache(tmp_path)
     provider = SemanticLocalEmbedding(cache_dir, manifest=_make_manifest())
     provider.embed_one("hello")
@@ -307,7 +315,7 @@ def test_provider_empty_input_returns_empty(fake_st, tmp_path):
     assert provider.embed([]) == []
 
 
-def test_provider_embed_shape_and_order(fake_st, tmp_path):
+def test_provider_embed_shape_and_order(fake_st, tmp_path, torch):
     cache_dir = _write_cache(tmp_path)
     provider = SemanticLocalEmbedding(cache_dir, manifest=_make_manifest())
     vectors = provider.embed(["first", "second"])
@@ -317,7 +325,7 @@ def test_provider_embed_shape_and_order(fake_st, tmp_path):
     assert vectors[0] != vectors[1]
 
 
-def test_provider_long_text_is_handled(fake_st, tmp_path):
+def test_provider_long_text_is_handled(fake_st, tmp_path, torch):
     cache_dir = _write_cache(tmp_path)
     provider = SemanticLocalEmbedding(cache_dir, manifest=_make_manifest())
     long_text = ("python function definition " * 400)[:5000]

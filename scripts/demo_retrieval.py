@@ -398,28 +398,32 @@ def _show_real_local() -> None:
     try:
         corpus = load_real_corpus()
     except Exception as exc:  # noqa: BLE001 - demo must surface failures
+        corpus = None
         st.error(f"real local corpus unavailable: {exc}")
-        return
 
-    with st.expander("Corpus & license", expanded=True):
-        st.markdown(
-            f"- **corpus:** `{corpus.corpus_id}` v{corpus.corpus_version} "
-            f"({len(corpus.documents)} documents, {len(corpus.chunks())} chunks)"
-        )
-        st.markdown(
-            f"- **license:** {corpus.manifest.license.name} v"
-            f"{corpus.manifest.license.version} ({corpus.manifest.license.url})"
-        )
-        st.markdown(
-            f"- **revision:** `{corpus.manifest.revision}` "
-            f"({corpus.manifest.revision_tag})"
-        )
+    if corpus is not None:
+        with st.expander("Corpus & license", expanded=True):
+            st.markdown(
+                f"- **corpus:** `{corpus.corpus_id}` v{corpus.corpus_version} "
+                f"({len(corpus.documents)} documents, {len(corpus.chunks())} chunks)"
+            )
+            st.markdown(
+                f"- **license:** {corpus.manifest.license.name} v"
+                f"{corpus.manifest.license.version} ({corpus.manifest.license.url})"
+            )
+            st.markdown(
+                f"- **revision:** `{corpus.manifest.revision}` "
+                f"({corpus.manifest.revision_tag})"
+            )
 
     col_mode, col_k, _ = st.columns([2, 1, 3])
     with col_mode:
         real_mode = st.selectbox("Retrieval mode", REAL_MODES, key="mode")
     with col_k:
         top_k = st.slider("top_k", 1, 10, 5, key="top_k")
+
+    if corpus is None:
+        return
 
     query = st.text_input("Query", value=DEFAULT_QUERY, key="query_input")
     run = st.button("Run retrieval", key="run_button", type="primary")

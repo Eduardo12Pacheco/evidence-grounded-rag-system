@@ -40,7 +40,7 @@ from tests.fake_provider import FakeSemanticProvider
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "data" / "manifests" / "corpus-source-v1.0.0.json"
-QUERY_SET = ROOT / "data" / "evaluation" / "queries" / "python-docs-real-v1.0.0.json"
+QUERY_SET = ROOT / "data" / "queries" / "python-docs-real-v1.0.0.json"
 RAW_DIR = ROOT / "data" / "raw" / "python-docs-3.12.13"
 PRIOR_REPORT = ROOT / "data" / "evaluations" / "python-docs-real-evaluation-v1.0.0.json"
 MODULE = (

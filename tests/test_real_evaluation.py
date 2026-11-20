@@ -35,7 +35,7 @@ from evidence_grounded_rag.evaluation.real_queries import (
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "data" / "manifests" / "corpus-source-v1.0.0.json"
-QUERY_SET = ROOT / "data" / "evaluation" / "queries" / "python-docs-real-v1.0.0.json"
+QUERY_SET = ROOT / "data" / "queries" / "python-docs-real-v1.0.0.json"
 RAW_DIR = ROOT / "data" / "raw" / "python-docs-3.12.13"
 SYNTHETIC_REPORT = ROOT / "data" / "manifests" / "evaluation-synthetic-v1.0.0.json"
 SYNTHETIC_MANIFEST = ROOT / "data" / "fixtures" / "synthetic_manifest.json"

@@ -1,5 +1,7 @@
 # Sistema RAG basado en evidencia
 
+[![CI](https://github.com/Eduardo12Pacheco/evidence-grounded-rag-system/actions/workflows/ci.yml/badge.svg)](https://github.com/Eduardo12Pacheco/evidence-grounded-rag-system/actions/workflows/ci.yml)
+
 > **TL;DR (English)** — Evidence-grounded RAG with hybrid retrieval, strict citations, mandatory abstention and reproducible evaluation; declared scope complete, live LLM generation not evaluated.
 > Quickstart: `uv sync --dev --extra demo` · `uv run pytest` · `uv run --extra demo streamlit run scripts/demo_retrieval.py` (offline, no API keys).
 >

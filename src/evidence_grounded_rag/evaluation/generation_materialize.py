@@ -70,7 +70,7 @@ LIVE_GENERATION_LABEL = (
 )
 
 DEFAULT_MANIFEST = Path("data/manifests/corpus-source-v1.0.0.json")
-DEFAULT_QUERIES = Path("data/evaluation/queries/python-docs-real-v1.0.0.json")
+DEFAULT_QUERIES = Path("data/queries/python-docs-real-v1.0.0.json")
 DEFAULT_RAW_DIR = Path("data/raw/python-docs-3.12.13")
 DEFAULT_FIXTURE = Path("data/fixtures/answer-evaluation-v1.0.0.json")
 DEFAULT_OUT = Path(

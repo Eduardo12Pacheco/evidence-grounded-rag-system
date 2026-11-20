@@ -81,7 +81,7 @@ _MODE_SEARCH_MODE = {
 _SEMANTIC_MODES = frozenset({MODE_SEMANTIC_KEY, MODE_HYBRID_KEY})
 
 DEFAULT_MANIFEST = Path("data/manifests/corpus-source-v1.0.0.json")
-DEFAULT_QUERIES = Path("data/evaluation/queries/python-docs-real-v1.0.0.json")
+DEFAULT_QUERIES = Path("data/queries/python-docs-real-v1.0.0.json")
 DEFAULT_RAW_DIR = Path("data/raw/python-docs-3.12.13")
 DEFAULT_MODEL_MANIFEST = Path("data/manifests/embedding-model-v1.0.0.json")
 DEFAULT_CACHE_DIR = Path("data/raw/models/bge-small-en-v1.5")

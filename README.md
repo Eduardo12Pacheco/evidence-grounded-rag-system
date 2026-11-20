@@ -217,18 +217,18 @@ offline):
 uv run python -m evidence_grounded_rag.evaluation.materialize   # reporte sintético
 uv run python -m evidence_grounded_rag.evaluation.real_materialize \
     --manifest data/manifests/corpus-source-v1.0.0.json \
-    --queries data/evaluation/queries/python-docs-real-v1.0.0.json \
+    --queries data/queries/python-docs-real-v1.0.0.json \
     --raw-dir data/raw/python-docs-3.12.13 \
     --output data/evaluations/python-docs-real-evaluation-v1.0.0.json
 uv run python -m evidence_grounded_rag.evaluation.generation_materialize \
     --manifest data/manifests/corpus-source-v1.0.0.json \
-    --queries data/evaluation/queries/python-docs-real-v1.0.0.json \
+    --queries data/queries/python-docs-real-v1.0.0.json \
     --raw-dir data/raw/python-docs-3.12.13 \
     --fixture data/fixtures/answer-evaluation-v1.0.0.json \
     --output data/evaluations/python-docs-real-generation-evaluation-v1.0.0.json
 uv run python -m evidence_grounded_rag.evaluation.semantic_materialize \
     --manifest data/manifests/corpus-source-v1.0.0.json \
-    --queries data/evaluation/queries/python-docs-real-v1.0.0.json \
+    --queries data/queries/python-docs-real-v1.0.0.json \
     --raw-dir data/raw/python-docs-3.12.13 \
     --model-manifest data/manifests/embedding-model-v1.0.0.json \
     --cache-dir data/raw/models/bge-small-en-v1.5 \
@@ -251,7 +251,7 @@ docs/                        # contracts, protocolos, demo script, activos de pu
 data/fixtures/               # fixtures sintéticos comprometidos
 data/manifests/              # manifests versionados comprometidos + checksums
 data/evaluations/            # reportes de evaluación comprometidos (JSON)
-data/evaluation/queries/     # conjunto de consultas local real comprometido
+data/queries/     # conjunto de consultas local real comprometido
 data/raw/ data/processed/    # salida de ejecución gitignored (corpus, pesos de modelo)
 scripts/                     # adquisición, verificación, materialización, demo
 deploy/                      # notas de despliegue (más adelante)

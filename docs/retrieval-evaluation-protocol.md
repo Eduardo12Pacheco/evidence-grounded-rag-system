@@ -188,7 +188,7 @@ Una evaluación acotada separada sobre el único corpus local real aprobado
 con el reporte sintético: conjunto de consultas separado, comando separado,
 archivo de reporte separado, etiquetas separadas.
 
-### Conjunto de consultas real (`data/evaluation/queries/python-docs-real-v1.0.0.json`)
+### Conjunto de consultas real (`data/queries/python-docs-real-v1.0.0.json`)
 
 Versión `1.0.0`, congelado contra el corpus `python-docs-3.12.13` v1.0.0 vía el
 source manifest `corpus-source-v1.0.0` (revisión `3bb231a6...`). 18 consultas
@@ -236,7 +236,7 @@ uv run python scripts/verify_corpus.py --manifest data/manifests/corpus-source-v
 
 uv run python -m evidence_grounded_rag.evaluation.real_materialize \
     --manifest data/manifests/corpus-source-v1.0.0.json \
-    --queries data/evaluation/queries/python-docs-real-v1.0.0.json \
+    --queries data/queries/python-docs-real-v1.0.0.json \
     --raw-dir data/raw/python-docs-3.12.13 \
     --output data/evaluations/python-docs-real-evaluation-v1.0.0.json
 ```
@@ -354,7 +354,7 @@ la habilitación semántica.
 ```bash
 uv run python -m evidence_grounded_rag.evaluation.semantic_materialize \
     --manifest data/manifests/corpus-source-v1.0.0.json \
-    --queries data/evaluation/queries/python-docs-real-v1.0.0.json \
+    --queries data/queries/python-docs-real-v1.0.0.json \
     --raw-dir data/raw/python-docs-3.12.13 \
     --model-manifest data/manifests/embedding-model-v1.0.0.json \
     --cache-dir data/raw/models/bge-small-en-v1.5 \
@@ -421,7 +421,7 @@ adaptador en vivo que falla cerrado).
 ```bash
 uv run python -m evidence_grounded_rag.evaluation.generation_materialize \
     --manifest data/manifests/corpus-source-v1.0.0.json \
-    --queries data/evaluation/queries/python-docs-real-v1.0.0.json \
+    --queries data/queries/python-docs-real-v1.0.0.json \
     --raw-dir data/raw/python-docs-3.12.13 \
     --fixture data/fixtures/answer-evaluation-v1.0.0.json \
     --output data/evaluations/python-docs-real-generation-evaluation-v1.0.0.json

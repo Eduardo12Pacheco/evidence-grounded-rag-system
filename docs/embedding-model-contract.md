@@ -49,7 +49,7 @@ Paso 4: ejecutar la evaluación separada del materializer semántico.
 ```bash
 uv run python -m evidence_grounded_rag.evaluation.semantic_materialize \
     --manifest data/manifests/corpus-source-v1.0.0.json \
-    --queries data/evaluation/queries/python-docs-real-v1.0.0.json \
+    --queries data/queries/python-docs-real-v1.0.0.json \
     --raw-dir data/raw/python-docs-3.12.13 \
     --model-manifest data/manifests/embedding-model-v1.0.0.json \
     --cache-dir data/raw/models/bge-small-en-v1.5 \

@@ -6,7 +6,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_expected_directories_exist() -> None:
-    for name in ("src", "tests", "docs", "data/fixtures", "data/manifests", "deploy"):
+    for name in ("src", "tests", "docs", "data/fixtures", "data/manifests", "data/queries", "scripts"):
         assert (ROOT / name).is_dir(), f"missing expected directory: {name}"
 
 

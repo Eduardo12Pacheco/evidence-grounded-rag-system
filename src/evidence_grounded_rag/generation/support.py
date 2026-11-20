@@ -1,3 +1,5 @@
+"""Deterministic normalized-exact-containment claim support evaluator."""
+
 from __future__ import annotations
 
 import unicodedata

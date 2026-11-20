@@ -1,3 +1,5 @@
+"""Build the approved local-only real corpus from ignored raw captures."""
+
 from __future__ import annotations
 
 import re

@@ -1,3 +1,5 @@
+"""Text normalization and SHA-256 helpers for corpus and evidence identity."""
+
 from __future__ import annotations
 
 import re

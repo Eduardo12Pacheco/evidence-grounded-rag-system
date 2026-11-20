@@ -1,3 +1,5 @@
+"""Retrieval result and scored-chunk models with rank and trace metadata."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass

@@ -1,3 +1,5 @@
+"""Central version constants for formats, tokenizer, prompt, and package."""
+
 from __future__ import annotations
 
 PACKAGE_VERSION = "0.1.0"

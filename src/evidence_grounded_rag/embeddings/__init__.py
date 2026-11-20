@@ -1,3 +1,5 @@
+"""Public embeddings API: providers, dense index, and manifest validation."""
+
 from __future__ import annotations
 
 from evidence_grounded_rag.embeddings.base import (

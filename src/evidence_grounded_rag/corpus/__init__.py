@@ -1,3 +1,5 @@
+"""Public corpus API: license-gated loading, manifests, and audits."""
+
 from __future__ import annotations
 
 from evidence_grounded_rag.corpus.audit import (

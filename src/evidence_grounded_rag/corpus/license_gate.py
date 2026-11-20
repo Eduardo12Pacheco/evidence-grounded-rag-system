@@ -1,3 +1,5 @@
+"""License gate that blocks unapproved or conflicting real corpora."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass

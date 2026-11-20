@@ -1,3 +1,5 @@
+"""CLI that materializes the synthetic-fixture evaluation report."""
+
 from __future__ import annotations
 
 import argparse

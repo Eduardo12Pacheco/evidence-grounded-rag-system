@@ -1,3 +1,5 @@
+"""Public retrieval API: BM25, dense index, fusion, and hybrid retriever."""
+
 from __future__ import annotations
 
 from evidence_grounded_rag.retrieval.bm25 import BM25, BM25Config

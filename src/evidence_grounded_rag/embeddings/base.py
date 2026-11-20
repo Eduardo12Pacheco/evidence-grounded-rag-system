@@ -1,3 +1,5 @@
+"""Embedding provider protocol and shared vector and search models."""
+
 from __future__ import annotations
 
 from collections.abc import Sequence

@@ -1,3 +1,5 @@
+"""Evidence-grounded RAG pipeline with hybrid retrieval, citations, and abstention."""
+
 from __future__ import annotations
 
 from evidence_grounded_rag.abstention import AbstentionReason

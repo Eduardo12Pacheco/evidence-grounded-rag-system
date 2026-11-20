@@ -1,3 +1,5 @@
+"""Deterministic offline extractive generator (not an LLM)."""
+
 from __future__ import annotations
 
 import itertools

@@ -1,3 +1,5 @@
+"""Deterministic, versioned tokenizer and key-token extraction."""
+
 from __future__ import annotations
 
 import re

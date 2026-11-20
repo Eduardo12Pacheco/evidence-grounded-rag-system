@@ -1,3 +1,5 @@
+"""Provider-neutral live generation with strict grounding and abstention."""
+
 from __future__ import annotations
 
 from collections.abc import Callable

@@ -1,3 +1,5 @@
+"""Model manifest parsing, auditing, and byte-exact cache verification."""
+
 from __future__ import annotations
 
 import json

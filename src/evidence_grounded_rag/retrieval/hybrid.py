@@ -1,3 +1,5 @@
+"""Hybrid retriever fusing BM25 with dense embeddings and traces."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass

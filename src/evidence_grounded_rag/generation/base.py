@@ -1,3 +1,5 @@
+"""Generator protocol shared by extractive, live, and test generators."""
+
 from __future__ import annotations
 
 from typing import Protocol, runtime_checkable

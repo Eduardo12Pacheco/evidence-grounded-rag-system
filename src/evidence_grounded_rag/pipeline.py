@@ -1,3 +1,5 @@
+"""End-to-end retrieve, generate, validate, and abstain pipeline."""
+
 from __future__ import annotations
 
 from collections.abc import Sequence

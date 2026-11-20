@@ -1,3 +1,5 @@
+"""Deterministic document and chunk identifier helpers with validation."""
+
 from __future__ import annotations
 
 import re

@@ -1,3 +1,5 @@
+"""Public generation API: evidence packs, extractive and live generators."""
+
 from __future__ import annotations
 
 from evidence_grounded_rag.generation.adapter import (

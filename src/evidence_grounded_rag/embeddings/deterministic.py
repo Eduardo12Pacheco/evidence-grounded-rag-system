@@ -1,3 +1,5 @@
+"""Deterministic non-semantic hash embedding used as an explicit diagnostic."""
+
 from __future__ import annotations
 
 import hashlib

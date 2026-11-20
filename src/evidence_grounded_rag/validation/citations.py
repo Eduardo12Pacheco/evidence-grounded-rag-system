@@ -1,3 +1,5 @@
+"""Fail-closed citation validation against exposed evidence and claims."""
+
 from __future__ import annotations
 
 from collections.abc import Iterable

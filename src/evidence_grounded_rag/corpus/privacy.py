@@ -1,3 +1,5 @@
+"""Privacy audit that detects emails and phone numbers in corpus text."""
+
 from __future__ import annotations
 
 import re

@@ -1,3 +1,5 @@
+"""Typed corpus errors with stable codes used by the loader and gate."""
+
 from __future__ import annotations
 
 

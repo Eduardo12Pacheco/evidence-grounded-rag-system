@@ -1,3 +1,5 @@
+"""Audit helpers for corpus source manifests, statuses, and approvals."""
+
 from __future__ import annotations
 
 import json

@@ -1,3 +1,5 @@
+"""Deterministic Okapi BM25 sparse retriever."""
+
 from __future__ import annotations
 
 import math

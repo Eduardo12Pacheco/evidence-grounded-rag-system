@@ -1,3 +1,5 @@
+"""Opt-in local semantic embeddings with no network or hash fallback."""
+
 from __future__ import annotations
 
 import importlib.util

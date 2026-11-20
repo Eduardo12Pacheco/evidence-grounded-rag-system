@@ -1,3 +1,5 @@
+"""Stable abstention reason codes and the detail shown with each refusal."""
+
 from __future__ import annotations
 
 from enum import Enum

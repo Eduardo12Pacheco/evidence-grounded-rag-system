@@ -1,3 +1,5 @@
+"""Retrieval and answer metrics such as recall, MRR, nDCG, and support."""
+
 from __future__ import annotations
 
 import math

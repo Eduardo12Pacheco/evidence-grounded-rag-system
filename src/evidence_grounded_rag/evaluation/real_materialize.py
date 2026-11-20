@@ -1,3 +1,5 @@
+"""CLI that materializes the real-corpus retrieval evaluation report."""
+
 from __future__ import annotations
 
 import argparse

@@ -1,3 +1,5 @@
+"""Dense index that ranks corpus chunks by embedding similarity."""
+
 from __future__ import annotations
 
 from collections.abc import Sequence

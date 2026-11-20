@@ -1,3 +1,5 @@
+"""Public evaluation API: retrieval metrics, query sets, and reports."""
+
 from __future__ import annotations
 
 from evidence_grounded_rag.evaluation.metrics import (

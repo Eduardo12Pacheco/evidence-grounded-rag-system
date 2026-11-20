@@ -1,3 +1,5 @@
+"""Real-local query-set models, validation, and loading."""
+
 from __future__ import annotations
 
 import json

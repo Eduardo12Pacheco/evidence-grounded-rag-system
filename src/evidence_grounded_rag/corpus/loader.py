@@ -1,3 +1,5 @@
+"""Load source manifests and verify their files against checksums."""
+
 from __future__ import annotations
 
 import json

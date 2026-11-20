@@ -1,3 +1,5 @@
+"""Environment-configured live generator adapter that fails closed when absent."""
+
 from __future__ import annotations
 
 import os

@@ -1,3 +1,5 @@
+"""Public API for the shared deterministic tokenizer."""
+
 from __future__ import annotations
 
 from evidence_grounded_rag.text.tokenizer import (

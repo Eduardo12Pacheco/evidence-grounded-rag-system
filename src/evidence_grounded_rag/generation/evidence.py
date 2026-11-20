@@ -1,3 +1,5 @@
+"""Bounded evidence-pack models exposed to generators and used in citations."""
+
 from __future__ import annotations
 
 from collections.abc import Iterable, Iterator

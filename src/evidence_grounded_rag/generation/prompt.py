@@ -1,3 +1,5 @@
+"""Frozen generation prompt contract and its version constants."""
+
 from __future__ import annotations
 
 from evidence_grounded_rag.generation.evidence import EvidencePack

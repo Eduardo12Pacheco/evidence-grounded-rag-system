@@ -1,4 +1,4 @@
-# Contract de corpus y licencia — evidence-grounded-rag-system
+# Contrato de corpus y licencia — sistema-rag-con-evidencia
 
 Estado: **fixtures sintéticos servidos; un corpus local real aprobado solo para
 desarrollo local (documentación de Python 3.12.13). Todos los demás corpus

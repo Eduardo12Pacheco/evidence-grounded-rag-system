@@ -1,4 +1,4 @@
-# Contract de generación — evidence-grounded-rag-system
+# Contrato de generación — sistema-rag-con-evidencia
 
 **Versión de prompt: `grounded-answer-prompt-v1.0.0`** — congelada. Cualquier
 cambio a la redacción del prompt, al esquema JSON o a la política de inyección

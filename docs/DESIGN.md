@@ -1,4 +1,4 @@
-# Design — evidence-grounded-rag-system
+# Diseño — sistema-rag-con-evidencia
 
 Estado: **implementación completa para el alcance declarado** — evaluación
 sintética por defecto y corpus real local aprobado solo para desarrollo; la

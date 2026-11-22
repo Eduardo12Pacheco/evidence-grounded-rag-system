@@ -1,4 +1,4 @@
-# Product — evidence-grounded-rag-system
+# Producto — sistema-rag-con-evidencia
 
 Estado: **implementación completa para el alcance declarado** — evaluación
 sintética por defecto y corpus real local aprobado solo para desarrollo; la

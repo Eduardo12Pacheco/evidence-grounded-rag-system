@@ -1,4 +1,4 @@
-# Demo Script — evidence-grounded-rag-system
+# Guion de la demo — sistema-rag-con-evidencia
 
 Estado: **implementada — demo offline de Streamlit sobre fixtures sintéticos
 comprometidos.**

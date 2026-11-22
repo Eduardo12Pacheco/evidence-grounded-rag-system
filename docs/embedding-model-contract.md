@@ -1,4 +1,4 @@
-# Contract del modelo de embeddings — BAAI/bge-small-en-v1.5 (local, opt-in)
+# Contrato del modelo de embeddings — BAAI/bge-small-en-v1.5 (local, opt-in)
 
 Estado: **`approved-for-local-development`** — revisión fijada `5c38ec7c405ec4b44b94cc5a9bb96e735b38267a`, adquirido localmente, nunca comprometido, nunca redistribuido.
 

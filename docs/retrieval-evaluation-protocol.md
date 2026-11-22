@@ -1,4 +1,4 @@
-# Protocolo de retrieval y evaluación — evidence-grounded-rag-system
+# Protocolo de retrieval y evaluación — sistema-rag-con-evidencia
 
 Estado: **fórmulas comprometidas, conjunto de consultas comprometido, números
 deterministas de fixture sintético.**
